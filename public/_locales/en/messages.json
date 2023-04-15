@@ -1,0 +1,58 @@
+{
+  "plugin_example": {
+    "message": "Plugin example",
+    "description": "Extension name, night not need to translate it."
+  },
+  "description": {
+    "message": "Keychain plugin example",
+    "description": "Extension description, as shown in the store."
+  },
+  "my_plugin_description": {
+    "message": "Description of my fantastic plugin",
+    "description": "description of the plugin"
+  },
+  "text_input_example_label": {
+    "message": "Text input example",
+    "description": "label for text input example"
+  },
+  "number_input_example_label": {
+    "message": "Number input example",
+    "description": "label for number input example"
+  },
+  "required_text_input_example_label": {
+    "message": "Required text input example",
+    "description": "label for required text input example"
+  },
+  "text_input_example_hint": {
+    "message": "Text input hint",
+    "description": "hint for text input example"
+  },
+  "checkbox_example_label": {
+    "message": "Checkbox example",
+    "description": "label for checkbox example"
+  },
+  "checkbox_example_hint": {
+    "message": "Hint for your checkbox",
+    "description": "hint for checkbox example"
+  },
+  "dropdown_example_label": {
+    "message": "Dropdown example",
+    "description": "label for dropdown example"
+  },
+  "dropdown_value1_example": {
+    "message": "Value 1",
+    "description": "Label for value 1"
+  },
+  "dropdown_value2_example": {
+    "message": "Value 2",
+    "description": "Label for value 2"
+  },
+  "dropdown_value3_example": {
+    "message": "Value 3",
+    "description": "Label for value 3"
+  },
+  "placeholder": {
+    "message": "placeholder...",
+    "description": "placeholder"
+  }
+}

@@ -1,0 +1,23 @@
+.App {
+  height: 600px;
+  width: 350px;
+  font-family: Futura !important;
+  font-weight: 400;
+  background: url('/assets/images/hive-watermark.png') 0% 0% no-repeat
+      padding-box,
+    linear-gradient(330deg, #59626c 0%, #000000 100%) 0% 0% no-repeat
+      padding-box !important;
+  color: white;
+  box-sizing: border-box;
+  overflow: auto;
+  margin-left: calc(100vw - 100%);
+  &.homepage {
+    font-size: 24px;
+    display: flex;
+    flex-direction: column;
+    row-gap: 24px;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+}
