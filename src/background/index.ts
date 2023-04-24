@@ -2,48 +2,44 @@ import { KeychainKeyTypes, KeychainRequestTypes, RequestCustomJSON } from 'src/i
 import { PluginMessage } from '../interfaces/plugin-messages.interface';
 import {
   CheckboxSetting,
-  PluginDefinition,
-  PluginSettingType,
+  PluginSettingType
 } from '../interfaces/plugins.interface';
 import { I18nUtils } from './i18n.utils';
-
-//@ts-ignore
-chrome.i18n.getMessage = I18nUtils.getMessage;
 
 const CHECK_AUTO_CLAIM_SETTING_ALARM = 'checkAutoClaimSetting';
 const KEYCHAIN_EXTENSION_ID = 'fbjjilfdeadgdphnoikkhjhpnndlkgfn';
 
-const getPlugin = async (): Promise<PluginDefinition> => {
-  const plugin: PluginDefinition = {
-    title: await chrome.i18n.getMessage('plugin_name'),
-    description: await chrome.i18n.getMessage('plugin_description'),
-    generalSettings: [
-      {
-        label: await chrome.i18n.getMessage('enable_plugin_label'),
-        key: 'enablePluginSetting',
-        type: PluginSettingType.CHECKBOX,
-        hint: await chrome.i18n.getMessage('enable_plugin_hint'),
-      } as CheckboxSetting,
-    ],
-    userSettings: [
-      {
-        label: await chrome.i18n.getMessage('claim_reward_label'),
-        key: 'autoClaimSetting',
-        type: PluginSettingType.CHECKBOX,
-        hint: await chrome.i18n.getMessage('claim_reward_hint'),
-      } as CheckboxSetting
-    ],
+//@ts-ignore
+chrome.i18n.getMessage = I18nUtils.getMessage;
+
+const getPlugin = async () => {
+  return {
+    definition: {
+      title: await chrome.i18n.getMessage('plugin_name'),
+      description: await chrome.i18n.getMessage('plugin_description'),
+      generalSettings: [
+        {
+          label: await chrome.i18n.getMessage('enable_plugin_label'),
+          key: 'enablePluginSetting',
+          type: PluginSettingType.CHECKBOX,
+          hint: await chrome.i18n.getMessage('enable_plugin_hint'),
+        } as CheckboxSetting,
+      ],
+      userSettings: [
+        {
+          label: await chrome.i18n.getMessage('claim_reward_label'),
+          key: 'autoClaimSetting',
+          type: PluginSettingType.CHECKBOX,
+          hint: await chrome.i18n.getMessage('claim_reward_hint'),
+        } as CheckboxSetting
+      ]
+    }
   };
-  return plugin;
 };
 
 const sendPluginData = async (sendResp: (response?: any) => void) => {
   const data = await chrome.storage.local.get('plugindata');
-  const pluginData = {
-    ...(await getPlugin()),
-    data: data.plugindata,
-  };
-  sendResp(pluginData);
+  sendResp({ ...(await getPlugin()), data: data.plugindata });
 };
 
 const externalMessageHandler = async (
@@ -51,51 +47,41 @@ const externalMessageHandler = async (
   sender: chrome.runtime.MessageSender,
   sendResp: (response?: any) => void,
 ) => {
-  switch (message.command) {
-    case PluginMessage.IS_INSTALLED:
-      sendResp(PluginMessage.ACK_PLUGIN_INSTALL);
-      break;
-    case PluginMessage.GET_PLUGIN_INFO:
-      sendPluginData(sendResp);
-      break;
-    case PluginMessage.SAVE_PLUGIN_DATA:
-      console.log('Saving data:', message.value);
-      chrome.storage.local.set({ plugindata: message.value }, () => {
-        if (chrome.runtime.lastError) {
-          console.error('Error saving data:', chrome.runtime.lastError);
-        }
+  if (message.command === PluginMessage.IS_INSTALLED) {
+    sendResp(PluginMessage.ACK_PLUGIN_INSTALL);
+  } else if (message.command === PluginMessage.GET_PLUGIN_INFO) {
+    sendPluginData(sendResp);
+  } else if (message.command === PluginMessage.SAVE_PLUGIN_DATA) {
+    console.log('Saving data:', message.value);
+    chrome.storage.local.set({ plugindata: message.value }, () => {
+      if (chrome.runtime.lastError) {
+        console.error('Error saving data:', chrome.runtime.lastError);
         sendResp(PluginMessage.ACK_PLUGIN_DATA_SAVED);
-      });
-      break;
-    default:
-      break;
+      } else {
+        sendResp(PluginMessage.ACK_PLUGIN_DATA_SAVED);
+      }
+    });
   }
 };
 
 chrome.runtime.onMessageExternal.addListener(externalMessageHandler);
 
 const createClaim = async (username: string) => {
+
   const json: string = JSON.stringify({
     token: 'SPS',
     qty: 0,
     app: 'splinter-plus',
-    n: '19nqfUoKHV',
-  });
+    n: '19nqfUoKHV'
+  })
 
   const displayMsg: string = await getMessage('sps_claim_display_message');
   const domain: string = await getMessage('plugin_name');
-  const request: RequestCustomJSON = createCustomJSONRequest(
-    'sm_stake_tokens',
-    json,
-    displayMsg,
-    username,
-    domain,
-  );
+  const request: RequestCustomJSON = createCustomJSONRequest('sm_stake_tokens', json, displayMsg, username, domain);
   
-  const claim = await sendCustomJSONRequest(request);
-  console.log('Claim Response ' + claim)
-  
+  return sendCustomJSONRequest(request);
 };
+
 
 const createCustomJSONRequest = (id: string, json: string, displayMsg: string, username: string, domain: string) => {
   return {
@@ -105,7 +91,7 @@ const createCustomJSONRequest = (id: string, json: string, displayMsg: string, u
     json,
     display_msg: displayMsg,
     username,
-    domain,
+    domain
   } as RequestCustomJSON;
 };
 
@@ -130,35 +116,25 @@ const sendCustomJSONRequest = (request: RequestCustomJSON) => {
   });
 };
 
-const checkUserSetting = async (settingKey: string, username: string) => {
-  const data = await chrome.storage.local.get('plugindata');
-  const userSettings = data?.plugindata?.userSettings;
-  const settingEnabled = userSettings?.[username]?.[settingKey];
-  return settingEnabled;
-};
-
 const checkAutoClaimSetting = async () => {
   const data = await chrome.storage.local.get('plugindata');
-  const users = data?.plugindata?.userSettings;
+  const users = data?.plugindata?.userSettings || {};
   for (const user in users) {
-    const autoClaimSettingEnabled = await checkUserSetting('autoClaimSetting', user);
+    const autoClaimSettingEnabled = users[user].autoClaimSetting;
     if (autoClaimSettingEnabled) {
       console.log(`Auto claim setting is enabled for ${user}`);
       try {
         await createClaim(user);
-        console.log(`SPS Claimed for ${user}`);
       } catch (error) {
-        console.log(`Unable to claim SPS for ${user}`);
         console.error(error);
       }
     }
   }
 };
 
-
 // Create the alarm
 chrome.alarms.create(CHECK_AUTO_CLAIM_SETTING_ALARM, {
-  periodInMinutes: 0.3,
+  periodInMinutes: 0.3
 });
 
 // Handle the alarm when it fires

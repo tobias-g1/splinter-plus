@@ -1,6 +1,6 @@
 {
-  "name": "__MSG_plugin_name__",
-  "description": "__MSG_plugin_description__",
+  "name": "__MSG_plugin_example__",
+  "description": "__MSG_description__",
   "default_locale": "en",
   "version": "1.0.0.0",
   "permissions": ["storage", "idle", "webNavigation", "alarms"],
