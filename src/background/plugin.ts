@@ -5,7 +5,7 @@ export const getPlugin = async () => {
   return {
     definition: {
       title: await getMessage('plugin_name'),
-      description: await getMessage('plugin_description'),
+      description: await getMessage('description'),
       generalSettings: [
         {
           label: await getMessage('enable_plugin_label'),
