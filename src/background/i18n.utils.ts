@@ -13,7 +13,6 @@ const getMessage = async (name: string, options?: string[]) => {
       ? withOptions(file[name].message, options)
       : `[Missing ${name} locale]`;
   } finally {
-    //Logger.log('[i18n]', lang, name, res);
     return res;
   }
 };
@@ -30,6 +29,5 @@ const withOptions = (message: string, options?: string[]) => {
   }
 };
 
-export const I18nUtils = {
-  getMessage,
-};
+export { getMessage };
+
