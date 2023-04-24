@@ -4,7 +4,7 @@ const CHECK_AUTO_CLAIM_SETTING_ALARM = 'checkAutoClaimSetting';
 
 export const createAlarm = () => {
   chrome.alarms.create(CHECK_AUTO_CLAIM_SETTING_ALARM, {
-    periodInMinutes: 0.3
+    periodInMinutes: 60
   });
 };
 
