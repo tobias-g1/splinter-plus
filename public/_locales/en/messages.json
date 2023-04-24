@@ -1,58 +1,30 @@
 {
-  "plugin_example": {
-    "message": "Plugin example",
+  "plugin_name": {
+    "message": "Splinter Plus",
     "description": "Extension name, night not need to translate it."
   },
-  "description": {
-    "message": "Keychain plugin example",
+  "plugin_description": {
+    "message": "Enhance your Splinterlands experience with Splinter Plus! Get more out of your gameplay with features like auto-claiming SPS rewards and more!",
     "description": "Extension description, as shown in the store."
+  },  
+  "enable_plugin_label": {
+    "message": "Enable Splinter Plus",
+    "description": "label for enable plugin checkbox"
   },
-  "my_plugin_description": {
-    "message": "Description of my fantastic plugin",
-    "description": "description of the plugin"
+  "enable_plugin_hint": {
+    "message": "Enable or disable Splinter Plus",
+    "description": "hint for enable plugin checkbox"
   },
-  "text_input_example_label": {
-    "message": "Text input example",
-    "description": "label for text input example"
+  "claim_reward_label": {
+    "message": "Auto-claim SPS",
+    "description": "label for auto-claim SPS checkbox"
   },
-  "number_input_example_label": {
-    "message": "Number input example",
-    "description": "label for number input example"
+  "claim_reward_hint": {
+    "message": "Automatically claim SPS rewards when available",
+    "description": "hint for auto-claim SPS checkbox"
   },
-  "required_text_input_example_label": {
-    "message": "Required text input example",
-    "description": "label for required text input example"
-  },
-  "text_input_example_hint": {
-    "message": "Text input hint",
-    "description": "hint for text input example"
-  },
-  "checkbox_example_label": {
-    "message": "Checkbox example",
-    "description": "label for checkbox example"
-  },
-  "checkbox_example_hint": {
-    "message": "Hint for your checkbox",
-    "description": "hint for checkbox example"
-  },
-  "dropdown_example_label": {
-    "message": "Dropdown example",
-    "description": "label for dropdown example"
-  },
-  "dropdown_value1_example": {
-    "message": "Value 1",
-    "description": "Label for value 1"
-  },
-  "dropdown_value2_example": {
-    "message": "Value 2",
-    "description": "Label for value 2"
-  },
-  "dropdown_value3_example": {
-    "message": "Value 3",
-    "description": "Label for value 3"
-  },
-  "placeholder": {
-    "message": "placeholder...",
-    "description": "placeholder"
+  "sps_claim_display_message": {
+    "message": "Claiming SPS...",
+    "description": "display message while claiming SPS"
   }
 }
