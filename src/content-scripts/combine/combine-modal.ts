@@ -1,7 +1,7 @@
 import { fetchCardData, fetchSettings, getCardBCX, getCardLevelInfo } from "src/content-scripts/combine/splinterlands";
 
 const modalToAdd = `
-<div id="market_list_dialog" class="modal fade neon in" tabindex="-1" role="dialog" style="display: block; padding-right: 10px;">
+<div id="combine_dialog" class="modal fade neon in" tabindex="-1" role="dialog" style="display: block; padding-right: 10px;">
   <div class="modal-dialog battle-dialog" role="document" style="width: 800px;">
     <div class="modal-content" style="background: transparent linear-gradient(236deg, #3A0045 0%, #005960 100%) 0% 0% no-repeat padding-box;">
       <div class="modal-header">
@@ -14,8 +14,16 @@ const modalToAdd = `
       </div>
       <div class="modal-body">
         <div style="display: flex" class="modal-content>
-        <div id="card-image"></div>
-        <p>In order to 
+          <div id="card-image"></div>
+          <div>
+            <p id="combine-info"></p>
+            <div class="sm-well">100 DEC</div>
+            <p class="buy-info"> In the event any cards are purchause prior to your transaction being submitted, other cards may be bought and you'll be provided an update quote on the price to combine to next.</p>
+            <div class="buttons" style="margin-top: 30px;">
+								<button class="gradient-button red" data-dismiss="modal">Cancel</button>
+								<button id="btn_sell" class="gradient-button green">COMBINE TO NEXT</button>
+							</div>
+          </div>
         </div>
       </div>
     </div>
@@ -56,8 +64,24 @@ const validateCards = (data: any[]): boolean => {
     return true;
 };
 
-const createAndShowModal = () => {
-    const modal = createModal();
+const createAndShowModal = async (bcx: number, levelInfo: any) => {
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-dialog battle-dialog';
+    modal.style.width = '800px';
+    modal.innerHTML = modalToAdd;
+
+    const cardImage: any = modal.querySelector('#card-image');
+    const cardName = levelInfo.name;
+    const level = levelInfo.level + 1;
+    const isGold = levelInfo.gold;
+
+    const combineInfo: any = modal.querySelector('#combine-info');
+    const cardsToCombine = levelInfo.cards_needed;
+    const estimatedCost = 0;
+
+    combineInfo.innerHTML = `The cards you've added will allow you to combine one card to level ${levelInfo.level}. In order to combine these cards to level ${levelInfo.level + 1}, you require ${cardsToCombine} cards. Before that, find the estimated cost to level to the next level: ${estimatedCost}`;
+
     document.body.appendChild(modal);
 
     const closeButton = modal.querySelector('.modal-close-new');
@@ -89,7 +113,6 @@ export const showConversionModal = async (): Promise<void> => {
 
         const combinedObj: any = {};
 
-
         for (let card of data) {
             for (let key in card) {
                 if (key === 'xp' && typeof card[key] === 'number') {
@@ -103,33 +126,16 @@ export const showConversionModal = async (): Promise<void> => {
             }
         }
 
-
-
-        console.log(combinedObj);
-
         const bcx = await getCardBCX(combinedObj, settings);
         const levelInfo: any = await getCardLevelInfo(combinedObj, settings);
 
-        console.log(bcx)
-        console.log(levelInfo)
+        createAndShowModal(bcx, levelInfo);
 
     } catch (error) {
         console.error(error);
         return;
     }
 
-    createAndShowModal();
 };
-
-
-const createModal = (): HTMLDivElement => {
-    const modal = document.createElement('div');
-    modal.className = 'modal-dialog battle-dialog';
-    modal.style.width = '800px';
-    modal.innerHTML = modalToAdd;
-    return modal;
-};
-
-
 
 

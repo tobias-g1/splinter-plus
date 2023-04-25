@@ -26,10 +26,7 @@ export const getCardBCX = async (card: any, settings: any) => {
 
 // Returns the card image URL based on edition, card name, level, and gold status
 export function getCardImage(edition: string, cardName: string, level: number, isGold = false): string {
-    const editionLower = edition.toLowerCase();
-    const cardNameEncoded = encodeURIComponent(cardName);
-    const goldSuffix = isGold ? '_gold' : '';
-    return `https://d36mxiodymuqjm.cloudfront.net/cards_by_level/${editionLower}/${cardNameEncoded}_lv${level}${goldSuffix}.png`;
+    return 'https://d36mxiodymuqjm.cloudfront.net/cards_by_level/beta/Spineback%20Turtle_lv4_gold.png';
 }
 
 // Retrieves level information for a given card

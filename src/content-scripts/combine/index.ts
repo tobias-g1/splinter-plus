@@ -1,4 +1,5 @@
 import { addConversionButton } from "src/content-scripts/combine/add-button";
+import './scss/combine.scss';
 
 /**
  * Logs a message indicating that the content script is running.
