@@ -7,19 +7,26 @@ import './scss/combine.scss';
 console.log("[Content Script] Running content script...");
 
 /**
- * Periodically checks if the buttons exist on the page and adds the conversion button if they do.
+ * Checks for the existence of the conversion button and adds it if it doesn't already exist.
  */
-const checkButtonsExist = setInterval(() => {
+const checkButtonsExist = () => {
   const buttonsDivs = document.querySelectorAll('.buttons');
   if (buttonsDivs && buttonsDivs.length) {
-    clearInterval(checkButtonsExist);
     addConversionButton();
+  } else {
+    console.log("[Content Script] .buttons element not found in the DOM yet");
   }
-}, 500);
+};
 
-/**
- * Stops the interval checking for buttons when the user navigates to a new page.
- */
-window.addEventListener('popstate', () => {
-  clearInterval(checkButtonsExist);
+// Call the checkButtonsExist function on initial load
+checkButtonsExist();
+
+// Watch for changes to the DOM and check for the existence of the conversion button on each change
+const observer = new MutationObserver(() => {
+  checkButtonsExist();
+});
+
+observer.observe(document.body, {
+  childList: true,
+  subtree: true
 });

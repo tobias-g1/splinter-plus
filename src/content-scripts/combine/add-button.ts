@@ -47,7 +47,7 @@ const addButtonToDOM = (buttonsDivs: NodeListOf<Element>, urlParams: URLSearchPa
 const createConversionButton = (): HTMLDivElement => {
     const button = document.createElement('div');
     button.id = 'btn_combine_sp';
-    button.className = 'combine_sp';
+    button.className = 'btn_combine sp_combine';
     button.setAttribute('data-toggle', 'tooltip');
     button.setAttribute('data-placement', 'top');
     button.setAttribute('role', 'button');
