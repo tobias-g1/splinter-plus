@@ -3,7 +3,7 @@ import { getSettingsFromLocalStorage } from "src/common/settings";
 import { KeychainKeyTypes } from "src/interfaces/keychain.interface";
 import { CardLevelInfo, ForSaleListing, SettingsWithIndexSignature, Transaction, TransactionUpdate } from "src/interfaces/splinterlands.interface";
 
-const BASE_URL = 'https://api2.splinterlands.com';
+const BASE_URL = process.env.SPLINTERLANDS_BASE || 'https://api2.splinterlands.com';
 
 // Fetches settings data from Splinterlands API
 export const fetchSettings = async () => {
@@ -200,22 +200,22 @@ export async function waitForTransactionSuccess(trxId: string, retryIntervalSeco
     }
 }
 
-export const buyCardsFromMarket = async (username: string, price: string, cards: ForSaleListing[]): Promise<any> => {
-
-    console.log(`Buying cards from the market for user ${username}`);
-
+export const buyCardsFromMarket = async (username: string, cards: ForSaleListing[], currency: string): Promise<any> => {
     const items = cards.map(card => card.market_id);
-    const total_price = cards.reduce((sum, card) => sum + parseFloat(card.buy_price), 0).toFixed(3);
-
+    const total_price = cards.reduce((sum, card) => sum + parseFloat(card.buy_price), 0).toFixed(3)
     const json: string = JSON.stringify({
         items,
         price: total_price,
-        currency: 'DEC',
+        currency,
         market: process.env.MARKET,
         app: process.env.APP_VERSION
     })
-
     const purchase = await sendCustomJSONRequest('sm_market_purchase', json, username, KeychainKeyTypes.active);
-    console.log(`Cards purchased for user ${username}:`, purchase);
     return purchase;
+};
+
+export const fetchBalances = async (username: string) => {
+    const apiUrl = `${BASE_URL}/players/balances?username=${username}`;
+    const response = await fetch(apiUrl);
+    return await response.json();
 };

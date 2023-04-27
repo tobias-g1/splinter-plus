@@ -878,3 +878,12 @@ export interface Seller {
     seller: string;
     items: string[];
 }
+
+export interface TokenBalance {
+    player: string;
+    token: string;
+    balance: number | string;
+    last_update_date: string | null;
+    last_reward_block?: number;
+    last_reward_time?: string;
+}

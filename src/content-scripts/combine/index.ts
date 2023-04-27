@@ -1,7 +1,6 @@
 import { addConversionButton } from "src/content-scripts/combine/add-button";
 import './combine.scss';
 
-
 /**
  * Checks for the existence of the conversion button and adds it if it doesn't already exist.
  */

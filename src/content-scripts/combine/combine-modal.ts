@@ -143,14 +143,13 @@ async function handleBuyAndCombine(username: string | null, cheapestCards: ForSa
     return;
   }
 
-  const total_price = cheapestCards.reduce((sum, card) => sum + parseFloat(card.buy_price), 0).toFixed(3);
-
   if (!username) {
     console.log("Username not found in local storage.");
     return;
   }
 
-  const response = await buyCardsFromMarket(username, total_price, cheapestCards);
+  console.log(cheapestCards)
+  const response = await buyCardsFromMarket(username, cheapestCards, 'DEC');
   const transactionId = response.trx_id;
   const transactionData: TransactionUpdate = await waitForTransactionSuccess(transactionId, 3, 3);
 
