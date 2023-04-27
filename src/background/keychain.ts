@@ -11,17 +11,17 @@ const generateSafeRandomNumber = (): number => {
 };
 
 export const sendCustomJSONRequest = async (
-  id: string, json: string, username: string
+  id: string, json: string, username: string, method: KeychainKeyTypes
 ): Promise<any> => {
   return new Promise((resolve, reject) => {
-        const request = {
-          type: KeychainRequestTypes.custom,
-          id,
-          method: KeychainKeyTypes.posting,
-          json,
-          username,
-          request_id: generateSafeRandomNumber()
-      } as KeychainRequest;
+    const request = {
+      type: KeychainRequestTypes.custom,
+      id,
+      method,
+      json,
+      username,
+      request_id: generateSafeRandomNumber()
+    } as KeychainRequest;
     chrome.runtime.sendMessage(KEYCHAIN_EXTENSION_ID, request, (response) => {
       resolve(response);
     });

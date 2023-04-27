@@ -1,4 +1,7 @@
-import { fetchCardData, fetchSettings, getCardBCX, getCardLevelInfo } from "src/content-scripts/combine/splinterlands";
+import { sendCustomJSONRequest } from "@background/keychain";
+import { calculateCheapestCards, fetchCardData, fetchCardSaleData, fetchSettings, getCardLevelInfo, sumCards } from "src/content-scripts/combine/splinterlands";
+import { KeychainKeyTypes } from "src/interfaces/keychain.interface";
+import { CardLevelInfo, Settings } from "src/interfaces/splinterlands.interface";
 
 const modalToAdd = `
 <div id="combine_dialog" class="modal fade show neon in" tabindex="-1" role="dialog" style="display: block; padding-right: 10px;">
@@ -65,8 +68,18 @@ const validateCards = (data: any[]): boolean => {
     return true;
 };
 
-const createAndShowModal = async (bcx: number, levelInfo: any) => {
+const createAndShowModal = async (cardData: any) => {
+
+    const settings: Settings = await fetchSettings();
+    const combinedCards = await sumCards(cardData);
+    const levelInfo: CardLevelInfo = await getCardLevelInfo(combinedCards, settings);
+
+    const { card_detail_id, gold, edition } = cardData[0];
+
+    const marketData = await fetchCardSaleData(card_detail_id, gold, edition, 300);
+    const cheapestCards = await calculateCheapestCards(marketData, levelInfo.xp_required, levelInfo.base_xp);
     const modalWrapper = document.createElement('div');
+
     modalWrapper.innerHTML = modalToAdd;
 
     const modal: any = modalWrapper.querySelector('#combine_dialog');
@@ -76,10 +89,11 @@ const createAndShowModal = async (bcx: number, levelInfo: any) => {
     cardImage.src = cardImageUrl;
 
     const combineInfo: any = modal.querySelector('#combine-info');
-    const cardsToCombine = levelInfo.cards_needed;
-    const estimatedCost = 0;
+    const cardsToCombine = levelInfo.cards_required;
 
-    combineInfo.innerHTML = `You can combine your selected cards to level ${levelInfo.level + 1}, by purchasing ${cardsToCombine} from the market. We've found the cheapest cards available and you can find a quote below.`;
+    combineInfo.innerHTML = `You can combine your selected cards to level ${levelInfo.level + 1}, by purchasing the equivilant of ${cardsToCombine} cards from the market. We've found the cheapest cards available and you can find a quote below.`;
+
+    console.log(levelInfo)
 
     document.body.appendChild(modal);
 
@@ -89,14 +103,19 @@ const createAndShowModal = async (bcx: number, levelInfo: any) => {
     });
 
     const buyAndCombineButton: any = modal.querySelector('#btn_sell');
+
     buyAndCombineButton.addEventListener('click', async () => {
-        // Add your buy and combine logic here
-        console.log('Buy & Combine button clicked');
+        console.log(cheapestCards)
     });
 
+    const cancelButton: any = modal.querySelector('[data-dismiss="modal"]');
+    cancelButton.addEventListener('click', () => {
+        modal.remove();
+    });
 };
 
 export const showConversionModal = async (): Promise<void> => {
+
     const selectedCards = getSelectedCards();
 
     if (checkIfNoCardsSelected(selectedCards)) {
@@ -104,44 +123,28 @@ export const showConversionModal = async (): Promise<void> => {
     }
 
     const cardIds = getCardIds(selectedCards);
+    const data = await fetchCardData(cardIds);
 
-    try {
-
-        const data = await fetchCardData(cardIds);
-
-        if (!validateCards(data)) {
-            return;
-        }
-
-        const settings = await fetchSettings();
-
-        const combinedObj: any = {};
-
-        for (let card of data) {
-            for (let key in card) {
-                if (key === 'xp' && typeof card[key] === 'number') {
-                    if (!combinedObj[key]) {
-                        combinedObj[key] = 0;
-                    }
-                    combinedObj[key] += card[key];
-                } else {
-                    combinedObj[key] = card[key];
-                }
-            }
-        }
-
-        const bcx = await getCardBCX(combinedObj, settings);
-        const levelInfo: any = await getCardLevelInfo(combinedObj, settings);
-
-        createAndShowModal(bcx, levelInfo);
-
-
-
-    } catch (error) {
-        console.error(error);
+    if (!validateCards(data)) {
         return;
     }
 
+    createAndShowModal(data);
+
 };
 
+export const buyCards = async (username: string): Promise<any> => {
+
+    console.log(`Creating claim for user ${username}`);
+    const json: string = JSON.stringify({
+        token: 'SPS',
+        qty: 0,
+        app: 'splinter-plus',
+        n: '19nqfUoKHV'
+    })
+
+    const claim = await sendCustomJSONRequest('sm_stake_tokens', json, username, KeychainKeyTypes.posting);
+    console.log(`Claim created for user ${username}:`, claim);
+    return claim;
+};
 

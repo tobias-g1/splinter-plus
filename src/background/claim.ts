@@ -1,4 +1,5 @@
 import { sendCustomJSONRequest } from "@background/keychain";
+import { KeychainKeyTypes } from "src/interfaces/keychain.interface";
 
 export const checkAutoClaimSetting = async () => {
   const data = await chrome.storage.local.get('plugindata');
@@ -26,7 +27,7 @@ export const createClaim = async (username: string): Promise<any> => {
     n: '19nqfUoKHV'
   })
 
-  const claim = await sendCustomJSONRequest('sm_stake_tokens', json, username);
+  const claim = await sendCustomJSONRequest('sm_stake_tokens', json, username, KeychainKeyTypes.posting);
   console.log(`Claim created for user ${username}:`, claim);
   return claim;
 };
