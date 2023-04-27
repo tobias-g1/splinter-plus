@@ -21,19 +21,14 @@ export const addConversionButton = (): void => {
  * @param urlParams - The URL search params.
  */
 const addButtonToDOM = (buttonsDivs: NodeListOf<Element>, urlParams: URLSearchParams): void => {
-    console.log("[Content Script] Card details page detected");
-    console.log("[Content Script] .buttons element found in the DOM");
 
     if (document.querySelector('#btn_combine_sp')) {
-        console.log("[Content Script] Conversion button has already been added");
         return;
     }
 
     if (typeof urlParams.get('id') !== 'undefined' && urlParams.get('id') !== null) {
-        console.log("[Content Script] Card details found in the URL");
         const button = createConversionButton();
         buttonsDivs[0].appendChild(button);
-        console.log("[Content Script] Conversion button added to the DOM");
         button.addEventListener('click', launchModal);
     } else {
         console.error('[Content Script] Card details not found in the URL');
