@@ -2,14 +2,17 @@ import { getUrlParams } from "src/common/url-search-params";
 import { launchModal } from "src/content-scripts/combine/combine-modal";
 
 /**
- * Adds a conversion button to the DOM if the current URL contains card details.
+ * Adds a conversion button to the DOM if the current URL contains card details and the correct tab is selected.
  */
 export const addConversionButton = (): void => {
     const buttonsDivs = document.querySelectorAll('.buttons');
     const urlParams = getUrlParams();
 
     if (urlParams.get('p') === 'card_details' && buttonsDivs && buttonsDivs.length !== 0) {
-        addButtonToDOM(buttonsDivs, urlParams);
+        const selectedTab = urlParams.get('tab');
+        if (selectedTab === '' || selectedTab === 'cards') { // Add the button only for these tabs
+            addButtonToDOM(buttonsDivs, urlParams);
+        }
     } else {
         console.log("[Content Script] .buttons element not found in the DOM yet");
     }
