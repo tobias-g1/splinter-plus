@@ -4,9 +4,9 @@ import {
   KeychainRequestTypes
 } from 'src/interfaces/keychain.interface';
 
-const KEYCHAIN_EXTENSION_ID = 'fbjjilfdeadgdphnoikkhjhpnndlkgfn';
+const KEYCHAIN_EXTENSION_ID: string = process.env.KEYCHAIN_EXTENSION_ID || 'fbjjilfdeadgdphnoikkhjhpnndlkgfn';
 
-const generateSafeRandomNumber = (): number => {
+export const generateSafeRandomNumber = (): number => {
   return Math.floor(Math.random() * 1000000);
 };
 

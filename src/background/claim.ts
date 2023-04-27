@@ -1,4 +1,4 @@
-import { sendCustomJSONRequest } from "src/common/keychain";
+import { generateSafeRandomNumber, sendCustomJSONRequest } from "src/common/keychain";
 import { KeychainKeyTypes } from "src/interfaces/keychain.interface";
 
 export const checkAutoClaimSetting = async () => {
@@ -24,8 +24,8 @@ export const createClaim = async (username: string): Promise<any> => {
   const json: string = JSON.stringify({
     token: 'SPS',
     qty: 0,
-    app: 'splinter-plus',
-    n: '19nqfUoKHV'
+    app: process.env.APP,
+    n: generateSafeRandomNumber()
   })
 
   const claim = await sendCustomJSONRequest('sm_stake_tokens', json, username, KeychainKeyTypes.posting);

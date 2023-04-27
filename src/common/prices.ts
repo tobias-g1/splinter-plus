@@ -1,18 +1,19 @@
 import { Prices } from "src/interfaces/prices.interface";
 
-const TIME_INTERVAL_IN_MINUTES = Number(process.env.TIME_INTERVAL_IN_MINUTES) || 1;
-const BASE_URL = process.env.BASE_URL || "https://prices.splinterlands.com";
+const TIME_INTERVAL_IN_MINUTES: number = Number(process.env.PRICE_FORCE_REFRESH_IN_MINUTES) || 1;
+const BASE_URL: string = process.env.BASE_URL || "https://prices.splinterlands.com";
 
 export const fetchPrices = async (): Promise<Prices> => {
-    const lastRefresh = await getLastPriceRefresh();
-    const currentTime = new Date().getTime();
+    const lastRefresh: number | undefined = await getLastPriceRefresh();
+    const currentTime: number = new Date().getTime();
+
     if (!lastRefresh || currentTime - lastRefresh > TIME_INTERVAL_IN_MINUTES * 60 * 1000) {
         const response = await fetch(`${BASE_URL}/prices`);
         const prices: Prices = await response.json();
         await updatePrices(prices);
         return prices;
     } else {
-        const cachedPrices = await getCachedPrices();
+        const cachedPrices: Prices | undefined = await getCachedPrices();
         return cachedPrices || fetchPrices();
     }
 };
@@ -26,11 +27,15 @@ const getLastPriceRefresh = (): Promise<number | undefined> => {
     });
 };
 
-const updatePrices = async (prices: Prices) => {
-    chrome.storage.local.set({ prices, lastPriceRefresh: new Date().getTime() }, () => {
-        if (chrome.runtime.lastError) {
-            console.error('Error saving prices data:', chrome.runtime.lastError);
-        }
+const updatePrices = async (prices: Prices): Promise<void> => {
+    return new Promise<void>((resolve, reject) => {
+        chrome.storage.local.set({ prices, lastPriceRefresh: new Date().getTime() }, () => {
+            if (chrome.runtime.lastError) {
+                reject(new Error(`Error saving prices data: ${chrome.runtime.lastError.message}`));
+            } else {
+                resolve();
+            }
+        });
     });
 };
 
@@ -44,15 +49,16 @@ const getCachedPrices = (): Promise<Prices | undefined> => {
 };
 
 export const getPricesFromLocalStorage = async (): Promise<Prices | undefined> => {
-    const lastRefresh = await getLastPriceRefresh();
-    const currentTime = new Date().getTime();
+    const lastRefresh: number | undefined = await getLastPriceRefresh();
+    const currentTime: number = new Date().getTime();
+
     if (!lastRefresh || currentTime - lastRefresh > TIME_INTERVAL_IN_MINUTES * 60 * 1000) {
-        const prices = await fetchPrices();
+        const prices: Prices = await fetchPrices();
         return prices;
     } else {
-        const cachedPrices = await getCachedPrices();
+        const cachedPrices: Prices | undefined = await getCachedPrices();
         if (!cachedPrices) {
-            const prices = await fetchPrices();
+            const prices: Prices = await fetchPrices();
             return prices;
         } else {
             return cachedPrices;

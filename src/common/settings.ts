@@ -1,7 +1,7 @@
 import { Settings } from "http2";
 import { fetchSettings } from "src/common/splinterlands";
 
-export const fetchSettingsAndUpdateStorage = async () => {
+export const fetchSettingsAndUpdateStorage = async (): Promise<Settings> => {
     const settings: Settings = await fetchSettings();
     chrome.storage.local.set({ settings }, () => {
         if (chrome.runtime.lastError) {
@@ -11,14 +11,11 @@ export const fetchSettingsAndUpdateStorage = async () => {
     return settings;
 };
 
-export const getSettingsFromLocalStorage = async () => {
-    return new Promise<Settings>(resolve => {
-        chrome.storage.local.get('settings', async (data) => {
-            let settings: Settings = data.settings;
-            if (!settings) {
-                settings = await fetchSettingsAndUpdateStorage();
-            }
-            resolve(settings);
-        });
-    });
+export const getSettingsFromLocalStorage = async (): Promise<Settings> => {
+    const data: any = chrome.storage.local.get('settings');
+    let settings: Settings = data.settings;
+    if (!settings) {
+        settings = await fetchSettingsAndUpdateStorage();
+    }
+    return settings;
 };

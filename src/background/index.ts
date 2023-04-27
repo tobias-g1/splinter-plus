@@ -26,10 +26,8 @@ const externalMessageHandler = async (
 
 chrome.runtime.onMessageExternal.addListener(externalMessageHandler);
 
-// Create the alarms
 createAlarms();
 
-// Handle the alarms when they fire
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   console.log('Alarm triggered:', alarm);
   handleAlarm(alarm);

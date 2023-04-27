@@ -1,4 +1,4 @@
-import { sendCustomJSONRequest } from "src/common/keychain";
+import { generateSafeRandomNumber, sendCustomJSONRequest } from "src/common/keychain";
 import { getSettingsFromLocalStorage } from "src/common/settings";
 import { KeychainKeyTypes } from "src/interfaces/keychain.interface";
 import { CardLevelInfo, ForSaleListing, SettingsWithIndexSignature, Transaction, TransactionUpdate } from "src/interfaces/splinterlands.interface";
@@ -208,7 +208,7 @@ export const buyCardsFromMarket = async (username: string, cards: ForSaleListing
         price: total_price,
         currency,
         market: process.env.MARKET,
-        app: process.env.APP_VERSION
+        app: process.env.APP
     })
     const purchase = await sendCustomJSONRequest('sm_market_purchase', json, username, KeychainKeyTypes.active);
     return purchase;
@@ -218,4 +218,20 @@ export const fetchBalances = async (username: string) => {
     const apiUrl = `${BASE_URL}/players/balances?username=${username}`;
     const response = await fetch(apiUrl);
     return await response.json();
+};
+
+export const combineCards = async (username: string, cards: string[], appVersion: string): Promise<any> => {
+    const json: string = JSON.stringify({
+        cards,
+        app: appVersion,
+        n: generateSafeRandomNumber()
+    });
+    const combineRequest = {
+        required_auths: [],
+        required_posting_auths: [username],
+        id: "sm_combine_cards",
+        json
+    };
+    const combineResponse = await sendCustomJSONRequest(combineRequest.id, JSON.stringify(combineRequest.json), username, KeychainKeyTypes.posting);
+    return combineResponse;
 };
