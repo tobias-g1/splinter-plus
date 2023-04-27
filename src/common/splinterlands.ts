@@ -1,4 +1,7 @@
-import { CardLevelInfo, ForSaleListing } from "src/interfaces/splinterlands.interface";
+import { sendCustomJSONRequest } from "src/common/keychain";
+import { getSettingsFromLocalStorage } from "src/common/settings";
+import { KeychainKeyTypes } from "src/interfaces/keychain.interface";
+import { CardLevelInfo, ForSaleListing, SettingsWithIndexSignature, Transaction, TransactionUpdate } from "src/interfaces/splinterlands.interface";
 
 const BASE_URL = 'https://api2.splinterlands.com';
 
@@ -22,12 +25,13 @@ export function getCardImage(edition: string, cardName: string, level: number, i
 }
 
 // Retrieves level information for a given card
-export const getCardLevelInfo = async (card: any, settings: any): Promise<CardLevelInfo> => {
+export const getCardLevelInfo = async (card: any): Promise<CardLevelInfo> => {
 
     const details = await getCardDetails(card.card_detail_id);
     const edition = card.edition;
     const rarity = details.rarity;
     const gold = card.gold;
+    const settings: SettingsWithIndexSignature = await getSettingsFromLocalStorage() as SettingsWithIndexSignature;
 
     // Calculate the base XP for the card
     let xp_property;
@@ -167,4 +171,51 @@ export const calculateCheapestCards = async (marketData: ForSaleListing[], requi
 };
 
 
+export const lookupTransaction = async (trxId: string): Promise<Transaction> => {
+    const url = `${BASE_URL}/transactions/lookup?trx_id=${trxId}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    return data;
+};
 
+export async function waitForTransactionSuccess(trxId: string, retryIntervalSeconds: number, maxRetries: number): Promise<TransactionUpdate> {
+    let retries = 0;
+    while (true) {
+        const transactionData: Transaction = await lookupTransaction(trxId);
+        if (transactionData.trx_info.success === true) {
+            return {
+                trx_info: transactionData.trx_info,
+                success: true
+            };
+        } else {
+            retries++;
+            if (retries > maxRetries) {
+                return {
+                    trx_info: transactionData.trx_info,
+                    success: false
+                };
+            }
+            await new Promise((resolve) => setTimeout(resolve, retryIntervalSeconds * 1000));
+        }
+    }
+}
+
+export const buyCardsFromMarket = async (username: string, price: string, cards: ForSaleListing[]): Promise<any> => {
+
+    console.log(`Buying cards from the market for user ${username}`);
+
+    const items = cards.map(card => card.market_id);
+    const total_price = cards.reduce((sum, card) => sum + parseFloat(card.buy_price), 0).toFixed(3);
+
+    const json: string = JSON.stringify({
+        items,
+        price: total_price,
+        currency: 'DEC',
+        market: process.env.MARKET,
+        app: process.env.APP_VERSION
+    })
+
+    const purchase = await sendCustomJSONRequest('sm_market_purchase', json, username, KeychainKeyTypes.active);
+    console.log(`Cards purchased for user ${username}:`, purchase);
+    return purchase;
+};

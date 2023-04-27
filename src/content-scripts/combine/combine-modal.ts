@@ -1,8 +1,7 @@
-import { sendCustomJSONRequest } from "src/common/keychain";
-import { calculateCheapestCards, fetchCardData, fetchCardSaleData, fetchSettings, getCardLevelInfo, sumCards } from "src/common/splinterlands";
+import { getPricesFromLocalStorage } from "src/common/prices";
+import { buyCardsFromMarket, calculateCheapestCards, fetchCardData, fetchCardSaleData, getCardLevelInfo, sumCards, waitForTransactionSuccess } from "src/common/splinterlands";
 import { getUsernameFromLocalStorage } from "src/common/user";
-import { KeychainKeyTypes } from "src/interfaces/keychain.interface";
-import { CardLevelInfo, ForSaleListing, Settings } from "src/interfaces/splinterlands.interface";
+import { CardLevelInfo, ForSaleListing, Result, Seller, TransactionUpdate } from "src/interfaces/splinterlands.interface";
 
 const modalToAdd = `
 <div id="combine_dialog" class="modal fade show neon in" tabindex="-1" role="dialog" style="display: block; padding-right: 10px;">
@@ -23,7 +22,7 @@ const modalToAdd = `
           
           <div>
             <p id="combine-info"></p>
-            <div class="sm-well">100 DEC</div>
+            <div id="price" class="sm-well"></div>
             <p class="buy-info"> In the event any cards are purchased prior to your transaction being submitted, other cards may be bought and you'll be provided an update quote on the price to combine to next.</p>
             <div class="buttons" style="margin-top: 15px;">
                 <button class="gradient-button red" data-dismiss="modal">Cancel</button>
@@ -41,18 +40,17 @@ const getSelectedCards = (): NodeListOf<HTMLElement> => {
   return document.querySelectorAll('.card-checkbox.checked');
 };
 
-const checkIfNoCardsSelected = (selectedCards: NodeListOf<HTMLElement>): boolean => {
-  if (selectedCards.length === 0) {
-    return true;
-  }
-  return false;
-};
+function setPrice(modal: HTMLElement, price: string): void {
+  const priceElement: HTMLElement = modal.querySelector('#price') as HTMLElement;
+  priceElement.innerHTML = `${price} DEC`;
+}
 
 const getCardIds = (selectedCards: NodeListOf<HTMLElement>): string => {
   return Array.from(selectedCards).map(card => card.getAttribute('card_id')).join(',');
 };
 
-const validateCards = (data: any[]): boolean => {
+const validate = (data: any[]): boolean => {
+
   const hasSameProperties = data.every((card: any) => {
     return card.gold === data[0].gold
       && card.rental_type === null
@@ -70,104 +68,108 @@ const validateCards = (data: any[]): boolean => {
   return true;
 };
 
-const createAndShowModal = async (cardData: any): Promise<void> => {
 
-  const settings: Settings = await fetchSettings();
-  const combinedCards = await sumCards(cardData);
-  const levelInfo: CardLevelInfo = await getCardLevelInfo(combinedCards, settings);
-
-  const { card_detail_id, gold, edition } = cardData[0];
-
-  const marketData: ForSaleListing[] = await fetchCardSaleData(card_detail_id, gold, edition, 300);
-  const cheapestCards: ForSaleListing[] | null = await calculateCheapestCards(marketData, levelInfo.xp_required, levelInfo.base_xp);
+function createModal(): HTMLElement {
   const modalWrapper: HTMLDivElement = document.createElement('div');
-
   modalWrapper.innerHTML = modalToAdd;
+  return modalWrapper.querySelector('#combine_dialog') as HTMLElement;
+}
 
-  const modal: HTMLElement = modalWrapper.querySelector('#combine_dialog') as HTMLElement;
-  const cardImage: HTMLImageElement = modal.querySelector('#card-image') as HTMLImageElement;
-
-  // const cardImageUrl: string = `https://d36mxiodymuqjm.cloudfront.net/cards_by_level/beta/Spineback%20Turtle_lv4_gold.png`;
-  //cardImage.src = cardImageUrl;
-
+function setCombineInfo(modal: HTMLElement, level: number, cardsToCombine: number): void {
   const combineInfo: HTMLElement = modal.querySelector('#combine-info') as HTMLElement;
-  const cardsToCombine: number = levelInfo.cards_required;
+  combineInfo.innerHTML = `You can combine your selected cards to level ${level}, by purchasing the equivalent of ${cardsToCombine} cards from the market. We've found the cheapest cards available and you can find a quote below.`;
+}
 
-  combineInfo.innerHTML = `You can combine your selected cards to level ${levelInfo.level + 1}, by purchasing the equivilant of ${cardsToCombine} cards from the market. We've found the cheapest cards available and you can find a quote below.`;
-
-  console.log(levelInfo)
-
-  document.body.appendChild(modal);
-
+function addModalEventListeners(modal: HTMLElement, buyAndCombineHandler: () => void): void {
   const closeButton: HTMLElement | null = modal.querySelector('.modal-close-new');
   closeButton?.addEventListener('click', () => {
     modal.remove();
   });
 
   const buyAndCombineButton: HTMLElement = modal.querySelector('#btn_sell') as HTMLElement;
-
-  buyAndCombineButton.addEventListener('click', async () => {
-
-    const username = await getUsernameFromLocalStorage();
-    console.log(username);
-
-    if (cheapestCards) {
-
-      const total_price = cheapestCards.reduce((sum, card) => sum + parseFloat(card.buy_price), 0).toFixed(3);
-
-      if (username) {
-        await buyCardsFromMarket(username, total_price, cheapestCards);
-      } else {
-        console.log("Username not found in local storage.");
-      }
-    } else {
-      console.log("No cheapest cards found.");
-    }
-  });
-
+  buyAndCombineButton.addEventListener('click', buyAndCombineHandler);
 
   const cancelButton: HTMLElement = modal.querySelector('[data-dismiss="modal"]') as HTMLElement;
   cancelButton.addEventListener('click', () => {
     modal.remove();
   });
-};
+}
 
-
-export const showConversionModal = async (): Promise<void> => {
-
+export const launchModal = async (): Promise<void> => {
   const selectedCards = getSelectedCards();
-
-  if (checkIfNoCardsSelected(selectedCards)) {
+  if (selectedCards.length === 0) {
     return;
   }
 
   const cardIds = getCardIds(selectedCards);
   const data = await fetchCardData(cardIds);
-
-  if (!validateCards(data)) {
+  if (!validate(data)) {
     return;
   }
 
-  createAndShowModal(data);
+  const combinedCards = await sumCards(data);
+  const levelInfo: CardLevelInfo = await getCardLevelInfo(combinedCards);
+  const { card_detail_id, gold, edition } = data[0];
 
+  const marketData: ForSaleListing[] = await fetchCardSaleData(card_detail_id, gold, edition, 300);
+  const cheapestCards: ForSaleListing[] | null = await calculateCheapestCards(marketData, levelInfo.xp_required, levelInfo.base_xp);
+
+  const modal: HTMLElement = createModal();
+  setCombineInfo(modal, levelInfo.level + 1, levelInfo.cards_required);
+  document.body.appendChild(modal);
+
+  // Calculate the price in DEC and update the modal
+  const prices = await getPricesFromLocalStorage();
+  if (cheapestCards && prices) {
+    const totalPriceUSD = cheapestCards.reduce((sum, card) => sum + parseFloat(card.buy_price), 0);
+    const totalPriceDEC = (totalPriceUSD / prices.dec).toFixed(3);
+    setPrice(modal, totalPriceDEC);
+  } else {
+    setPrice(modal, '0');
+  }
+
+
+  const buyAndCombineHandler = async () => {
+    const username = await getUsernameFromLocalStorage();
+    handleBuyAndCombine(username, cheapestCards);
+  };
+
+  addModalEventListeners(modal, buyAndCombineHandler);
 };
 
-export const buyCardsFromMarket = async (username: string, price: string, cards: ForSaleListing[]): Promise<any> => {
+async function handleBuyAndCombine(username: string | null, cheapestCards: ForSaleListing[] | null): Promise<void> {
+  if (!cheapestCards) {
+    console.log("No cheapest cards found.");
+    return;
+  }
 
-  console.log(`Buying cards from the market for user ${username}`);
+  const total_price = cheapestCards.reduce((sum, card) => sum + parseFloat(card.buy_price), 0).toFixed(3);
 
-  const items = cards.map(card => card.market_id);
-  const total_price = cards.reduce((sum, card) => sum + parseFloat(card.buy_price), 0).toFixed(3);
+  if (!username) {
+    console.log("Username not found in local storage.");
+    return;
+  }
 
-  const json: string = JSON.stringify({
-    items,
-    price: total_price,
-    currency: 'DEC',
-    market: process.env.MARKET,
-    app: process.env.APP_VERSION
-  })
+  const response = await buyCardsFromMarket(username, total_price, cheapestCards);
+  const transactionId = response.trx_id;
+  const transactionData: TransactionUpdate = await waitForTransactionSuccess(transactionId, 3, 3);
 
-  const purchase = await sendCustomJSONRequest('sm_market_purchase', json, username, KeychainKeyTypes.active);
-  console.log(`Cards purchased for user ${username}:`, purchase);
-  return purchase;
-};
+  if (!transactionData.success) {
+    console.log("Transaction failed after 3 retries");
+    return;
+  }
+
+  const result: Result = JSON.parse(transactionData.trx_info.result);
+  const purchasedCards = result.by_seller.reduce((sum: string[], seller: Seller) => {
+    return sum.concat(seller.items);
+  }, []);
+
+  if (purchasedCards.length === cheapestCards.length) {
+    console.log("All cards purchased successfully");
+  } else {
+    const unpurchasedCards = cheapestCards.filter((card) => {
+      return !purchasedCards.includes(card.card_detail_id + "-" + card.edition);
+    });
+    console.log("Some cards could not be purchased:", unpurchasedCards);
+  }
+}

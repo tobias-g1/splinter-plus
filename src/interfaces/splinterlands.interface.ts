@@ -123,6 +123,10 @@ export interface Settings {
     template_caching: boolean
 }
 
+export interface SettingsWithIndexSignature extends Settings {
+    [key: string]: any;
+}
+
 export interface BatEventList {
     id: string
     bat: number
@@ -834,4 +838,43 @@ export interface CardLevelInfo {
     cards_required: number;
     xp_required: number;
     base_xp: number;
+}
+
+export interface Transaction {
+    trx_info: TrxInfo
+}
+
+export interface TransactionUpdate extends Transaction {
+    success: boolean
+}
+
+export interface TrxInfo {
+    id: string
+    block_id: string
+    prev_block_id: string
+    type: string
+    player: string
+    data: string
+    success: boolean
+    error: any
+    block_num: number
+    created_date: string
+    result: string
+    steem_price: any
+    sbd_price: any
+}
+
+export interface Result {
+    success: boolean;
+    purchaser: string;
+    num_cards: number;
+    total_usd: number;
+    total_dec: number;
+    total_fees_dec: number;
+    by_seller: Seller[];
+}
+
+export interface Seller {
+    seller: string;
+    items: string[];
 }

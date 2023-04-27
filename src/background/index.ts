@@ -1,5 +1,5 @@
 import { PluginMessage } from '../interfaces/plugin-messages.interface';
-import { createAlarm, handleAlarm } from './alarms';
+import { createAlarms, handleAlarm } from './alarms';
 import { sendPluginData } from './plugin';
 
 const externalMessageHandler = async (
@@ -26,10 +26,10 @@ const externalMessageHandler = async (
 
 chrome.runtime.onMessageExternal.addListener(externalMessageHandler);
 
-// Create the alarm
-createAlarm();
+// Create the alarms
+createAlarms();
 
-// Handle the alarm when it fires
+// Handle the alarms when they fire
 chrome.alarms.onAlarm.addListener(async (alarm) => {
   console.log('Alarm triggered:', alarm);
   handleAlarm(alarm);

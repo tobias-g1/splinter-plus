@@ -1,5 +1,5 @@
 import { getUrlParams } from "src/common/url-search-params";
-import { showConversionModal } from "src/content-scripts/combine/combine-modal";
+import { launchModal } from "src/content-scripts/combine/combine-modal";
 
 /**
  * Adds a conversion button to the DOM if the current URL contains card details.
@@ -34,7 +34,7 @@ const addButtonToDOM = (buttonsDivs: NodeListOf<Element>, urlParams: URLSearchPa
         const button = createConversionButton();
         buttonsDivs[0].appendChild(button);
         console.log("[Content Script] Conversion button added to the DOM");
-        button.addEventListener('click', showConversionModal);
+        button.addEventListener('click', launchModal);
     } else {
         console.error('[Content Script] Card details not found in the URL');
     }
