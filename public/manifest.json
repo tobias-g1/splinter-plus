@@ -12,6 +12,10 @@
     {
       "matches": ["https://splinterlands.com/*"],
       "js": ["combineBundle.js"]
+    },
+    {
+      "matches": ["https://splinterlands.com/*"],
+      "js": ["usernameBundle.js"]
     }
   ],
   "icons": {
@@ -23,7 +27,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["/images/logo.png", "_locales/*"],
+      "resources": ["/images/logo.png", "_locales/*", "usernameBundle.js"],
       "matches": ["https://*/*", "http://0.0.0.0:1337/*", "http://*/*"],
       "extension_ids": []
     }

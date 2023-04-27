@@ -31,7 +31,6 @@ createAlarm();
 
 // Handle the alarm when it fires
 chrome.alarms.onAlarm.addListener(async (alarm) => {
-    console.log('Alarm triggered:', alarm);
-    handleAlarm(alarm);
+  console.log('Alarm triggered:', alarm);
+  handleAlarm(alarm);
 });
-

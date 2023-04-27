@@ -1,4 +1,4 @@
-import { sendCustomJSONRequest } from "@background/keychain";
+import { sendCustomJSONRequest } from "src/common/keychain";
 import { KeychainKeyTypes } from "src/interfaces/keychain.interface";
 
 export const checkAutoClaimSetting = async () => {
@@ -20,6 +20,7 @@ export const checkAutoClaimSetting = async () => {
 export const createClaim = async (username: string): Promise<any> => {
 
   console.log(`Creating claim for user ${username}`);
+
   const json: string = JSON.stringify({
     token: 'SPS',
     qty: 0,
@@ -30,4 +31,5 @@ export const createClaim = async (username: string): Promise<any> => {
   const claim = await sendCustomJSONRequest('sm_stake_tokens', json, username, KeychainKeyTypes.posting);
   console.log(`Claim created for user ${username}:`, claim);
   return claim;
+
 };

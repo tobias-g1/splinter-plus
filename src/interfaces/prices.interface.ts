@@ -1,0 +1,29 @@
+export interface Prices {
+    eth: number;
+    hive: number;
+    leo: number;
+    ltc: number;
+    bat: number;
+    busd: number;
+    tlos: number;
+    cub: number;
+    wax: number;
+    gala: number;
+    pgu: number;
+    uni: number;
+    trx: number;
+    sand: number;
+    ht: number;
+    dai: number;
+    enj: number;
+    hbd: number;
+    steem: number;
+    game: number;
+    btc: number;
+    sbd: number;
+    eos: number;
+    emp: number;
+    dec: number;
+    voucher: number;
+    sps: number;
+}

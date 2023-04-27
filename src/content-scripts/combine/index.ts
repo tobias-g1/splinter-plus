@@ -1,10 +1,6 @@
 import { addConversionButton } from "src/content-scripts/combine/add-button";
-import './scss/combine.scss';
+import './combine.scss';
 
-/**
- * Logs a message indicating that the content script is running.
- */
-console.log("[Content Script] Running content script...");
 
 /**
  * Checks for the existence of the conversion button and adds it if it doesn't already exist.
@@ -14,7 +10,7 @@ const checkButtonsExist = () => {
   if (buttonsDivs && buttonsDivs.length) {
     addConversionButton();
   } else {
-    console.log("[Content Script] .buttons element not found in the DOM yet");
+    return;
   }
 };
 

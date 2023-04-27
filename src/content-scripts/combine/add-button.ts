@@ -1,5 +1,5 @@
+import { getUrlParams } from "src/common/url-search-params";
 import { showConversionModal } from "src/content-scripts/combine/combine-modal";
-import { getUrlParams } from "src/content-scripts/combine/url-search-params";
 
 /**
  * Adds a conversion button to the DOM if the current URL contains card details.

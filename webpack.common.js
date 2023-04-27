@@ -8,6 +8,7 @@ const config = {
   entry: {
     background: './src/background/index.ts',
     combine: './src/content-scripts/combine/index.ts',
+    username: './src/content-scripts/username/username.js'
   },
   module: {
     rules: [
