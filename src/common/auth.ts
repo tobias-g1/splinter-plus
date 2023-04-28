@@ -4,10 +4,6 @@ import { getUsernameFromLocalStorage } from "src/common/user";
 
 const LOGIN_STORAGE_KEY = 'dw_access_token';
 
-const KEYCHAIN_EXTENSION_ID = 'your-keychain-extension-id'; // Replace with your keychain extension ID
-const USERNAME = 'your-username'; // Replace with your username
-const MESSAGE = 'your-message'; // Replace with your message
-
 export const getAccessToken = async (): Promise<string | undefined> => {
     return new Promise((resolve) => {
         chrome.storage.local.get(LOGIN_STORAGE_KEY, (data) => {
@@ -26,10 +22,10 @@ export const setAccessToken = async (token: string): Promise<void> => {
 
 
 export const login = async (): Promise<string> => {
+    const message = 'Login to Splinter Plus';
     const username = await getUsernameFromLocalStorage()
-    const message = 'login'
     const { signature, pubkey } = await sendRequestSignBuffer(username as string, message);
-    const { access_token } = await sendRequest('login', 'POST', undefined, undefined, { message: MESSAGE, signature, pubkey });
+    const { access_token } = await sendRequest('login', 'POST', undefined, undefined, { message, signature, pubkey });
     await setAccessToken(access_token);
     return access_token;
 };

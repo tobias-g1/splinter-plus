@@ -34,7 +34,8 @@ export const sendRequestSignBuffer = async (username: string, message: string): 
       type: KeychainRequestTypes.signBuffer,
       request_id: generateSafeRandomNumber(),
       username,
-      message
+      message,
+      method: KeychainKeyTypes.posting
     } as KeychainRequest;
     chrome.runtime.sendMessage(KEYCHAIN_EXTENSION_ID, request, (response) => {
       resolve(response);
