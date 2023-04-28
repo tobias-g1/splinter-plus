@@ -9,7 +9,8 @@ export const checkAutoClaimSetting = async () => {
     if (autoClaimSettingEnabled) {
       console.log(`Auto claim setting is enabled for ${user}`);
       try {
-        await createClaim(user);
+        // In order to claim tokens you can submit a stake with 0;
+        await stakeTokens(user, 0, 'SPS');
       } catch (error) {
         console.error(error);
       }
@@ -17,19 +18,16 @@ export const checkAutoClaimSetting = async () => {
   }
 };
 
-export const createClaim = async (username: string): Promise<any> => {
-
-  console.log(`Creating claim for user ${username}`);
+export const stakeTokens = async (username: string, quantity: number, symbol: string): Promise<any> => {
 
   const json: string = JSON.stringify({
-    token: 'SPS',
-    qty: 0,
+    token: symbol,
+    qty: quantity,
     app: process.env.APP,
     n: generateSafeRandomNumber()
   })
 
   const claim = await sendCustomJSONRequest('sm_stake_tokens', json, username, KeychainKeyTypes.posting);
-  console.log(`Claim created for user ${username}:`, claim);
   return claim;
 
 };
