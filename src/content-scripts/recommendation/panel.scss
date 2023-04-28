@@ -5,32 +5,90 @@
     padding: 25px;
     max-height: 100px;
     margin-top: 25px;
-  }
   
-  .custom-panel .header {
-    color: white;
-    font-family: nanami-bold;
-    font-size: 19px;
-    text-transform: uppercase;
-  }
+    .header {
+      color: white;
+      font-family: nanami-bold;
+      font-size: 20px;
+      text-transform: uppercase;
+    }
   
-  .custom-panel.expanded {
-    max-height: 500px;
-  }
+    &.expanded {
+        max-height: initial;
+      .panel-content {
+        display: block;
+      }
+    }
   
-  .panel-content {
-    display: none;
-  }
+    .panel-content {
+      display: none;
   
-  .custom-panel.expanded .panel-content {
-    display: block;
-  }
+      p {
+        font-family: OpenSans;
+        font-size: 14px;
+      }
+    }
+  
 
-  select {
+  
+    .card-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(16%, 1fr));
+      grid-gap: 16px;
+      max-width: 100%;
+    }
+  
+    .card-item {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+  
+      .card-img {
+        display: block;
+        width: 100%;
+        height: auto;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+        transition: all 0.3s ease-in-out;
+      }
+  
+      &:hover {
+        .card-buttons {
+          display: flex;
+          transform: scale(1.05);
+        }
+  
+        .card-img {
+          transform: scale(1.05);
+        }
+      }
+      
+  
+      .card-buttons {
+        display: none;
+        flex-shrink: 0;
+        position: absolute;
+        background: #000000b3;
+        height: 100%;
+        width: 100%;
+        align-items: center;
+        justify-content: center;
+        button {
+            cursor: pointer;
+    border: 0;
+    border-radius: 5px;
+    box-shadow: none;
+    margin-top: 0;
+    padding: 10px 20px;
+    white-space: nowrap;
+    font-family: nanami-bold;
+    font-size: 17px;
     color: white;
-    border: 1px solid white;
-    border-radius: 8px;
-    min-width: 100px;
-    padding: 5px 10px;
+    background-color: #006896;
+    text-transform: uppercase;
+    margin: 10px;
+        }
+      }
+    }
   }
   

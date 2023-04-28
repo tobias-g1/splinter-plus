@@ -1,6 +1,6 @@
 import { sendRequestSignBuffer } from "src/common/keychain";
 import { sendRequest } from "src/common/splinter-plus";
-import { getUsernameFromLocalStorage } from "src/content-scripts/username/username";
+import { getUsernameFromLocalStorage } from "src/common/user";
 
 const LOGIN_STORAGE_KEY = 'dw_access_token';
 

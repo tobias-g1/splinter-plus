@@ -1,6 +1,6 @@
 import { getPricesFromLocalStorage } from "src/common/prices";
 import { buyCardsFromMarket, calculateCheapestCards, fetchCardData, fetchCardSaleData, getCardLevelInfo, sumCards, waitForTransactionSuccess } from "src/common/splinterlands";
-import { getUsernameFromLocalStorage } from "src/content-scripts/username/username";
+import { getUsernameFromLocalStorage } from "src/common/user";
 import { CardLevelInfo, ForSaleListing, Result, Seller, TransactionUpdate } from "src/interfaces/splinterlands.interface";
 
 const modalToAdd = `
