@@ -2,37 +2,37 @@
     {
       "name": "Fire",
       "value": "Red",
-      "image": "https://example.com/fire.png"
+      "image": "/assets/icons/fire.png"
     },
     {
       "name": "Water",
       "value": "Blue",
-      "image": "https://example.com/water.png"
+      "image": "/assets/icons/water.png"
     },
     {
       "name": "Earth",
       "value": "Green",
-      "image": "https://example.com/earth.png"
+      "image": "/assets/icons/earth.png"
     },
     {
       "name": "Life",
       "value": "White",
-      "image": "https://example.com/life.png"
+      "image": "/assets/icons/life.png"
     },
     {
       "name": "Death",
       "value": "Black",
-      "image": "https://example.com/death.png"
+      "image": "/assets/icons/death.png"
     },
     {
       "name": "Dragon",
       "value": "Gold",
-      "image": "https://example.com/dragon.png"
+      "image": "/assets/icons/dragon.webp"
     },
     {
       "name": "Neutral",
       "value": "Gray",
-      "image": "https://example.com/neutral.png"
+      "image": "/assets/icons/neutral.webp"
     }
   ]
   

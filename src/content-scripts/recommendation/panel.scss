@@ -26,6 +26,8 @@
       p {
         font-family: OpenSans;
         font-size: 14px;
+        margin: 0;
+        line-height: 20px;
       }
     }
   
@@ -79,16 +81,59 @@
     border-radius: 5px;
     box-shadow: none;
     margin-top: 0;
-    padding: 10px 20px;
+    padding: 7.5px 15px;
     white-space: nowrap;
     font-family: nanami-bold;
     font-size: 17px;
     color: white;
     background-color: #006896;
     text-transform: uppercase;
-    margin: 10px;
+    margin: 5px;
         }
       }
     }
   }
   
+  .explore-button {
+    color: white;
+    background: transparent linear-gradient(108deg,#004eff 0,#0ff 100%) 0 0 no-repeat padding-box;
+    font-family: nanami-bold;
+    font-size: 18px;
+    text-transform: uppercase;
+    padding: 5px 20px;
+    border: 0;
+    border-radius: 5px;
+  }
+
+  .explore-button.close-expand {
+    background: 0;
+    border: 2px solid;
+  }
+
+  .header-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .option {
+    background: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+}
+
+.options {
+    display: flex;
+    margin-left: 15px;
+}
+
+  .content-header {
+    display: flex;
+    align-items: end;
+    margin-bottom: 15px;
+  }

@@ -1,90 +1,133 @@
-export function buildAndInsertPanel(format: string) {
-    console.log(`Building and inserting panel for format: ${format}`);
+import elementsData from '../../json/elements.json';
 
-    // Create a new div with the required styles and functionality
-    const panelDiv = document.createElement('div');
-    panelDiv.classList.add('custom-panel');
-    panelDiv.onclick = () => {
-        panelDiv.classList.toggle('expanded');
-    };
-
-    // Create the header with the specified class and styles
+function createHeader() {
     const headerDiv = document.createElement('div');
-    headerDiv.classList.add('header');
-    headerDiv.innerText = 'Recommended Deck';
+    headerDiv.classList.add('header-wrapper');
 
-    // Append the header to the panel
-    panelDiv.appendChild(headerDiv);
+    const header = document.createElement('span');
+    header.classList.add('header');
+    header.innerText = 'Recommended Deck';
+    headerDiv.appendChild(header);
 
-    // Create the expandable content container
-    const contentDiv = document.createElement('div');
-    contentDiv.classList.add('panel-content');
+    const exploreButton = document.createElement('button');
+    exploreButton.classList.add('explore-button');
+    exploreButton.innerText = 'Explore';
+    exploreButton.onclick = (event: any) => {
+        event.stopPropagation();
+        const panelDiv: any = event.target.closest('.custom-panel');
+        panelDiv.classList.toggle('expanded');
+        if (panelDiv.classList.contains('expanded')) {
+            exploreButton.innerText = 'Close';
+            exploreButton.classList.add('close-expand');
+        } else {
+            exploreButton.innerText = 'Explore';
+            exploreButton.classList.remove('close-expand');
+        }
+    };
+    headerDiv.appendChild(exploreButton);
 
-    // Create the description element
-    const description = document.createElement('p');
-    description.innerText = 'Unlock your full potential in every battle with the ultimate deck handpicked just for you! Based on our extensive analysis of thousands of battles, we recommend this deck specifically tailored for your league and game mode selection. Get ready to dominate the competition like never before!';
+    return headerDiv;
+}
 
-    // Append the description to the content container
-    contentDiv.appendChild(description);
 
-    // Create the recommended cards container
-    const recommendedCards = document.createElement('div');
-    recommendedCards.classList.add('recommended-cards');
+function createCardItem() {
+    const cardItem = document.createElement('div');
+    cardItem.classList.add('card-item');
 
-    // Create the card list
+    const cardImage = document.createElement('img');
+    cardImage.classList.add('card-img');
+    cardImage.src = `https://d36mxiodymuqjm.cloudfront.net/cards_by_level/beta/Spineback%20Turtle_lv4_gold.png`;
+    cardItem.appendChild(cardImage);
+
+    const cardButtons = document.createElement('div');
+    cardButtons.classList.add('card-buttons');
+
+    const buyButton = document.createElement('button');
+    buyButton.classList.add('buy-button');
+    buyButton.innerText = 'Buy';
+    cardButtons.appendChild(buyButton);
+
+    const rentButton = document.createElement('button');
+    rentButton.classList.add('rent-button');
+    rentButton.innerText = 'Rent';
+    cardButtons.appendChild(rentButton);
+
+    cardItem.appendChild(cardButtons);
+
+    return cardItem;
+}
+
+function createCardList() {
     const cardList = document.createElement('div');
     cardList.classList.add('card-list');
 
-    // Create the card items
     for (let i = 1; i <= 12; i++) {
-        const cardItem = document.createElement('div');
-        cardItem.classList.add('card-item');
-
-        // Create the card image
-        const cardImage = document.createElement('img');
-        cardImage.classList.add('card-img');
-        cardImage.src = `https://d36mxiodymuqjm.cloudfront.net/cards_by_level/beta/Spineback%20Turtle_lv4_gold.png`;
-
-        // Create the card buttons
-        const cardButtons = document.createElement('div');
-        cardButtons.classList.add('card-buttons');
-
-        // Create the buy button
-        const buyButton = document.createElement('button');
-        buyButton.classList.add('buy-button');
-        buyButton.innerText = 'Buy';
-
-        // Create the rent button
-        const rentButton = document.createElement('button');
-        rentButton.classList.add('rent-button');
-        rentButton.innerText = 'Rent';
-
-        // Append the buttons to the card buttons container
-        cardButtons.appendChild(buyButton);
-        cardButtons.appendChild(rentButton);
-
-        // Append the card image and buttons to the card item
-        cardItem.appendChild(cardImage);
-        cardItem.appendChild(cardButtons);
-
-        // Append the card item to the card list
-        cardList.appendChild(cardItem);
+        cardList.appendChild(createCardItem());
     }
 
-    // Append the card list to the recommended cards container
-    recommendedCards.appendChild(cardList);
+    return cardList;
+}
 
-    // Append the recommended cards container to the content container
+function createContentHeader() {
+    const contentHeader = document.createElement('div');
+
+    const description = document.createElement('p');
+    description.innerText = 'Unlock your full potential in every battle with the ultimate deck handpicked just for you! Based on our extensive analysis of thousands of battles, we recommend this deck specifically tailored for your league and game mode selection. Get ready to dominate the competition like never before!';
+
+    contentHeader.append(description)
+
+    contentHeader.classList.add('content-header');
+
+    const options = document.createElement('div');
+    options.classList.add('options');
+
+    elementsData.forEach(element => {
+        const optionDiv = document.createElement('div');
+        optionDiv.classList.add('option');
+
+        const img = document.createElement('img');
+        img.src = chrome.runtime.getURL(element.image);
+        img.alt = element.name;
+        optionDiv.appendChild(img);
+
+        optionDiv.addEventListener('click', () => {
+            alert(element.name);
+        });
+
+        options.appendChild(optionDiv);
+    });
+
+    contentHeader.appendChild(options);
+
+    return contentHeader;
+}
+
+
+export function buildAndInsertPanel(format: string) {
+    console.log(`Building and inserting panel for format: ${format}`);
+
+    const panelDiv = document.createElement('div');
+    panelDiv.classList.add('custom-panel');
+
+    const headerDiv = createHeader();
+    panelDiv.appendChild(headerDiv);
+
+    const contentDiv = document.createElement('div');
+    contentDiv.classList.add('panel-content');
+
+    const contentHeader = createContentHeader();
+    contentDiv.appendChild(contentHeader);
+
+    const recommendedCards = document.createElement('div');
+    recommendedCards.classList.add('recommended-cards');
+    recommendedCards.appendChild(createCardList());
     contentDiv.appendChild(recommendedCards);
 
-    // Append the content container to the panel
     panelDiv.appendChild(contentDiv);
 
-    // Insert the new div after the history-header div
     const historyHeaderDiv = document.querySelector('.history-header');
     if (historyHeaderDiv) {
         historyHeaderDiv.parentNode?.insertBefore(panelDiv, historyHeaderDiv.nextSibling);
     }
-
-
 }
+
