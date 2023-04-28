@@ -1,0 +1,46 @@
+.sp_combine.btn_combine {
+    background-image: url(https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/card_details/icon_combine_disabled.svg);
+}
+
+p {
+    color: white;
+}
+
+.sm-well {
+    max-width: 500px;
+    font-weight: bold;
+    color: white;
+    font-size: 19px;
+    margin: auto;
+    margin-top: 20px;
+    margin-bottom: 15px;
+}
+
+.buy-info {
+    font-size: 15px;
+    max-width: 550px;
+    margin: auto;
+    line-height: 25px;
+}
+
+button.gradient-button {
+    margin: 0 10px !important;
+}
+
+.modal {
+    display: block;
+    padding-right: 10px;
+    background: #000000c2;
+}
+
+
+.level-image {
+    width: 275px;
+    margin-bottom: 12px;
+}
+
+.combine-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

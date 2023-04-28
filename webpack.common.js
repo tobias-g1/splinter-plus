@@ -6,8 +6,9 @@ const path = require('path');
 
 const config = {
   entry: {
-    popup: './src/popup/index.tsx',
     background: './src/background/index.ts',
+    combine: './src/content-scripts/combine/index.ts',
+    username: './src/content-scripts/username/username.js'
   },
   module: {
     rules: [

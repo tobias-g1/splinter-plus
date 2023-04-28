@@ -1,4 +1,5 @@
-import { sendCustomJSONRequest } from "@background/keychain";
+import { generateSafeRandomNumber, sendCustomJSONRequest } from "src/common/keychain";
+import { KeychainKeyTypes } from "src/interfaces/keychain.interface";
 
 export const checkAutoClaimSetting = async () => {
   const data = await chrome.storage.local.get('plugindata');
@@ -8,7 +9,8 @@ export const checkAutoClaimSetting = async () => {
     if (autoClaimSettingEnabled) {
       console.log(`Auto claim setting is enabled for ${user}`);
       try {
-        await createClaim(user);
+        // In order to claim tokens you can submit a stake with 0;
+        await stakeTokens(user, 0, 'SPS');
       } catch (error) {
         console.error(error);
       }
@@ -16,17 +18,16 @@ export const checkAutoClaimSetting = async () => {
   }
 };
 
-export const createClaim = async (username: string): Promise<any> => {
+export const stakeTokens = async (username: string, quantity: number, symbol: string): Promise<any> => {
 
-  console.log(`Creating claim for user ${username}`);
   const json: string = JSON.stringify({
-    token: 'SPS',
-    qty: 0,
-    app: 'splinter-plus',
-    n: '19nqfUoKHV'
+    token: symbol,
+    qty: quantity,
+    app: process.env.APP,
+    n: generateSafeRandomNumber()
   })
 
-  const claim = await sendCustomJSONRequest('sm_stake_tokens', json, username);
-  console.log(`Claim created for user ${username}:`, claim);
+  const claim = await sendCustomJSONRequest('sm_stake_tokens', json, username, KeychainKeyTypes.posting);
   return claim;
+
 };

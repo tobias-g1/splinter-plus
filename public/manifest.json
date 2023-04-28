@@ -6,9 +6,18 @@
   "permissions": ["storage", "idle", "webNavigation", "alarms"],
   "host_permissions": ["https://*/*"],
   "action": {
-    "default_popup": "popup.html",
     "default_icon": "/assets/images/plugin.png"
   },
+  "content_scripts": [
+    {
+      "matches": ["https://splinterlands.com/*"],
+      "js": ["combineBundle.js"]
+    },
+    {
+      "matches": ["https://splinterlands.com/*"],
+      "js": ["usernameBundle.js"]
+    }
+  ],
   "icons": {
     "128": "/assets/images/plugin.png"
   },
@@ -18,7 +27,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["/images/logo.png", "_locales/*"],
+      "resources": ["/images/logo.png", "_locales/*", "usernameBundle.js"],
       "matches": ["https://*/*", "http://0.0.0.0:1337/*", "http://*/*"],
       "extension_ids": []
     }

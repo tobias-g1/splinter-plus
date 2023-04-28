@@ -25,7 +25,8 @@
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "sscjs": "^0.0.9",
-    "url-loader": "^4.1.1"
+    "url-loader": "^4.1.1",
+    "url-search-params": "^1.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.8",
@@ -37,6 +38,7 @@
     "@types/react": "^17.0.43",
     "@types/react-dom": "^17.0.14",
     "@types/remote-redux-devtools": "^0.5.5",
+    "@types/url-search-params": "^1.1.0",
     "babel-loader": "^8.0.2",
     "babel-plugin-module-resolver": "^4.1.0",
     "copy-webpack-plugin": "^10.2.0",
