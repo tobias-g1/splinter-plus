@@ -5,7 +5,6 @@ import { checkAutoClaimSetting } from './claim';
 const SETTINGS_REFRESH_INTERVAL_MINUTES = Number(process.env.SETTINGS_REFRESH_INTERVAL_MINUTES) || 240;
 const CHECK_AUTO_CLAIM_SETTING_INTERVAL_MINUTES = Number(process.env.CHECK_AUTO_CLAIM_SETTING_INTERVAL_MINUTES) || 60;
 
-const CHECK_PRICES_ALARM = 'checkPrices';
 const CHECK_SETTINGS_ALARM = 'checkSettings';
 const CHECK_AUTO_CLAIM_SETTING_ALARM = 'checkAutoClaimSetting';
 

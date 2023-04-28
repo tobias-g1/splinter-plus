@@ -1,0 +1,38 @@
+[
+    {
+      "name": "Fire",
+      "value": "Red",
+      "image": "https://example.com/fire.png"
+    },
+    {
+      "name": "Water",
+      "value": "Blue",
+      "image": "https://example.com/water.png"
+    },
+    {
+      "name": "Earth",
+      "value": "Green",
+      "image": "https://example.com/earth.png"
+    },
+    {
+      "name": "Life",
+      "value": "White",
+      "image": "https://example.com/life.png"
+    },
+    {
+      "name": "Death",
+      "value": "Black",
+      "image": "https://example.com/death.png"
+    },
+    {
+      "name": "Dragon",
+      "value": "Gold",
+      "image": "https://example.com/dragon.png"
+    },
+    {
+      "name": "Neutral",
+      "value": "Gray",
+      "image": "https://example.com/neutral.png"
+    }
+  ]
+  

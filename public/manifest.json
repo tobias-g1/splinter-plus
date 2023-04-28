@@ -11,11 +11,15 @@
   "content_scripts": [
     {
       "matches": ["https://splinterlands.com/*"],
+      "js": ["usernameBundle.js"]
+    },
+    {
+      "matches": ["https://splinterlands.com/*"],
       "js": ["combineBundle.js"]
     },
     {
       "matches": ["https://splinterlands.com/*"],
-      "js": ["usernameBundle.js"]
+      "js": ["recommendationBundle.js"]
     }
   ],
   "icons": {

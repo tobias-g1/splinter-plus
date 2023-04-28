@@ -1,0 +1,36 @@
+.custom-panel {
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 25px;
+    transition: max-height 0.3s;
+    padding: 25px;
+    max-height: 100px;
+    margin-top: 25px;
+  }
+  
+  .custom-panel .header {
+    color: white;
+    font-family: nanami-bold;
+    font-size: 19px;
+    text-transform: uppercase;
+  }
+  
+  .custom-panel.expanded {
+    max-height: 500px;
+  }
+  
+  .panel-content {
+    display: none;
+  }
+  
+  .custom-panel.expanded .panel-content {
+    display: block;
+  }
+
+  select {
+    color: white;
+    border: 1px solid white;
+    border-radius: 8px;
+    min-width: 100px;
+    padding: 5px 10px;
+  }
+  
