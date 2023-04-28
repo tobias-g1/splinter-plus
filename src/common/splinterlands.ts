@@ -131,43 +131,52 @@ export const sumCards = async (cardData: any) => {
     return combinedObj;
 }
 
-// Calculates the cheapest way to achieve the required XP and returns a list of listings
 export const calculateCheapestCards = async (marketData: ForSaleListing[], requiredXP: number, baseXP: number) => {
 
-    // First, sort the cards by price per XP in ascending order.
-    const sortedMarketData = marketData.sort((a, b) => {
-
+    // Create an array of indices and sort it by price per BCX in ascending order.
+    const sortedIndices = [...Array(marketData.length).keys()].sort((i, j) => {
+        const a = marketData[i];
+        const b = marketData[j];
         const aPrice = parseFloat(a.buy_price);
         const bPrice = parseFloat(b.buy_price);
         const aXP = a.xp > 0 ? a.xp : baseXP;
         const bXP = b.xp > 0 ? b.xp : baseXP;
+        const aBcx = aXP / baseXP;
+        const bBcx = bXP / baseXP;
 
-        return (aPrice / aXP) - (bPrice / bXP);
+        return (aPrice / aBcx) - (bPrice / bBcx);
     });
 
-    const findCombination = (currentIndex: number, remainingXP: number, selectedCards: ForSaleListing[]): ForSaleListing[] | null => {
+    const findCombination = (currentIndex: number, remainingXP: number, selectedCardIndices: number[]): number[] | null => {
         if (remainingXP <= 0) {
-            return selectedCards;
+            return selectedCardIndices;
         }
 
-        if (currentIndex >= sortedMarketData.length) {
+        if (currentIndex >= sortedIndices.length) {
             return null;
         }
 
-        const currentCard = sortedMarketData[currentIndex];
+        const currentCardIndex = sortedIndices[currentIndex];
+        const currentCard = marketData[currentCardIndex];
         const currentCardXP = currentCard.xp > 0 ? currentCard.xp : baseXP;
 
         if (currentCardXP <= remainingXP) {
-            const withCard = findCombination(currentIndex + 1, remainingXP - currentCardXP, [...selectedCards, currentCard]);
+            selectedCardIndices.push(currentCardIndex);
+            const withCard = findCombination(currentIndex + 1, remainingXP - currentCardXP, selectedCardIndices);
             if (withCard !== null) {
                 return withCard;
             }
+            selectedCardIndices.pop();
         }
 
-        return findCombination(currentIndex + 1, remainingXP, selectedCards);
+        return findCombination(currentIndex + 1, remainingXP, selectedCardIndices);
     };
 
-    return findCombination(0, requiredXP, []);
+    const selectedCardIndices = findCombination(0, requiredXP, []);
+    if (selectedCardIndices === null) {
+        return null;
+    }
+    return selectedCardIndices.map(index => marketData[index]);
 };
 
 
