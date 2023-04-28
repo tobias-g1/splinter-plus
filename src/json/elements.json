@@ -17,7 +17,7 @@
     {
       "name": "Life",
       "value": "White",
-      "image": "/assets/icons/life.png"
+      "image": "assets/icons/life.png"
     },
     {
       "name": "Death",

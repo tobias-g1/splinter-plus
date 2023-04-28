@@ -31,7 +31,7 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["/images/logo.png", "_locales/*", "usernameBundle.js"],
+      "resources": ["/images/logo.png", "_locales/*", "usernameBundle.js", "assets/icons/*"],
       "matches": ["https://*/*", "http://0.0.0.0:1337/*", "http://*/*"],
       "extension_ids": []
     }
