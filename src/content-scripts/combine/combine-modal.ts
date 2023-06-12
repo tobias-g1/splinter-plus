@@ -77,7 +77,7 @@ function createModal(): HTMLElement {
 
 function setCombineInfo(modal: HTMLElement, level: number, cardsToCombine: number): void {
   const combineInfo: HTMLElement = modal.querySelector('#combine-info') as HTMLElement;
-  combineInfo.innerHTML = `You can combine your selected cards to level ${level}, by purchasing the equivalent of ${cardsToCombine} cards from the market. We've found the cheapest cards available and you can find a quote below.`;
+  combineInfo.innerHTML = `You can combine your selected card(s) to <b>level ${level}</b>, by purchasing the equivalent of <b>${cardsToCombine} cards </b> from the market. We've found the cheapest card combination available and you can find a quote below.`;
 }
 
 function addModalEventListeners(modal: HTMLElement, buyAndCombineHandler: () => void): void {
