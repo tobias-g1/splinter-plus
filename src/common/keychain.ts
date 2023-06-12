@@ -4,12 +4,25 @@ import {
   KeychainRequestTypes
 } from 'src/interfaces/keychain.interface';
 
+// The extension ID of the Keychain extension
 const KEYCHAIN_EXTENSION_ID: string = 'cgbodljjckpjacbgjcfgljhacbeoojkb';
 
+/**
+ * Generates a safe random number.
+ * @returns {number} The generated safe random number.
+ */
 export const generateSafeRandomNumber = (): number => {
   return Math.floor(Math.random() * 1000000);
 };
 
+/**
+ * Sends a custom JSON request to the Keychain extension.
+ * @param {string} id - The request ID.
+ * @param {string} json - The JSON data to be sent.
+ * @param {string} username - The username.
+ * @param {KeychainKeyTypes} method - The Keychain key type.
+ * @returns {Promise<any>} A promise that resolves with the response from the Keychain extension.
+ */
 export const sendCustomJSONRequest = async (
   id: string, json: string, username: string, method: KeychainKeyTypes
 ): Promise<any> => {
@@ -40,5 +53,3 @@ export const sendCustomJSONRequest = async (
     }
   });
 };
-
-
