@@ -12,10 +12,11 @@ export const fetchSettingsAndUpdateStorage = async (): Promise<Settings> => {
 };
 
 export const getSettingsFromLocalStorage = async (): Promise<Settings> => {
-    const data: any = chrome.storage.local.get('settings');
-    let settings: Settings = data.settings;
+    const data = localStorage.getItem('settings');
+    let settings: Settings = data ? JSON.parse(data) : null;
     if (!settings) {
         settings = await fetchSettingsAndUpdateStorage();
     }
     return settings;
 };
+
