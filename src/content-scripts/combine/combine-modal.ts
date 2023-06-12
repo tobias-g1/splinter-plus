@@ -1,7 +1,7 @@
 import { getPricesFromLocalStorage } from "src/common/prices";
-import { buyCardsFromMarket, calculateCheapestCards, fetchCardData, fetchCardSaleData, getCardLevelInfo, sumCards, waitForTransactionSuccess } from "src/common/splinterlands";
+import { buyCardsFromMarket, calculateCheapestCards, fetchCardData, fetchCardSaleData, getCardLevelInfo, sumCards } from "src/common/splinterlands";
 import { getUsernameFromLocalStorage } from "src/common/user";
-import { CardLevelInfo, ForSaleListing, Result, Seller, TransactionUpdate } from "src/interfaces/splinterlands.interface";
+import { CardLevelInfo, ForSaleListing } from "src/interfaces/splinterlands.interface";
 
 const modalToAdd = `
 <div id="combine_dialog" class="modal fade show neon in" tabindex="-1" role="dialog" style="display: block; padding-right: 10px;">
@@ -184,28 +184,3 @@ function createResultContent(header: string, text: string): HTMLElement {
   resultContent.innerHTML = `<h2>${header}</h2><p>${text}</p>`;
   return resultContent;
 }
-
-export async function checkBuyTransaction(username: string, transaction: any): Promise<any> {
-
-  const loadingIndicator = createLoadingIndicator();
-  setModalBodyContent(globalModal, loadingIndicator)
-
-  const { tx_id } = transaction;
-
-  const transactionData: TransactionUpdate = await waitForTransactionSuccess(tx_id, 3, 3);
-
-  if (!transactionData.success) {
-    console.log("Transaction failed after 3 retries");
-    return null;
-  }
-
-  const result: Result = JSON.parse(transactionData.trx_info.result);
-
-  const purchasedCards = result.by_seller.reduce((sum: string[], seller: Seller) => {
-    return sum.concat(seller.items);
-  }, []);
-  console.log(username)
-  console.log(transaction)
-  console.log(purchasedCards)
-}
-
