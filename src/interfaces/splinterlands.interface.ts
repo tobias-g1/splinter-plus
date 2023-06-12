@@ -887,3 +887,18 @@ export interface TokenBalance {
     last_reward_block?: number;
     last_reward_time?: string;
 }
+
+export interface BalanceHistory {
+    player: string;
+    token: string;
+    amount: string;
+    balance_start: string;
+    balance_end: string;
+    block_num: number;
+    trx_id: string;
+    type: string;
+    created_date: Date;
+    counterparty: string;
+    last_update_date: Date;
+    is_archived: number;
+}
