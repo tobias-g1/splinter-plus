@@ -37,7 +37,7 @@ const modalToAdd = `
 
 
 const getSelectedCards = (): NodeListOf<HTMLElement> => {
-  return document.querySelectorAll('.card-checkbox.checked');
+  return document.querySelectorAll('.card-checkbox.checked:not(#check_all)');
 };
 
 function setPrice(modal: HTMLElement, price: string): void {
@@ -96,7 +96,9 @@ function addModalEventListeners(modal: HTMLElement, buyAndCombineHandler: () => 
 }
 
 export const launchModal = async (): Promise<void> => {
+
   const selectedCards = getSelectedCards();
+
   if (selectedCards.length === 0) {
     return;
   }
@@ -148,7 +150,6 @@ async function handleBuyAndCombine(username: string | null, cheapestCards: ForSa
     return;
   }
 
-  console.log(cheapestCards)
   const response = await buyCardsFromMarket(username, cheapestCards, 'DEC');
   const transactionId = response.trx_id;
   const transactionData: TransactionUpdate = await waitForTransactionSuccess(transactionId, 3, 3);
