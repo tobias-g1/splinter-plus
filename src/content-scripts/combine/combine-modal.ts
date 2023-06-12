@@ -22,7 +22,6 @@ const modalToAdd = `
           <div>
             <p id="combine-info"></p>
             <div id="price" class="sm-well"></div>
-            <div id="usd" class="usd-indicator"></div>
             <p class="buy-info"> In the event any cards are purchased prior to your transaction being submitted, other cards may be bought and you'll be provided an update quote on the price to combine to next.</p>
             <div class="buttons" style="margin-top: 15px;">
                 <button class="gradient-button red" data-dismiss="modal">Cancel</button>
@@ -43,11 +42,6 @@ const getSelectedCards = (): NodeListOf<HTMLElement> => {
 
 function setPrice(modal: HTMLElement, price: string): void {
   const priceElement: HTMLElement = modal.querySelector('#price') as HTMLElement;
-  priceElement.innerHTML = `${price} `;
-}
-
-function setUsdPrice(element: HTMLElement, price: string): void {
-  const priceElement: HTMLElement = element.querySelector('#usd') as HTMLElement;
   priceElement.innerHTML = `${price} `;
 }
 
@@ -137,8 +131,7 @@ export const launchModal = async (): Promise<void> => {
     const totalPriceUSD = cheapestCards.reduce((sum, card) => sum + parseFloat(card.buy_price), 0);
     const totalPriceDEC = (totalPriceUSD / prices.dec).toFixed(3);
 
-    setPrice(modal, `~${totalPriceDEC} DEC`);
-    setUsdPrice(modal, '$' + totalPriceUSD);
+    setPrice(modal, `~${totalPriceDEC} DEC (${totalPriceUSD})`);
 
   } else {
     setPrice(modal, '0');
