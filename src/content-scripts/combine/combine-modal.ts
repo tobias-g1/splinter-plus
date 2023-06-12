@@ -24,7 +24,7 @@ const modalToAdd = `
             <div id="price" class="sm-well"></div>
             <p class="buy-info"> In the event any cards are purchased prior to your transaction being submitted, other cards may be bought and you'll be provided an update quote on the price to combine to next.</p>
             <div class="buttons" style="margin-top: 15px;">
-                <button class="gradient-button red" data-dismiss="modal">Cancel</button>
+                <button id="btn_cancel" class="gradient-button red" data-dismiss="modal">Cancel</button>
                 <button id="btn_sell" class="gradient-button green">BUY & COMBINE</button>
             </div>
           </div>
@@ -89,7 +89,7 @@ function addModalEventListeners(modal: HTMLElement, buyAndCombineHandler: () => 
   const buyAndCombineButton: HTMLElement = modal.querySelector('#btn_sell') as HTMLElement;
   buyAndCombineButton.addEventListener('click', buyAndCombineHandler);
 
-  const cancelButton: HTMLElement = modal.querySelector('[data-dismiss="modal"]') as HTMLElement;
+  const cancelButton: HTMLElement = modal.querySelector('#btn_cancel') as HTMLElement;
   cancelButton.addEventListener('click', () => {
     modal.remove();
   });
