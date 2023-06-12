@@ -1,7 +1,7 @@
 import { generateSafeRandomNumber, sendCustomJSONRequest } from "src/common/keychain";
 import { getSettingsFromLocalStorage } from "src/common/settings";
 import { KeychainKeyTypes } from "src/interfaces/keychain.interface";
-import { CardLevelInfo, ForSaleListing, SettingsWithIndexSignature, Transaction, TransactionUpdate } from "src/interfaces/splinterlands.interface";
+import { BalanceHistory, CardLevelInfo, ForSaleListing, SettingsWithIndexSignature, Transaction, TransactionUpdate } from "src/interfaces/splinterlands.interface";
 
 const BASE_URL = process.env.SPLINTERLANDS_BASE || 'https://api2.splinterlands.com';
 
@@ -243,4 +243,12 @@ export const combineCards = async (username: string, cards: string[], appVersion
     };
     const combineResponse = await sendCustomJSONRequest(combineRequest.id, JSON.stringify(combineRequest.json), username, KeychainKeyTypes.posting);
     return combineResponse;
+};
+
+
+export const lookupBalanceHistory = async (username: string, types: string, tokenType: string, offset: number, limit: number): Promise<BalanceHistory[]> => {
+    const url = `https://api2.splinterlands.com/players/balance_history?username=${username}&token_type=${tokenType}&types=${types}&offset=${offset}&limit=${limit}`;
+    const response = await fetch(url);
+    const data = await response.json();
+    return data;
 };
