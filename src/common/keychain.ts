@@ -27,7 +27,7 @@ export const sendCustomJSONRequest = async (
       console.log('Sending message:', request);
       chrome.runtime.sendMessage(KEYCHAIN_EXTENSION_ID, request, (response) => {
         if (chrome.runtime.lastError) {
-          console.error('Error from sendMessage:', chrome.runtime.lastError);
+          console.error('Error from sendMessage:', JSON.stringify(chrome.runtime.lastError));
           reject(new Error(chrome.runtime.lastError.message));
         } else {
           console.log('Response received:', response);

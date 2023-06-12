@@ -127,11 +127,11 @@ export const sumCards = async (cardData: any) => {
             }
         }
     }
-
     return combinedObj;
 }
 
 export const calculateCheapestCards = async (marketData: ForSaleListing[], requiredXP: number, baseXP: number) => {
+    const requiredBcx = requiredXP / baseXP;
 
     // Create an array of indices and sort it by price per BCX in ascending order.
     const sortedIndices = [...Array(marketData.length).keys()].sort((i, j) => {
@@ -139,46 +139,44 @@ export const calculateCheapestCards = async (marketData: ForSaleListing[], requi
         const b = marketData[j];
         const aPrice = parseFloat(a.buy_price);
         const bPrice = parseFloat(b.buy_price);
-        const aXP = a.xp > 0 ? a.xp : baseXP;
-        const bXP = b.xp > 0 ? b.xp : baseXP;
-        const aBcx = aXP / baseXP;
-        const bBcx = bXP / baseXP;
+        const aBcx = a.bcx;
+        const bBcx = b.bcx;
 
         return (aPrice / aBcx) - (bPrice / bBcx);
     });
 
-    const findCombination = (currentIndex: number, remainingXP: number, selectedCardIndices: number[]): number[] | null => {
-        if (remainingXP <= 0) {
+    const findCombination = (currentIndex: number, remainingBcx: number, selectedCardIndices: number[]): number[] | null => {
+
+        if (remainingBcx === 0) {
             return selectedCardIndices;
         }
 
-        if (currentIndex >= sortedIndices.length) {
+        if (currentIndex >= sortedIndices.length || remainingBcx < 0) {
             return null;
         }
 
         const currentCardIndex = sortedIndices[currentIndex];
         const currentCard = marketData[currentCardIndex];
-        const currentCardXP = currentCard.xp > 0 ? currentCard.xp : baseXP;
+        const currentCardBcx = currentCard.bcx;
 
-        if (currentCardXP <= remainingXP) {
+        // Only consider adding the current card if it would not make the total BCX exceed requiredBcx
+        if (currentCardBcx <= remainingBcx) {
             selectedCardIndices.push(currentCardIndex);
-            const withCard = findCombination(currentIndex + 1, remainingXP - currentCardXP, selectedCardIndices);
+            const withCard = findCombination(currentIndex + 1, remainingBcx - currentCardBcx, selectedCardIndices);
             if (withCard !== null) {
                 return withCard;
             }
             selectedCardIndices.pop();
         }
-
-        return findCombination(currentIndex + 1, remainingXP, selectedCardIndices);
+        return findCombination(currentIndex + 1, remainingBcx, selectedCardIndices);
     };
 
-    const selectedCardIndices = findCombination(0, requiredXP, []);
+    const selectedCardIndices = findCombination(0, requiredBcx, []);
     if (selectedCardIndices === null) {
         return null;
     }
     return selectedCardIndices.map(index => marketData[index]);
 };
-
 
 export const lookupTransaction = async (trxId: string): Promise<Transaction> => {
     const url = `${BASE_URL}/transactions/lookup?trx_id=${trxId}`;
@@ -219,8 +217,7 @@ export const buyCardsFromMarket = async (username: string, cards: ForSaleListing
         market: process.env.MARKET,
         app: process.env.APP
     })
-    const purchase = await sendCustomJSONRequest('sm_market_purchase', json, username, KeychainKeyTypes.active);
-    return purchase;
+    sendCustomJSONRequest('sm_market_purchase', json, username, KeychainKeyTypes.active);
 };
 
 export const fetchBalances = async (username: string) => {

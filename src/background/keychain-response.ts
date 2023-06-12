@@ -13,6 +13,9 @@ export const handleKeyChainResponse = async (message: KeyChainResponse) => {
             case 'sm_stake_tokens':
                 await attemptAutoStake(username, tx_id);
                 break;
+            case 'sm_market_purchase':
+                console.log(message)
+                break;
             default:
                 break;
         }

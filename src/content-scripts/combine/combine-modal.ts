@@ -19,10 +19,10 @@ const modalToAdd = `
       </div>
       <div class="modal-body">
         <div style="display: flex" class="combine-content">
-          
           <div>
             <p id="combine-info"></p>
             <div id="price" class="sm-well"></div>
+            <div id="usd" class="usd-indicator"></div>
             <p class="buy-info"> In the event any cards are purchased prior to your transaction being submitted, other cards may be bought and you'll be provided an update quote on the price to combine to next.</p>
             <div class="buttons" style="margin-top: 15px;">
                 <button class="gradient-button red" data-dismiss="modal">Cancel</button>
@@ -35,6 +35,7 @@ const modalToAdd = `
   </div>
 </div>`;
 
+let globalModal: any = null;
 
 const getSelectedCards = (): NodeListOf<HTMLElement> => {
   return document.querySelectorAll('.card-checkbox.checked:not(#check_all)');
@@ -42,7 +43,12 @@ const getSelectedCards = (): NodeListOf<HTMLElement> => {
 
 function setPrice(modal: HTMLElement, price: string): void {
   const priceElement: HTMLElement = modal.querySelector('#price') as HTMLElement;
-  priceElement.innerHTML = `${price} DEC`;
+  priceElement.innerHTML = `${price} `;
+}
+
+function setUsdPrice(element: HTMLElement, price: string): void {
+  const priceElement: HTMLElement = element.querySelector('#usd') as HTMLElement;
+  priceElement.innerHTML = `${price} `;
 }
 
 const getCardIds = (selectedCards: NodeListOf<HTMLElement>): string => {
@@ -111,65 +117,102 @@ export const launchModal = async (): Promise<void> => {
 
   const combinedCards = await sumCards(data);
   const levelInfo: CardLevelInfo = await getCardLevelInfo(combinedCards);
+
   const { card_detail_id, gold, edition } = data[0];
 
   const marketData: ForSaleListing[] = await fetchCardSaleData(card_detail_id, gold, edition, 300);
   const cheapestCards: ForSaleListing[] | null = await calculateCheapestCards(marketData, levelInfo.xp_required, levelInfo.base_xp);
-
   const modal: HTMLElement = createModal();
+
+  globalModal = modal;
+
   setCombineInfo(modal, levelInfo.level + 1, levelInfo.cards_required);
+
   document.body.appendChild(modal);
 
-  // Calculate the price in DEC and update the modal
   const prices = await getPricesFromLocalStorage();
+
   if (cheapestCards && prices) {
+
     const totalPriceUSD = cheapestCards.reduce((sum, card) => sum + parseFloat(card.buy_price), 0);
     const totalPriceDEC = (totalPriceUSD / prices.dec).toFixed(3);
-    setPrice(modal, totalPriceDEC);
+
+    setPrice(modal, `~${totalPriceDEC} DEC`);
+    setUsdPrice(modal, '$' + totalPriceUSD);
+
   } else {
     setPrice(modal, '0');
   }
 
-
   const buyAndCombineHandler = async () => {
     const username = await getUsernameFromLocalStorage();
-    handleBuyAndCombine(username, cheapestCards);
+    submitBuyRequest(username, cheapestCards);
   };
 
   addModalEventListeners(modal, buyAndCombineHandler);
 };
 
-async function handleBuyAndCombine(username: string | null, cheapestCards: ForSaleListing[] | null): Promise<void> {
+async function submitBuyRequest(username: string | null, cheapestCards: ForSaleListing[] | null): Promise<any | null> {
+
   if (!cheapestCards) {
     console.log("No cheapest cards found.");
-    return;
+    return null;
   }
 
   if (!username) {
     console.log("Username not found in local storage.");
-    return;
+    return null;
   }
 
-  const response = await buyCardsFromMarket(username, cheapestCards, 'DEC');
-  const transactionId = response.trx_id;
-  const transactionData: TransactionUpdate = await waitForTransactionSuccess(transactionId, 3, 3);
+  buyCardsFromMarket(username, cheapestCards, 'DEC');
+
+}
+
+function setModalBodyContent(modal: HTMLElement, content: HTMLElement | string): void {
+  const modalBody: HTMLElement = modal.querySelector('.modal-body') as HTMLElement;
+  modalBody.innerHTML = ''; // Clear the existing content
+  if (typeof content === 'string') {
+    modalBody.innerHTML = content;
+  } else {
+    modalBody.appendChild(content);
+  }
+}
+
+function createLoadingIndicator(): HTMLElement {
+  const loadingIndicator: HTMLDivElement = document.createElement('div');
+  loadingIndicator.innerText = 'Loading...';
+  loadingIndicator.style.fontSize = '2em';
+  loadingIndicator.style.textAlign = 'center';
+  return loadingIndicator;
+}
+
+function createResultContent(header: string, text: string): HTMLElement {
+  const resultContent: HTMLDivElement = document.createElement('div');
+  resultContent.innerHTML = `<h2>${header}</h2><p>${text}</p>`;
+  return resultContent;
+}
+
+export async function checkBuyTransaction(username: string, transaction: any): Promise<any> {
+
+  const loadingIndicator = createLoadingIndicator();
+  setModalBodyContent(globalModal, loadingIndicator)
+
+  const { tx_id } = transaction;
+
+  const transactionData: TransactionUpdate = await waitForTransactionSuccess(tx_id, 3, 3);
 
   if (!transactionData.success) {
     console.log("Transaction failed after 3 retries");
-    return;
+    return null;
   }
 
   const result: Result = JSON.parse(transactionData.trx_info.result);
+
   const purchasedCards = result.by_seller.reduce((sum: string[], seller: Seller) => {
     return sum.concat(seller.items);
   }, []);
-
-  if (purchasedCards.length === cheapestCards.length) {
-    console.log("All cards purchased successfully");
-  } else {
-    const unpurchasedCards = cheapestCards.filter((card) => {
-      return !purchasedCards.includes(card.card_detail_id + "-" + card.edition);
-    });
-    console.log("Some cards could not be purchased:", unpurchasedCards);
-  }
+  console.log(username)
+  console.log(transaction)
+  console.log(purchasedCards)
 }
+

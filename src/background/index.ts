@@ -13,6 +13,7 @@ const externalMessageHandler = async (
   } else if (message.command === PluginMessage.GET_PLUGIN_INFO) {
     sendPluginData(sendResp);
   } else if (message.command === PluginMessage.HIVE_KEYCHAIN_RESPONSE) {
+    console.log(message)
     handleKeyChainResponse(message);
   } else if (message.command === PluginMessage.SAVE_PLUGIN_DATA) {
     console.log('Saving data:', message.value);

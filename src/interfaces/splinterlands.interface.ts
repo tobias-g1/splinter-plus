@@ -1,6 +1,7 @@
 export interface ForSaleListing {
     fee_percent: number;
     uid: string;
+    bcx: number;
     seller: string;
     card_detail_id: number;
     xp: number;
