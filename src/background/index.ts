@@ -13,10 +13,8 @@ const externalMessageHandler = async (
   } else if (message.command === PluginMessage.GET_PLUGIN_INFO) {
     sendPluginData(sendResp);
   } else if (message.command === PluginMessage.HIVE_KEYCHAIN_RESPONSE) {
-    console.log(message)
     handleKeyChainResponse(message);
   } else if (message.command === PluginMessage.SAVE_PLUGIN_DATA) {
-    console.log('Saving data:', message.value);
     chrome.storage.local.set({ plugindata: message.value }, () => {
       if (chrome.runtime.lastError) {
         console.error('Error saving data:', chrome.runtime.lastError);
@@ -26,7 +24,7 @@ const externalMessageHandler = async (
       }
     });
   } else {
-    console.log(message)
+    console.log(message);
   }
 };
 
@@ -38,3 +36,10 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   console.log('Alarm triggered:', alarm);
   handleAlarm(alarm);
 });
+
+export const validate = async (user: string, trxId: string): Promise<any> => {
+  // Communicate back to content script
+}
+
+
+console.log('Background Script Loaded')

@@ -1,3 +1,4 @@
+import { validate } from "@background/index";
 import { attemptAutoStake } from "src/common/claim";
 import { KeyChainResponse } from "src/interfaces/keychain-response.interface";
 
@@ -20,7 +21,7 @@ export const handleKeyChainResponse = async (message: KeyChainResponse) => {
                 await attemptAutoStake(username, tx_id);
                 break;
             case 'sm_market_purchase':
-                console.log(message);
+                await validate('', '')
                 break;
             default:
                 break;
