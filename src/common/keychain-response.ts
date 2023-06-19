@@ -1,4 +1,4 @@
-import { attemptAutoStake } from "@background/claim";
+import { attemptAutoStake } from "src/common/claim";
 import { KeyChainResponse } from "src/interfaces/keychain-response.interface";
 
 /**

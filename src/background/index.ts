@@ -1,5 +1,5 @@
-import { handleKeyChainResponse } from '@background/keychain-response';
 import { PluginMessage } from 'hive-keychain-commons/lib/plugins';
+import { handleKeyChainResponse } from 'src/common/keychain-response';
 import { createAlarms, handleAlarm } from './alarms';
 import { sendPluginData } from './plugin';
 

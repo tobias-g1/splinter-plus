@@ -1,5 +1,5 @@
 import { fetchSettingsAndUpdateStorage } from 'src/common/settings';
-import { checkAutoClaimSetting } from './claim';
+import { checkAutoClaimSetting } from '../common/claim';
 
 // The interval (in minutes) for refreshing settings
 const SETTINGS_REFRESH_INTERVAL_MINUTES = Number(process.env.SETTINGS_REFRESH_INTERVAL_MINUTES) || 240;
