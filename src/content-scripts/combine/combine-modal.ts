@@ -36,18 +36,55 @@ const modalToAdd = `
 
 let globalModal: any = null;
 
-const getSelectedCards = (): NodeListOf<HTMLElement> => {
-  return document.querySelectorAll('.card-checkbox.checked:not(#check_all)');
+const getSelectedCards = (): NodeListOf<Element> | Element[] | null => {
+
+  // New method
+  const checkedBoxesNew = document.querySelectorAll('.c-gyOReJ.c-dcDALJ.c-gyOReJ-crmSPl-adjusted-true:checked:not(#check_all)');
+  if (checkedBoxesNew.length) {
+    const selectedCardRowsNew = Array.from(checkedBoxesNew)
+      .map(checkbox => checkbox.closest('tr'))
+      .filter(el => el !== null) as Element[];
+    return selectedCardRowsNew;
+  }
+
+  // Legacy method
+  const checkedBoxesLegacy = document.querySelectorAll('.card-checkbox.checked:not(#check_all)');
+  if (checkedBoxesLegacy.length) {
+    return checkedBoxesLegacy;
+  }
+
+  // Neither method found checked boxes
+  return null;
 };
+
+
 
 function setPrice(modal: HTMLElement, price: string): void {
   const priceElement: HTMLElement = modal.querySelector('#price') as HTMLElement;
   priceElement.innerHTML = `${price} `;
 }
 
-const getCardIds = (selectedCards: NodeListOf<HTMLElement>): string => {
-  return Array.from(selectedCards).map(card => card.getAttribute('card_id')).join(',');
+const getCardIds = (selectedCards: NodeListOf<Element> | Element[]): string => {
+
+  console.log(selectedCards);
+
+  return Array.from(selectedCards).map(card => {
+    // New method
+    if (card instanceof HTMLTableRowElement) {
+      const tds = card.querySelectorAll('td');
+      console.log(tds)
+      if (tds.length > 1) {
+        return tds[tds.length - 3].textContent;
+      }
+    }
+    // Legacy method
+    else if (card instanceof HTMLElement) {
+      return card.getAttribute('card_id');
+    }
+  }).filter(id => id !== undefined && id !== null).join(',');
 };
+
+
 
 const validate = (data: any[]): boolean => {
 
@@ -99,11 +136,15 @@ export const launchModal = async (): Promise<void> => {
 
   const selectedCards = getSelectedCards();
 
-  if (selectedCards.length === 0) {
+  if (!selectedCards || selectedCards.length === 0) {
+    console.log('No cards selected')
     return;
   }
 
   const cardIds = getCardIds(selectedCards);
+
+  console.log(cardIds)
+
   const data = await fetchCardData(cardIds);
   if (!validate(data)) {
     return;
@@ -178,6 +219,13 @@ function createLoadingIndicator(): HTMLElement {
   loadingIndicator.style.textAlign = 'center';
   return loadingIndicator;
 }
+
+export function showLoadingIndicator() {
+  const loadingIndicator = createLoadingIndicator();
+  setModalBodyContent(globalModal, loadingIndicator);
+}
+
+
 
 function createResultContent(header: string, text: string): HTMLElement {
   const resultContent: HTMLDivElement = document.createElement('div');
