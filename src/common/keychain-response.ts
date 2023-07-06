@@ -1,4 +1,4 @@
-import { validate } from "@background/index";
+import { sendMessageToContentScript } from "@background/index";
 import { attemptAutoStake } from "src/common/claim";
 import { KeyChainResponse } from "src/interfaces/keychain-response.interface";
 
@@ -6,6 +6,7 @@ import { KeyChainResponse } from "src/interfaces/keychain-response.interface";
  * Handles the response received from KeyChain.
  * @param {KeyChainResponse} message - The KeyChain response message.
  */
+
 export const handleKeyChainResponse = async (message: KeyChainResponse) => {
     // Extract relevant information from the response
     const { response } = message;
@@ -21,10 +22,12 @@ export const handleKeyChainResponse = async (message: KeyChainResponse) => {
                 await attemptAutoStake(username, tx_id);
                 break;
             case 'sm_market_purchase':
-                await validate('', '')
+                sendMessageToContentScript({ command: 'showLoadingIndicator' })
                 break;
             default:
                 break;
         }
     }
 };
+
+

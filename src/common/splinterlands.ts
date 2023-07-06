@@ -249,3 +249,44 @@ export const lookupBalanceHistory = async (username: string, types: string, toke
     const data = await response.json();
     return data;
 };
+
+export function getItemStatus(ids: string[]) {
+    const apiUrl: string = `https://api2.splinterlands.com/market/status?ids=${ids.join(',')}`;
+
+    return fetch(apiUrl)
+        .then(response => response.json())
+        .then(apiRes => apiRes)
+        .catch(error => {
+            console.log('Error:', error);
+        });
+}
+
+export async function verifySuccessfulPurchases(trxId: string) {
+    try {
+        const res = await waitForTransactionSuccess(trxId, 3, 5);
+        const trxInfo = res.trx_info;
+        const json = JSON.parse(trxInfo.data);
+        const { items } = json;
+        const status = await getItemStatus(items);
+
+        const allSuccessful = status.every((item: any) => item.status === 1);
+        const successful = status.filter((item: any) => item.status === 1);
+        const unsuccessful = status.filter((item: any) => item.status !== 1);
+
+        return {
+            allSuccessful,
+            successful,
+            unsuccessful
+        };
+    } catch (error) {
+        console.log('Error:', error);
+        return {
+            allSuccessful: false,
+            successful: [],
+            unsuccessful: []
+        };
+    }
+}
+
+
+
