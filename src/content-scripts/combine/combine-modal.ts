@@ -3,7 +3,9 @@ import { buyCardsFromMarket, calculateCheapestCards, fetchCardData, fetchCardSal
 import { getUsernameFromLocalStorage } from "src/common/user";
 import { CardLevelInfo, ForSaleListing } from "src/interfaces/splinterlands.interface";
 
-const modalToAdd = `
+let launched: boolean = false;
+let globalModal: any = null;
+const modalToAdd: string = `
 <div id="combine_dialog" class="modal fade show neon in" tabindex="-1" role="dialog" style="display: block; padding-right: 10px;">
   <div class="modal-dialog battle-dialog" style="width: 800px;">
     <div class="modal-content">
@@ -34,8 +36,6 @@ const modalToAdd = `
   </div>
 </div>`;
 
-let globalModal: any = null;
-
 const getSelectedCards = (): NodeListOf<Element> | Element[] | null => {
 
   // New method
@@ -53,11 +53,8 @@ const getSelectedCards = (): NodeListOf<Element> | Element[] | null => {
     return checkedBoxesLegacy;
   }
 
-  // Neither method found checked boxes
   return null;
 };
-
-
 
 function setPrice(modal: HTMLElement, price: string): void {
   const priceElement: HTMLElement = modal.querySelector('#price') as HTMLElement;
@@ -102,7 +99,6 @@ const validate = (data: any[]): boolean => {
   return true;
 };
 
-
 function createModal(): HTMLElement {
   const modalWrapper: HTMLDivElement = document.createElement('div');
   modalWrapper.innerHTML = modalToAdd;
@@ -117,6 +113,7 @@ function setCombineInfo(modal: HTMLElement, level: number, cardsToCombine: numbe
 function addModalEventListeners(modal: HTMLElement, buyAndCombineHandler: () => void): void {
   const closeButton: HTMLElement | null = modal.querySelector('.modal-close-new');
   closeButton?.addEventListener('click', () => {
+    launched = false;
     modal.remove();
   });
 
@@ -125,11 +122,16 @@ function addModalEventListeners(modal: HTMLElement, buyAndCombineHandler: () => 
 
   const cancelButton: HTMLElement = modal.querySelector('#btn_cancel') as HTMLElement;
   cancelButton.addEventListener('click', () => {
+    launched = false;
     modal.remove();
   });
 }
 
 export const launchModal = async (): Promise<void> => {
+
+  if (launched) return;
+
+  launched = true;
 
   const selectedCards = getSelectedCards();
 
