@@ -18,11 +18,17 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://splinterlands.com/*"],
+      "matches": [
+        "https://splinterlands.com/*",
+        "https://next.splinterlands.com/*"
+      ],
       "js": ["combineBundle.js"]
     },
     {
-      "matches": ["https://splinterlands.com/*"],
+      "matches": [
+        "https://splinterlands.com/*",
+        "https://next.splinterlands.com/*"
+      ],
       "js": ["usernameBundle.js"]
     }
   ],
@@ -30,8 +36,7 @@
     "128": "/assets/images/plugin.png"
   },
   "background": {
-    "service_worker": "backgroundBundle.js",
-    "type": "module"
+    "service_worker": "backgroundBundle.js"
   },
   "web_accessible_resources": [
     {
