@@ -66,13 +66,10 @@ function setPrice(modal: HTMLElement, price: string): void {
 
 const getCardIds = (selectedCards: NodeListOf<Element> | Element[]): string => {
 
-  console.log(selectedCards);
-
   return Array.from(selectedCards).map(card => {
     // New method
     if (card instanceof HTMLTableRowElement) {
       const tds = card.querySelectorAll('td');
-      console.log(tds)
       if (tds.length > 1) {
         return tds[tds.length - 3].textContent;
       }
@@ -142,10 +139,8 @@ export const launchModal = async (): Promise<void> => {
   }
 
   const cardIds = getCardIds(selectedCards);
-
-  console.log(cardIds)
-
   const data = await fetchCardData(cardIds);
+
   if (!validate(data)) {
     return;
   }
