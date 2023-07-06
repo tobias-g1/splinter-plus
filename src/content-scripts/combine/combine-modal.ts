@@ -134,7 +134,7 @@ export const launchModal = async (): Promise<void> => {
   const selectedCards = getSelectedCards();
 
   if (!selectedCards || selectedCards.length === 0) {
-    console.log('No cards selected')
+    alert('Oops! No cards have been selected for combining. Please choose at least one card to proceed.');
     return;
   }
 
