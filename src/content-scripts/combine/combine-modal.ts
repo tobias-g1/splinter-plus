@@ -1,10 +1,14 @@
 import { getPricesFromLocalStorage } from "src/common/prices";
-import { buyCardsFromMarket, calculateCheapestCards, fetchCardData, fetchCardSaleData, getCardLevelInfo, sumCards } from "src/common/splinterlands";
+import { buyCardsFromMarket, calculateCheapestCards, combineCards, fetchCardData, fetchCardSaleData, getCardLevelInfo, sumCards, verifySuccessfulPurchases } from "src/common/splinterlands";
 import { getUsernameFromLocalStorage } from "src/common/user";
 import { CardLevelInfo, ForSaleListing } from "src/interfaces/splinterlands.interface";
 
 let launched: boolean = false;
 let globalModal: any = null;
+let cardsToCombine: string[] = [];
+export let combineInProgress: boolean = false;
+export let inProgressPurchase: ForSaleListing[] = [];
+
 const modalToAdd: string = `
 <div id="combine_dialog" class="modal fade show neon in" tabindex="-1" role="dialog" style="display: block; padding-right: 10px;">
   <div class="modal-dialog battle-dialog" style="width: 800px;">
@@ -132,8 +136,10 @@ export const launchModal = async (): Promise<void> => {
   if (launched) return;
 
   launched = true;
+  cardsToCombine = [];
 
   const selectedCards = getSelectedCards();
+
 
   if (!selectedCards || selectedCards.length === 0) {
     alert('Oops! No cards have been selected for combining. Please choose at least one card to proceed.');
@@ -146,6 +152,8 @@ export const launchModal = async (): Promise<void> => {
   if (!validate(data)) {
     return;
   }
+
+  cardsToCombine = cardIds.split(',');
 
   const combinedCards = await sumCards(data);
   const levelInfo: CardLevelInfo = await getCardLevelInfo(combinedCards);
@@ -176,8 +184,10 @@ export const launchModal = async (): Promise<void> => {
     setPrice(modal, '0');
   }
 
+
   const buyAndCombineHandler = async () => {
     const username = await getUsernameFromLocalStorage();
+
     submitBuyRequest(username, cheapestCards);
   };
 
@@ -196,7 +206,73 @@ async function submitBuyRequest(username: string | null, cheapestCards: ForSaleL
     return null;
   }
 
+  inProgressPurchase = cheapestCards;
+
   buyCardsFromMarket(username, cheapestCards, 'DEC');
+
+}
+
+export async function handlePurchase(data: any) {
+
+  addLoadingIndicator("Hang tight! We're processing your card purchase.");
+
+  const { tx_id } = data;
+  const cardsBought = await verifySuccessfulPurchases(tx_id);
+
+  const { allSuccessful, successful, unsuccessful } = cardsBought;
+
+  let cardCombine: string[] = cardsToCombine;
+  let successfulCards: any[] = [];
+  let unsuccessfulCards: any[] = [];
+
+  if (successful && successful.length > 0) {
+    successful.forEach((purchase: any) => {
+      if (purchase.cards && purchase.cards.length > 0) {
+        purchase.cards.forEach((card: any) => {
+          cardsToCombine.push(card.uid);
+          successfulCards.push(card);
+        });
+      }
+    });
+  }
+
+  if (unsuccessful && unsuccessful.length > 0) {
+    unsuccessful.forEach((purchase: any) => {
+      if (purchase.cards && purchase.cards.length > 0) {
+        purchase.cards.forEach((card: any) => {
+          unsuccessfulCards.push(card);
+        });
+      }
+    });
+  }
+
+  if (allSuccessful) {
+    const username = await getUsernameFromLocalStorage();
+    if (username) {
+      combineInProgress = true;
+      await combineCards(username, cardCombine);
+    }
+
+  } else {
+    addResultContainer('There has been an error purchasing your cards.', 'lorem')
+  }
+}
+
+export async function handleCombine(data: any) {
+
+  addLoadingIndicator("Your cards we're purchased successfully. We're processing your card combine.");
+
+  const { tx_id } = data;
+  const cardCombination = await verifySuccessfulPurchases(tx_id);
+  const { allSuccessful } = cardCombination;
+
+  if (allSuccessful) {
+    addResultContainer('Your card has now been upgraded.', 'lorem')
+  } else {
+    addResultContainer('There has been an error.', 'lorem')
+  }
+
+  combineInProgress = false;
 
 }
 
@@ -231,14 +307,15 @@ function createLoadingIndicator(loadingText: string): HTMLDivElement {
   return loadingIndicator;
 }
 
-
-
-
 export function addLoadingIndicator(text: string) {
   const loadingIndicator = createLoadingIndicator(text);
   setModalBodyContent(globalModal, loadingIndicator);
 }
 
+export function addResultContainer(header: string, description: string) {
+  const resultContainer = createResultContent(header, description);
+  setModalBodyContent(globalModal, resultContainer);
+}
 
 
 function createResultContent(header: string, text: string): HTMLElement {

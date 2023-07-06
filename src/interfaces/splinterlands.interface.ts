@@ -842,7 +842,9 @@ export interface CardLevelInfo {
 }
 
 export interface Transaction {
-    trx_info: TrxInfo
+    trx_info: TrxInfo,
+    error: string,
+    error_code: number
 }
 
 export interface TransactionUpdate extends Transaction {

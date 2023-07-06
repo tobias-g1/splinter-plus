@@ -1,6 +1,5 @@
 import { PluginMessage } from 'hive-keychain-commons/lib/plugins';
 import { handleKeyChainResponse } from 'src/common/keychain-response';
-import { verifySuccessfulPurchases } from 'src/common/splinterlands';
 import { createAlarms, handleAlarm } from './alarms';
 import { sendPluginData } from './plugin';
 
@@ -68,7 +67,5 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   handleAlarm(alarm);
 });
 
-
-verifySuccessfulPurchases('cdba4d044be139bfb6a67658bd6c287d6ab4c20c')
 
 console.log('Background Script Loaded');

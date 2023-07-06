@@ -18,11 +18,13 @@ export const handleKeyChainResponse = async (message: KeyChainResponse) => {
     if (type === 'custom') {
         switch (id) {
             case 'sm_stake_tokens':
-                // Attempt auto stake based on the username and transaction ID
                 await attemptAutoStake(username, tx_id);
                 break;
             case 'sm_market_purchase':
-                sendMessageToContentScript({ command: 'combine-purchase' })
+                sendMessageToContentScript({ command: 'combine-purchase', data: { tx_id } })
+                break;
+            case 'sm_combine_cards':
+                sendMessageToContentScript({ command: 'combine-combining', data: { tx_id } })
                 break;
             default:
                 break;

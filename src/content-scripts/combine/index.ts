@@ -1,5 +1,5 @@
 import { addCombineButton } from "src/content-scripts/combine/add-button";
-import { addLoadingIndicator } from "src/content-scripts/combine/combine-modal";
+import { combineInProgress, handleCombine, handlePurchase, inProgressPurchase } from "src/content-scripts/combine/combine-modal";
 import './combine.scss';
 
 let backgroundScriptPort: chrome.runtime.Port;
@@ -15,8 +15,16 @@ const connectToBackgroundScript = () => {
       backgroundScriptPort.postMessage({ command: 'contentReady' });
       console.log('Sent contentReady message to background script');
     } else if (message.command === 'combine-purchase') {
-      addLoadingIndicator("Hang tight! We're processing your card purchase.");
+      if (inProgressPurchase && inProgressPurchase.length !== 0) {
+        handlePurchase(message.data);
+      }
+    } else if (message.command === 'combine-combining') {
+      if (combineInProgress) {
+        handleCombine(message.data)
+      }
     }
+
+
     // Handle other messages...
   });
 
