@@ -31,8 +31,10 @@ const connectToBackgroundScript = () => {
 const checkButtonsExist = () => {
   const buttonsDivs = document.querySelectorAll('.buttons, .c-PJLV-ifKYhuQ-css > .c-PJLV-ihmcGFm-css');
   if (buttonsDivs && buttonsDivs.length) {
-    addCombineButton();
-    console.log('Conversion button added.');
+    if (!document.getElementById('btn_combine_sp')) {
+      addCombineButton();
+      console.log('Conversion button added.');
+    }
   } else {
     return;
   }
