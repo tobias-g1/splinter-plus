@@ -13,9 +13,9 @@ export const addCombineButton = (): void => {
         const selectedTab = urlParams.get('tab');
         console.log(selectedTab)
         if (selectedTab === '' || selectedTab === 'cards') {
-            addButtonToDOM(buttonsDivs);
+            addButtonToDOM(buttonsDivs, 'old');
         } else if (window.location.pathname.startsWith('/card-detail')) {
-            addButtonToDOM(buttonsDivs);
+            addButtonToDOM(buttonsDivs, 'new');
         }
     } else {
         console.log("[Content Script] .buttons or .c-PJLV-ihmcGFm-css elements not found in the DOM yet");
@@ -28,12 +28,19 @@ export const addCombineButton = (): void => {
  * @param buttonsDivs - The buttons container divs on the page.
  * @param urlParams - The URL search params.
  */
-const addButtonToDOM = (buttonsDivs: NodeListOf<Element>): void => {
+const addButtonToDOM = (buttonsDivs: NodeListOf<Element>, type: string): void => {
 
     buttonsDivs.forEach(buttonsDiv => {
         if (!buttonsDiv.querySelector('#btn_combine_sp')) {
-            const button = createCombineButton();
-            buttonsDiv.appendChild(button);
+            const button = createCombineButton(type);
+            const buttonContainer = document.createElement('div');
+            if (type === 'new') {
+                buttonContainer.className = 'sp_button_container_new';
+            } else {
+                buttonContainer.className = 'sp_button_container';
+            }
+            buttonContainer.appendChild(button);
+            buttonsDiv.appendChild(buttonContainer);
             button.addEventListener('click', launchModal);
         }
     });
@@ -43,10 +50,15 @@ const addButtonToDOM = (buttonsDivs: NodeListOf<Element>): void => {
  * Creates a combine button with necessary attributes.
  * @returns The created combine button.
  */
-const createCombineButton = (): HTMLDivElement => {
+const createCombineButton = (type: string): HTMLDivElement => {
     const button = document.createElement('div');
 
-    let imageUrl = chrome.runtime.getURL('images/combine.svg');
+    let imageUrl = chrome.runtime.getURL('assets/images/combine-new.svg');
+
+    if (type === 'old') {
+        imageUrl = chrome.runtime.getURL('assets/images/combine-old.svg');
+    }
+
     button.style.backgroundImage = `url(${imageUrl})`;
 
     button.id = 'btn_combine_sp';

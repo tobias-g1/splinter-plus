@@ -41,10 +41,11 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "/images/logo.png",
+        "images/logo.png",
         "_locales/*",
         "usernameBundle.js",
-        "images/combine.svg"
+        "assets/images/combine-new.svg",
+        "assets/images/combine-old.svg"
       ],
       "matches": ["https://*/*", "http://0.0.0.0:1337/*", "http://*/*"],
       "extension_ids": []
