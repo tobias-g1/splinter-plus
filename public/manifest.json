@@ -40,11 +40,17 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["/images/logo.png", "_locales/*", "usernameBundle.js"],
+      "resources": [
+        "/images/logo.png",
+        "_locales/*",
+        "usernameBundle.js",
+        "images/combine.svg"
+      ],
       "matches": ["https://*/*", "http://0.0.0.0:1337/*", "http://*/*"],
       "extension_ids": []
     }
   ],
+
   "manifest_version": 3,
   "externally_connectable": {
     "ids": ["cgbodljjckpjacbgjcfgljhacbeoojkb"],

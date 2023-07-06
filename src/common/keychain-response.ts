@@ -22,7 +22,7 @@ export const handleKeyChainResponse = async (message: KeyChainResponse) => {
                 await attemptAutoStake(username, tx_id);
                 break;
             case 'sm_market_purchase':
-                sendMessageToContentScript({ command: 'showLoadingIndicator' })
+                sendMessageToContentScript({ command: 'combine-purchase' })
                 break;
             default:
                 break;

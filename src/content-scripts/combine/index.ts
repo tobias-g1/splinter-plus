@@ -1,5 +1,5 @@
 import { addCombineButton } from "src/content-scripts/combine/add-button";
-import { showLoadingIndicator } from "src/content-scripts/combine/combine-modal";
+import { addLoadingIndicator } from "src/content-scripts/combine/combine-modal";
 import './combine.scss';
 
 let backgroundScriptPort: chrome.runtime.Port;
@@ -14,8 +14,8 @@ const connectToBackgroundScript = () => {
       // Notify the background script that the content script is ready
       backgroundScriptPort.postMessage({ command: 'contentReady' });
       console.log('Sent contentReady message to background script');
-    } else if (message.command === 'showLoadingIndicator') {
-      showLoadingIndicator()
+    } else if (message.command === 'combine-purchase') {
+      addLoadingIndicator("Hang tight! We're processing your card purchase.");
     }
     // Handle other messages...
   });

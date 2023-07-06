@@ -114,7 +114,7 @@ function createModal(): HTMLElement {
 
 function setCombineInfo(modal: HTMLElement, level: number, cardsToCombine: number): void {
   const combineInfo: HTMLElement = modal.querySelector('#combine-info') as HTMLElement;
-  combineInfo.innerHTML = `You can combine your selected card(s) to <b>level ${level}</b>, by purchasing the equivalent of <b>${cardsToCombine} cards </b> from the market. We've found the cheapest card combination available and you can find a quote below.`;
+  combineInfo.innerHTML = `You can combine your selected card(s) to <b>level ${level}</b>, by purchasing the equivalent of <b>${cardsToCombine} card(s) </b> from the market. We've found the cheapest card combination available and you can find a quote below.`;
 }
 
 function addModalEventListeners(modal: HTMLElement, buyAndCombineHandler: () => void): void {
@@ -212,16 +212,32 @@ function setModalBodyContent(modal: HTMLElement, content: HTMLElement | string):
   }
 }
 
-function createLoadingIndicator(): HTMLElement {
+function createLoadingIndicator(loadingText: string): HTMLDivElement {
   const loadingIndicator: HTMLDivElement = document.createElement('div');
-  loadingIndicator.innerText = 'Loading...';
-  loadingIndicator.style.fontSize = '2em';
-  loadingIndicator.style.textAlign = 'center';
+  loadingIndicator.classList.add('sp-loading');
+
+  const img: HTMLImageElement = document.createElement('img');
+  img.src = 'https://d36mxiodymuqjm.cloudfront.net/website/loading-spinner_500.gif';
+  img.alt = 'Loading Indicator';
+
+  loadingIndicator.appendChild(img);
+
+  const text: HTMLDivElement = document.createElement('div');
+  text.innerText = loadingText;
+  text.style.fontSize = '20px';
+  text.style.color = '#fff';
+  text.style.textAlign = 'center';
+
+  loadingIndicator.appendChild(text);
+
   return loadingIndicator;
 }
 
-export function showLoadingIndicator() {
-  const loadingIndicator = createLoadingIndicator();
+
+
+
+export function addLoadingIndicator(text: string) {
+  const loadingIndicator = createLoadingIndicator(text);
   setModalBodyContent(globalModal, loadingIndicator);
 }
 

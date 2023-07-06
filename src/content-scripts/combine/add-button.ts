@@ -12,7 +12,7 @@ export const addCombineButton = (): void => {
     if ((window.location.pathname.startsWith('/card-detail') || urlParams.get('p') === 'card_details') && buttonsDivs && buttonsDivs.length !== 0) {
         const selectedTab = urlParams.get('tab');
         console.log(selectedTab)
-        if (selectedTab === '' || selectedTab === 'cards') { // Add the button only for these tabs
+        if (selectedTab === '' || selectedTab === 'cards') {
             addButtonToDOM(buttonsDivs);
         } else if (window.location.pathname.startsWith('/card-detail')) {
             addButtonToDOM(buttonsDivs);
@@ -45,6 +45,10 @@ const addButtonToDOM = (buttonsDivs: NodeListOf<Element>): void => {
  */
 const createCombineButton = (): HTMLDivElement => {
     const button = document.createElement('div');
+
+    let imageUrl = chrome.runtime.getURL('images/combine.svg');
+    button.style.backgroundImage = `url(${imageUrl})`;
+
     button.id = 'btn_combine_sp';
     button.className = 'btn_combine sp_combine';
     button.setAttribute('data-toggle', 'tooltip');
@@ -54,3 +58,4 @@ const createCombineButton = (): HTMLDivElement => {
     button.setAttribute('data-original-title', 'Combine to Next Level');
     return button;
 };
+

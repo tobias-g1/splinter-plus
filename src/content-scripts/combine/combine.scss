@@ -13,6 +13,14 @@ p {
   line-height: 32px;
 }
 
+.sp-loading {
+  padding: 25px;
+  img {
+    height: 150px;
+    margin-bottom: 25px;
+  }
+}
+
 .sm-well {
   max-width: 500px;
   font-weight: bold;
