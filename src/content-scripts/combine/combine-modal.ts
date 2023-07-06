@@ -164,10 +164,11 @@ export const launchModal = async (): Promise<void> => {
 
   if (cheapestCards && prices) {
 
-    const totalPriceUSD = cheapestCards.reduce((sum, card) => sum + parseFloat(card.buy_price), 0);
-    const totalPriceDEC = (totalPriceUSD / prices.dec).toFixed(3);
+    const totalPriceUSD = cheapestCards.reduce((sum, card) => sum + parseFloat(card.buy_price), 0).toFixed(2)
+    const totalPriceDEC = (parseFloat(totalPriceUSD) / prices.dec).toFixed(3);
 
-    setPrice(modal, `~${totalPriceDEC} DEC (${totalPriceUSD})`);
+    setPrice(modal, `~${totalPriceDEC} DEC ($${totalPriceUSD})`);
+
 
   } else {
     setPrice(modal, '0');
