@@ -5,13 +5,12 @@ import { launchModal } from "src/content-scripts/combine/combine-modal";
  * Adds a combine button to the DOM if the current URL contains card details and the correct tab is selected.
  */
 export const addCombineButton = (): void => {
-    const buttonsDivs = document.querySelectorAll('.buttons, .c-PJLV-ifKYhuQ-css > .c-PJLV-ihmcGFm-css');
+    const buttonsDivs = document.querySelectorAll('.header > .buttons, .c-PJLV-ifKYhuQ-css > .c-PJLV-ihmcGFm-css');
     const urlParams = getUrlParams();
 
     // Check if pathname starts with /card-detail or if p URL parameter is 'card_details'
     if ((window.location.pathname.startsWith('/card-detail') || urlParams.get('p') === 'card_details') && buttonsDivs && buttonsDivs.length !== 0) {
         const selectedTab = urlParams.get('tab');
-        console.log(selectedTab)
         if (selectedTab === '' || selectedTab === 'cards') {
             addButtonToDOM(buttonsDivs, 'old');
         } else if (window.location.pathname.startsWith('/card-detail')) {
