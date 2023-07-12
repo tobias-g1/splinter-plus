@@ -5,7 +5,7 @@ import {
 } from 'src/interfaces/keychain.interface';
 
 // The extension ID of the Keychain extension
-const KEYCHAIN_EXTENSION_ID: string = 'cgbodljjckpjacbgjcfgljhacbeoojkb';
+const KEYCHAIN_EXTENSION_ID: string = process.env.KEYCHAIN_EXTENSION_ID || '';
 
 /**
  * Generates a safe random number.
