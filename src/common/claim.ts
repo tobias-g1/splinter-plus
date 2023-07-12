@@ -1,7 +1,7 @@
 import { getUserSettings } from "@background/plugin";
 import { generateSafeRandomNumber, sendCustomJSONRequest } from "src/common/keychain";
 import { KeychainKeyTypes } from "src/interfaces/keychain.interface";
-import { lookupBalanceHistory } from '../common/splinterlands';
+import { lookupBalanceHistory } from './splinterlands';
 
 // This function checks if autoClaimSetting is enabled for each user, if so stakes tokens for them
 export const checkAutoClaimSetting = async () => {

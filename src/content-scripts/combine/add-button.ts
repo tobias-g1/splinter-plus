@@ -1,49 +1,65 @@
 import { getUrlParams } from "src/common/url-search-params";
-import { launchModal } from "src/content-scripts/combine/combine-modal";
+import { launchCollectionModal } from "src/content-scripts/combine";
 
 /**
- * Adds a conversion button to the DOM if the current URL contains card details and the correct tab is selected.
+ * Adds a combine button to the DOM if the current URL contains card details and the correct tab is selected.
  */
-export const addConversionButton = (): void => {
-    const buttonsDivs = document.querySelectorAll('.buttons');
+export const addCombineButton = (): void => {
+    const buttonsDivs = document.querySelectorAll('.header > .buttons, .c-PJLV-ifKYhuQ-css > .c-PJLV-ihmcGFm-css');
     const urlParams = getUrlParams();
 
-    if (urlParams.get('p') === 'card_details' && buttonsDivs && buttonsDivs.length !== 0) {
+    // Check if pathname starts with /card-detail or if p URL parameter is 'card_details'
+    if ((window.location.pathname.startsWith('/card-detail') || urlParams.get('p') === 'card_details') && buttonsDivs && buttonsDivs.length !== 0) {
         const selectedTab = urlParams.get('tab');
-        if (selectedTab === '' || selectedTab === 'cards') { // Add the button only for these tabs
-            addButtonToDOM(buttonsDivs, urlParams);
+        if (selectedTab === '' || selectedTab === 'cards') {
+            addButtonToDOM(buttonsDivs, 'old');
+        } else if (window.location.pathname.startsWith('/card-detail')) {
+            addButtonToDOM(buttonsDivs, 'new');
         }
     } else {
-        console.log("[Content Script] .buttons element not found in the DOM yet");
+        console.log("[Content Script] .buttons or .c-PJLV-ihmcGFm-css elements not found in the DOM yet");
     }
 };
 
+
 /**
- * Adds a conversion button to the DOM if it doesn't already exist.
+ * Adds a combine button to the DOM if it doesn't already exist.
  * @param buttonsDivs - The buttons container divs on the page.
  * @param urlParams - The URL search params.
  */
-const addButtonToDOM = (buttonsDivs: NodeListOf<Element>, urlParams: URLSearchParams): void => {
+const addButtonToDOM = (buttonsDivs: NodeListOf<Element>, type: string): void => {
 
-    if (document.querySelector('#btn_combine_sp')) {
-        return;
-    }
-
-    if (typeof urlParams.get('id') !== 'undefined' && urlParams.get('id') !== null) {
-        const button = createConversionButton();
-        buttonsDivs[0].appendChild(button);
-        button.addEventListener('click', launchModal);
-    } else {
-        console.error('[Content Script] Card details not found in the URL');
-    }
+    buttonsDivs.forEach(buttonsDiv => {
+        if (!buttonsDiv.querySelector('#btn_combine_sp')) {
+            const button = createCombineButton(type);
+            const buttonContainer = document.createElement('div');
+            if (type === 'new') {
+                buttonContainer.className = 'sp_button_container_new';
+            } else {
+                buttonContainer.className = 'sp_button_container';
+            }
+            buttonContainer.appendChild(button);
+            buttonsDiv.appendChild(buttonContainer);
+            button.addEventListener('click', launchCollectionModal);
+        }
+    });
 };
 
 /**
- * Creates a conversion button with necessary attributes.
- * @returns The created conversion button.
+ * Creates a combine button with necessary attributes.
+ * @returns The created combine button.
  */
-const createConversionButton = (): HTMLDivElement => {
+const createCombineButton = (type: string): HTMLDivElement => {
     const button = document.createElement('div');
+
+    let imageUrl = chrome.runtime.getURL('assets/images/combine-new.svg');
+
+    if (type === 'old') {
+        imageUrl = chrome.runtime.getURL('assets/images/combine-old.svg');
+    }
+
+    button.style.backgroundImage = `url(${imageUrl})`;
+
     button.id = 'btn_combine_sp';
     button.className = 'btn_combine sp_combine';
     button.setAttribute('data-toggle', 'tooltip');
@@ -53,3 +69,4 @@ const createConversionButton = (): HTMLDivElement => {
     button.setAttribute('data-original-title', 'Combine to Next Level');
     return button;
 };
+

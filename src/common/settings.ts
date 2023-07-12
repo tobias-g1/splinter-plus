@@ -1,21 +1,37 @@
 import { Settings } from "http2";
 import { fetchSettings } from "src/common/splinterlands";
 
+/**
+ * Fetches the settings and updates the localStorage with the fetched settings.
+ * @returns {Promise<Settings>} The fetched settings.
+ */
 export const fetchSettingsAndUpdateStorage = async (): Promise<Settings> => {
-    const settings: Settings = await fetchSettings();
-    chrome.storage.local.set({ settings }, () => {
-        if (chrome.runtime.lastError) {
-            console.error('Error saving settings data:', chrome.runtime.lastError);
-        }
-    });
-    return settings;
+    try {
+        const settings: Settings = await fetchSettings();
+        localStorage.setItem('settings', JSON.stringify(settings));
+        return settings;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
 };
 
+/**
+ * Retrieves the settings from the localStorage.
+ * If the settings are not found in the localStorage, fetches the settings
+ * and updates the storage.
+ * @returns {Promise<Settings>} The retrieved or fetched settings.
+ */
 export const getSettingsFromLocalStorage = async (): Promise<Settings> => {
-    const data: any = chrome.storage.local.get('settings');
-    let settings: Settings = data.settings;
-    if (!settings) {
-        settings = await fetchSettingsAndUpdateStorage();
+    try {
+        const data = localStorage.getItem('settings');
+        let settings: Settings = data ? JSON.parse(data) : null;
+        if (!settings) {
+            settings = await fetchSettingsAndUpdateStorage();
+        }
+        return settings;
+    } catch (error) {
+        console.error(error);
+        throw error;
     }
-    return settings;
 };

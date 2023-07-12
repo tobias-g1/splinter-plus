@@ -1,28 +1,50 @@
-import { generateSafeRandomNumber, sendCustomJSONRequest } from "src/common/keychain";
+import { sendCustomJSONRequest } from "src/common/keychain";
 import { getSettingsFromLocalStorage } from "src/common/settings";
 import { KeychainKeyTypes } from "src/interfaces/keychain.interface";
-import { BalanceHistory, CardLevelInfo, ForSaleListing, SettingsWithIndexSignature, Transaction, TransactionUpdate } from "src/interfaces/splinterlands.interface";
+import { BalanceHistory, CardLevelInfo, ForSaleListing, SettingsWithIndexSignature, Transaction } from "src/interfaces/splinterlands.interface";
 
 const BASE_URL = process.env.SPLINTERLANDS_BASE || 'https://api2.splinterlands.com';
 
 // Fetches settings data from Splinterlands API
 export const fetchSettings = async () => {
-    const settingsUrl = `${BASE_URL}/settings`;
-    const settingsResponse = await fetch(settingsUrl);
-    return await settingsResponse.json();
+    try {
+        const settingsUrl = `${BASE_URL}/settings`;
+        const settingsResponse = await fetch(settingsUrl);
+
+        if (!settingsResponse.ok) {
+            throw new Error(`Error: ${settingsResponse.status} ${settingsResponse.statusText}`);
+        }
+
+        return await settingsResponse.json();
+    } catch (error) {
+        console.error('An error occurred during the settings fetch:', error);
+        throw error;
+    }
 };
+
 
 // Fetches card details from Splinterlands API
 export const getCardDetails = async (card_detail_id: number) => {
-    const response = await fetch(`${BASE_URL}/cards/get_details`);
-    const data = await response.json();
-    return data.find((card: any) => card.id === card_detail_id);
-};
+    try {
+        const response = await fetch(`${BASE_URL}/cards/get_details`);
 
-// Returns the card image URL based on edition, card name, level, and gold status
-export function getCardImage(edition: string, cardName: string, level: number, isGold = false): string {
-    return '';
-}
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const card = data.find((card: any) => card.id === card_detail_id);
+
+        if (!card) {
+            throw new Error(`Card with ID ${card_detail_id} not found.`);
+        }
+
+        return card;
+    } catch (error) {
+        console.error('An error occurred while fetching card details:', error);
+        throw error;
+    }
+};
 
 // Retrieves level information for a given card
 export const getCardLevelInfo = async (card: any): Promise<CardLevelInfo> => {
@@ -99,18 +121,49 @@ export const getCardLevelInfo = async (card: any): Promise<CardLevelInfo> => {
 
 // Fetches card data for a list of card IDs from Splinterlands API
 export const fetchCardData = async (cardIds: string) => {
-    const apiUrl = `${BASE_URL}/cards/find?ids=${cardIds}`;
-    const response = await fetch(apiUrl);
-    return await response.json();
+    try {
+        const apiUrl = `${BASE_URL}/cards/find?ids=${cardIds}`;
+        const response = await fetch(apiUrl);
+
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error('An error occurred during the card data fetch:', error);
+        throw error;
+    }
 };
 
 // Fetches card sale data for a specific card detail ID from Splinterlands API
-export const fetchCardSaleData = async (cardDetailId: number, gold: boolean, edition: number, fee: number): Promise<ForSaleListing[]> => {
-    const apiUrl = `${BASE_URL}/market/for_sale_by_card?card_detail_id=${cardDetailId}&gold=${gold}&edition=${edition}&fee=${fee}`;
-    const response = await fetch(apiUrl);
-    const data = await response.json();
-    return data.flat();
+export const fetchCardSaleData = async (
+    cardDetailId: number,
+    gold: boolean,
+    edition: number,
+    fee: number
+): Promise<ForSaleListing[]> => {
+    try {
+        const apiUrl = `${BASE_URL}/market/for_sale_by_card?card_detail_id=${cardDetailId}&gold=${gold}&edition=${edition}&fee=${fee}`;
+        const response = await fetch(apiUrl);
+
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (!Array.isArray(data)) {
+            throw new Error('Invalid response format: expected an array.');
+        }
+
+        return data.flat();
+    } catch (error) {
+        console.error('An error occurred during the card sale data fetch:', error);
+        throw error;
+    }
 };
+
 
 export const sumCards = async (cardData: any) => {
     const combinedObj: any = {};
@@ -127,11 +180,11 @@ export const sumCards = async (cardData: any) => {
             }
         }
     }
-
     return combinedObj;
 }
 
 export const calculateCheapestCards = async (marketData: ForSaleListing[], requiredXP: number, baseXP: number) => {
+    const requiredBcx = requiredXP / baseXP;
 
     // Create an array of indices and sort it by price per BCX in ascending order.
     const sortedIndices = [...Array(marketData.length).keys()].sort((i, j) => {
@@ -139,75 +192,104 @@ export const calculateCheapestCards = async (marketData: ForSaleListing[], requi
         const b = marketData[j];
         const aPrice = parseFloat(a.buy_price);
         const bPrice = parseFloat(b.buy_price);
-        const aXP = a.xp > 0 ? a.xp : baseXP;
-        const bXP = b.xp > 0 ? b.xp : baseXP;
-        const aBcx = aXP / baseXP;
-        const bBcx = bXP / baseXP;
+        const aBcx = a.bcx;
+        const bBcx = b.bcx;
 
         return (aPrice / aBcx) - (bPrice / bBcx);
     });
 
-    const findCombination = (currentIndex: number, remainingXP: number, selectedCardIndices: number[]): number[] | null => {
-        if (remainingXP <= 0) {
+    const findCombination = (currentIndex: number, remainingBcx: number, selectedCardIndices: number[]): number[] | null => {
+
+        if (remainingBcx === 0) {
             return selectedCardIndices;
         }
 
-        if (currentIndex >= sortedIndices.length) {
+        if (currentIndex >= sortedIndices.length || remainingBcx < 0) {
             return null;
         }
 
         const currentCardIndex = sortedIndices[currentIndex];
         const currentCard = marketData[currentCardIndex];
-        const currentCardXP = currentCard.xp > 0 ? currentCard.xp : baseXP;
+        const currentCardBcx = currentCard.bcx;
 
-        if (currentCardXP <= remainingXP) {
+        // Only consider adding the current card if it would not make the total BCX exceed requiredBcx
+        if (currentCardBcx <= remainingBcx) {
             selectedCardIndices.push(currentCardIndex);
-            const withCard = findCombination(currentIndex + 1, remainingXP - currentCardXP, selectedCardIndices);
+            const withCard = findCombination(currentIndex + 1, remainingBcx - currentCardBcx, selectedCardIndices);
             if (withCard !== null) {
                 return withCard;
             }
             selectedCardIndices.pop();
         }
-
-        return findCombination(currentIndex + 1, remainingXP, selectedCardIndices);
+        return findCombination(currentIndex + 1, remainingBcx, selectedCardIndices);
     };
 
-    const selectedCardIndices = findCombination(0, requiredXP, []);
+    const selectedCardIndices = findCombination(0, requiredBcx, []);
     if (selectedCardIndices === null) {
         return null;
     }
     return selectedCardIndices.map(index => marketData[index]);
 };
 
-
 export const lookupTransaction = async (trxId: string): Promise<Transaction> => {
     const url = `${BASE_URL}/transactions/lookup?trx_id=${trxId}`;
-    const response = await fetch(url);
-    const data = await response.json();
-    return data;
+
+    try {
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`Error: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('An error occurred during the transaction lookup:', error);
+        throw error;
+    }
 };
 
-export async function waitForTransactionSuccess(trxId: string, retryIntervalSeconds: number, maxRetries: number): Promise<TransactionUpdate> {
+
+export async function waitForTransactionSuccess(
+    trxId: string,
+    retryIntervalSeconds: number,
+    maxRetries: number
+): Promise<any> {
     let retries = 0;
     while (true) {
-        const transactionData: Transaction = await lookupTransaction(trxId);
-        if (transactionData.trx_info.success === true) {
-            return {
-                trx_info: transactionData.trx_info,
-                success: true
-            };
-        } else {
-            retries++;
-            if (retries > maxRetries) {
+        try {
+            const transactionData: any = await lookupTransaction(trxId);
+            if (transactionData.error && transactionData.error_code === 1) {
+                retries++;
+                if (retries > maxRetries) {
+                    return {
+                        trx_info: null,
+                        success: false,
+                    };
+                }
+                await new Promise((resolve) => setTimeout(resolve, retryIntervalSeconds * 1000));
+            } else if (transactionData.trx_info.success === true) {
                 return {
                     trx_info: transactionData.trx_info,
-                    success: false
+                    success: true,
                 };
+            } else {
+                retries++;
+                if (retries > maxRetries) {
+                    return {
+                        trx_info: transactionData.trx_info,
+                        success: false,
+                    };
+                }
+                await new Promise((resolve) => setTimeout(resolve, retryIntervalSeconds * 1000));
             }
-            await new Promise((resolve) => setTimeout(resolve, retryIntervalSeconds * 1000));
+        } catch (error) {
+            console.error('An error occurred while waiting for transaction success:', error);
+            throw error;
         }
     }
 }
+
 
 export const buyCardsFromMarket = async (username: string, cards: ForSaleListing[], currency: string): Promise<any> => {
     const items = cards.map(card => card.market_id);
@@ -219,8 +301,7 @@ export const buyCardsFromMarket = async (username: string, cards: ForSaleListing
         market: process.env.MARKET,
         app: process.env.APP
     })
-    const purchase = await sendCustomJSONRequest('sm_market_purchase', json, username, KeychainKeyTypes.active);
-    return purchase;
+    sendCustomJSONRequest('sm_market_purchase', json, username, KeychainKeyTypes.active);
 };
 
 export const fetchBalances = async (username: string) => {
@@ -229,11 +310,20 @@ export const fetchBalances = async (username: string) => {
     return await response.json();
 };
 
-export const combineCards = async (username: string, cards: string[], appVersion: string): Promise<any> => {
+function generateRandomString() {
+    let result = 'N';
+    for (let i = 0; i < 8; i++) {
+        result += Math.random().toString(36).charAt(2);
+    }
+    return result;
+}
+
+
+export const combineCards = async (username: string, cards: string[]): Promise<any> => {
     const json: string = JSON.stringify({
         cards,
-        app: appVersion,
-        n: generateSafeRandomNumber()
+        app: "splinterlands/0.7.230630",
+        n: generateRandomString()
     });
     const combineRequest = {
         required_auths: [],
@@ -241,7 +331,7 @@ export const combineCards = async (username: string, cards: string[], appVersion
         id: "sm_combine_cards",
         json
     };
-    const combineResponse = await sendCustomJSONRequest(combineRequest.id, JSON.stringify(combineRequest.json), username, KeychainKeyTypes.posting);
+    const combineResponse = await sendCustomJSONRequest(combineRequest.id, combineRequest.json, username, KeychainKeyTypes.posting);
     return combineResponse;
 };
 
@@ -252,3 +342,52 @@ export const lookupBalanceHistory = async (username: string, types: string, toke
     const data = await response.json();
     return data;
 };
+
+
+export function getItemStatus(ids: string[]): Promise<any> {
+
+    const apiUrl: string = `https://api2.splinterlands.com/market/status?ids=${ids.join(',')}`;
+
+    return fetch(apiUrl)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error(`Request failed with status code: ${response.status}`);
+            }
+            return response.json();
+        })
+        .catch((error) => {
+            console.error('An error occurred during the API request:', error);
+            throw new Error('Failed to fetch item status. Please try again later.');
+        });
+}
+
+export async function verifySuccessfulPurchases(trxId: string) {
+    try {
+        const res = await waitForTransactionSuccess(trxId, 4, 5);
+        const trxInfo = res.trx_info;
+        const json = JSON.parse(trxInfo.data);
+        const { items } = json;
+
+        console.log(items)
+
+        const status = await getItemStatus(items);
+
+        const allSuccessful = status.every((item: any) => item.status === 1);
+        const successful = status.filter((item: any) => item.status === 1);
+        const unsuccessful = status.filter((item: any) => item.status !== 1);
+
+        return {
+            allSuccessful,
+            successful,
+            unsuccessful
+        };
+
+    } catch (error) {
+        console.error('An error occurred during purchase verification:', error);
+        throw new Error('Failed to verify purchase. Please try again later.');
+    }
+}
+
+
+
+

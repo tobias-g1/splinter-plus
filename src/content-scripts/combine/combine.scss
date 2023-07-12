@@ -1,46 +1,278 @@
 .sp_combine.btn_combine {
-    background-image: url(https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/card_details/icon_combine_disabled.svg);
+  width: 50px;
+  height: 25px;
+  background-repeat: no-repeat;
+  cursor: pointer !important;
+  width: 25px !important;
+  background-position: center;
+  margin: auto;
+  background-size: contain;
+  margin-left: 7.5px;
+}
+
+.sp_button_container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  cursor: default !important;
+}
+
+.sp_button_container_new {
+  height: 50px;
+  cursor: default !important;
+  .sp_combine {
+    fill: #573e41;
+    background-attachment: #573e41;
+    color: #573e41;
+  }
 }
 
 p {
-    color: white;
+  color: white;
+  font-family: 'Eczar', serif;
+  font-size: 22px;
+  line-height: 32px;
+}
+
+.sp-loading {
+  padding: 25px;
+  img {
+    height: 150px;
+    margin-bottom: 25px;
+  }
 }
 
 .sm-well {
-    max-width: 500px;
-    font-weight: bold;
-    color: white;
-    font-size: 19px;
-    margin: auto;
-    margin-top: 20px;
-    margin-bottom: 15px;
+  max-width: 500px;
+  font-weight: bold;
+  color: white;
+  font-size: 19px;
+  margin: auto;
+  margin-top: 20px;
+  margin-bottom: 15px;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 10px;
+  border-radius: 8px;
 }
 
 .buy-info {
-    font-size: 15px;
-    max-width: 550px;
-    margin: auto;
-    line-height: 25px;
+  font-size: 15px;
+  max-width: 550px;
+  margin: auto;
+  line-height: 25px;
 }
 
 button.gradient-button {
-    margin: 0 10px !important;
+  margin: 0 10px !important;
 }
 
 .modal {
-    display: block;
-    padding-right: 10px;
-    background: #000000c2;
+  display: block;
+  padding-right: 10px;
+  background: #000000c2;
 }
 
-
 .level-image {
-    width: 275px;
-    margin-bottom: 12px;
+  width: 275px;
+  margin-bottom: 12px;
 }
 
 .combine-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+// Splinterlands Specific
+
+.modal {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1050;
+  display: none;
+  overflow: hidden;
+  -webkit-overflow-scrolling: touch;
+  outline: 0;
+}
+
+.show {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+button.gradient-button {
+  height: 56px;
+  min-width: 208px;
+  border: 1px solid #ffeda0;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  color: white;
+  font-family: nanami-bold;
+  font-size: 18px;
+  text-transform: uppercase;
+  margin: 0 20px;
+}
+
+button.gradient-button.red {
+  background: transparent
+    linear-gradient(180deg, #ffe283 0, #ff3a00 16%, #410000 82%, #e22626 100%) 0
+    0 no-repeat padding-box;
+}
+
+button.gradient-button.green {
+  background: transparent
+    linear-gradient(180deg, #d3ff9f 0, #26e234 16%, #00632a 82%, #26e234 100%) 0
+    0 no-repeat padding-box;
+}
+
+.battle-dialog .modal-body {
+  background: 0;
+  padding: 0;
+  font-family: OpenSans;
+  font-size: 18px;
+  color: #ddd;
+}
+
+.modal-body {
+  text-align: center;
+  overflow: hidden;
+  clear: both;
+  color: #fcc366;
+  background: linear-gradient(#204a50, #72afb9);
+}
+
+.modal-body {
+  position: relative;
+  padding: 15px;
+}
+
+.neon .modal-body {
+  padding: 20px 30px;
+  font-size: 16px;
+}
+
+.neon .modal-header {
+  padding: 0;
+  height: 50px;
+}
+
+.battle-dialog .modal-header {
+  background-image: none;
+}
+
+.modal-header {
+  background-image: url(https://d36mxiodymuqjm.cloudfront.net/website/bg_header_leather.jpg);
+  color: white;
+  border: 0;
+}
+
+.neon .modal-content {
+  border: 3px solid #f5d307;
+  border-radius: 8px;
+}
+
+.battle-dialog .modal-content {
+  background-image: linear-gradient(to top right, #002a30, #007888);
+  background-color: transparent;
+  box-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
+}
+
+.modal-content {
+  position: relative;
+  background-color: #fff;
+  -webkit-background-clip: padding-box;
+  background-clip: padding-box;
+  border-radius: 6px;
+  outline: 0;
+  -webkit-box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 3px 9px rgba(0, 0, 0, 0.5);
+}
+
+.neon .modal-header .banner {
+  width: 100%;
+  height: 77px;
+  position: absolute;
+  top: -40px;
+  left: 0;
+  z-index: 999;
+  background-repeat: no-repeat;
+  background-position: 50%;
+}
+
+.neon .modal-header .modal-close-new {
+  position: absolute;
+  z-index: 999;
+  opacity: 0.8;
+  right: 10px;
+  top: 10px;
+  margin: 0;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.modal-close-new {
+  float: right;
+  position: relative;
+  z-index: 999;
+  opacity: 0.8;
+  margin-right: 15px;
+  margin-top: 5px;
+}
+
+.modal-dialog.battle-dialog,
+.modal-dialog.no-bg {
+  border: 0;
+  margin-top: 100px;
+}
+
+.modal.fade .modal-dialog {
+  -webkit-transition: -webkit-transform 0.3s ease-out;
+  -o-transition: -o-transform 0.3s ease-out;
+  transition: transform 0.3s ease-out;
+  -webkit-transform: translate(0, -25%);
+  -ms-transform: translate(0, -25%);
+  -o-transform: translate(0, -25%);
+  transform: translate(0, -25%);
+}
+
+.neon .modal-header .banner .relative-position {
+  width: 100%;
+}
+
+.neon .modal-header .banner {
+  background-image: url(https://d36mxiodymuqjm.cloudfront.net/website/ui_elements/popups/bg_header.png);
+}
+
+.relative-position {
+  position: relative;
+  height: 0;
+  width: 0;
+}
+
+.battle-dialog .modal-header .banner .title-text,
+.faq-container .banner .title-text {
+  position: absolute;
+  width: 300px;
+  font-family: nanami-bold;
+  font-size: 32px;
+  text-shadow: 3px 3px 3px #555;
+  top: 20px;
+  left: 100px;
+  text-align: center;
+}
+
+.neon .modal-header .banner .relative-position .title-text {
+  width: 100%;
+  top: 20px;
+  font-size: 24px;
+  left: 0;
+}
+
+.result-header {
+  color: #fff !important;
+  font-family: nanami-bold !important;
 }

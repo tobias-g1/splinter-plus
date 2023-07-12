@@ -1,6 +1,7 @@
 export interface ForSaleListing {
     fee_percent: number;
     uid: string;
+    bcx: number;
     seller: string;
     card_detail_id: number;
     xp: number;
@@ -841,7 +842,9 @@ export interface CardLevelInfo {
 }
 
 export interface Transaction {
-    trx_info: TrxInfo
+    trx_info: TrxInfo,
+    error: string,
+    error_code: number
 }
 
 export interface TransactionUpdate extends Transaction {
