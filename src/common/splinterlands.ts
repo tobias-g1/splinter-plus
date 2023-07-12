@@ -345,6 +345,7 @@ export const lookupBalanceHistory = async (username: string, types: string, toke
 
 
 export function getItemStatus(ids: string[]): Promise<any> {
+
     const apiUrl: string = `https://api2.splinterlands.com/market/status?ids=${ids.join(',')}`;
 
     return fetch(apiUrl)

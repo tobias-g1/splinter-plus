@@ -1,5 +1,5 @@
 import { getPricesFromLocalStorage } from "src/common/prices";
-import { buyCardsFromMarket, calculateCheapestCards, combineCards, fetchCardData, fetchCardSaleData, getCardLevelInfo, sumCards, verifySuccessfulPurchases } from "src/common/splinterlands";
+import { buyCardsFromMarket, calculateCheapestCards, combineCards, fetchCardData, fetchCardSaleData, getCardLevelInfo, sumCards, verifySuccessfulPurchases, waitForTransactionSuccess } from "src/common/splinterlands";
 import { getUsernameFromLocalStorage } from "src/common/user";
 import { CardLevelInfo, ForSaleListing } from "src/interfaces/splinterlands.interface";
 
@@ -252,9 +252,8 @@ export async function handlePurchase(data: any) {
       combineInProgress = true;
       await combineCards(username, cardCombine);
     }
-
   } else {
-    addResultContainer('There has been an error purchasing your cards.', 'lorem')
+    addResultContainer('There has been an error purchasing your cards', "We're sorry, but an error occurred while trying to process your card purchase. Please ensure you have the correct amount to complete the purchase and try again.")
   }
 }
 
@@ -263,13 +262,12 @@ export async function handleCombine(data: any) {
   addLoadingIndicator("Your cards we're purchased successfully. We're processing your card combine.");
 
   const { tx_id } = data;
-  const cardCombination = await verifySuccessfulPurchases(tx_id);
-  const { allSuccessful } = cardCombination;
+  const success = await waitForTransactionSuccess(tx_id, 4, 5);
 
-  if (allSuccessful) {
-    addResultContainer('Your card has now been upgraded.', 'lorem')
+  if (success) {
+    addResultContainer('Your cards have been combined successfully!', 'Congratulations! Your cards were successfully combined. You can now view the combined card in your inventory.')
   } else {
-    addResultContainer('There has been an error.', 'lorem')
+    addResultContainer('There has been an error combining your cards', "We're sorry, but an error occurred while trying to process your card combine.")
   }
 
   combineInProgress = false;
@@ -316,7 +314,6 @@ export function addResultContainer(header: string, description: string) {
   const resultContainer = createResultContent(header, description);
   setModalBodyContent(globalModal, resultContainer);
 }
-
 
 function createResultContent(header: string, text: string): HTMLElement {
   const resultContent: HTMLDivElement = document.createElement('div');
