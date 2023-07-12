@@ -40,49 +40,10 @@ const modalToAdd: string = `
   </div>
 </div>`;
 
-const getSelectedCards = (): NodeListOf<Element> | Element[] | null => {
-
-  // New method
-  const checkedBoxesNew = document.querySelectorAll('.c-gyOReJ.c-dcDALJ.c-gyOReJ-crmSPl-adjusted-true:checked:not(#check_all)');
-  if (checkedBoxesNew.length) {
-    const selectedCardRowsNew = Array.from(checkedBoxesNew)
-      .map(checkbox => checkbox.closest('tr'))
-      .filter(el => el !== null) as Element[];
-    return selectedCardRowsNew;
-  }
-
-  // Legacy method
-  const checkedBoxesLegacy = document.querySelectorAll('.card-checkbox.checked:not(#check_all)');
-  if (checkedBoxesLegacy.length) {
-    return checkedBoxesLegacy;
-  }
-
-  return null;
-};
-
 function setPrice(modal: HTMLElement, price: string): void {
   const priceElement: HTMLElement = modal.querySelector('#price') as HTMLElement;
   priceElement.innerHTML = `${price} `;
 }
-
-const getCardIds = (selectedCards: NodeListOf<Element> | Element[]): string => {
-
-  return Array.from(selectedCards).map(card => {
-    // New method
-    if (card instanceof HTMLTableRowElement) {
-      const tds = card.querySelectorAll('td');
-      if (tds.length > 1) {
-        return tds[tds.length - 3].textContent;
-      }
-    }
-    // Legacy method
-    else if (card instanceof HTMLElement) {
-      return card.getAttribute('card_id');
-    }
-  }).filter(id => id !== undefined && id !== null).join(',');
-};
-
-
 
 const validate = (data: any[]): boolean => {
 
@@ -131,25 +92,17 @@ function addModalEventListeners(modal: HTMLElement, buyAndCombineHandler: () => 
   });
 }
 
-export const launchModal = async (): Promise<void> => {
+export const launchModal = async (cardIds: string): Promise<void> => {
 
   if (launched) return;
 
   launched = true;
   cardsToCombine = [];
 
-  const selectedCards = getSelectedCards();
-
-
-  if (!selectedCards || selectedCards.length === 0) {
-    alert('Oops! No cards have been selected for combining. Please choose at least one card to proceed.');
-    return;
-  }
-
-  const cardIds = getCardIds(selectedCards);
   const data = await fetchCardData(cardIds);
 
   if (!validate(data)) {
+    launched = false;
     return;
   }
 
@@ -197,12 +150,12 @@ export const launchModal = async (): Promise<void> => {
 async function submitBuyRequest(username: string | null, cheapestCards: ForSaleListing[] | null): Promise<any | null> {
 
   if (!cheapestCards) {
-    console.log("No cheapest cards found.");
+    addResultContainer("We weren't able to find any cards on the market.", "Unfortunately, we couldn't find any available cards in the market at this time. Please check back later for updates. We apologize for any inconvenience caused.")
     return null;
   }
 
   if (!username) {
-    console.log("Username not found in local storage.");
+    addResultContainer("An unexpected error occurred", "We're very sorry, but an unexpected error occurred while processing your request. Please try again later.")
     return null;
   }
 
