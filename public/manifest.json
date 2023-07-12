@@ -18,7 +18,13 @@
   },
   "content_scripts": [
     {
-: ["recommendationBundle.js"]
+      "matches": [
+        "https://splinterlands.com/*",
+        "https://next.splinterlands.com/*"
+      ],
+      "js": ["recommendationBundle.js"]
+    },
+    {
       "matches": [
         "https://splinterlands.com/*",
         "https://next.splinterlands.com/*"
