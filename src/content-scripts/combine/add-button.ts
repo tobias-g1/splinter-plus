@@ -1,5 +1,5 @@
 import { getUrlParams } from "src/common/url-search-params";
-import { launchModal } from "src/content-scripts/combine/combine-modal";
+import { launchCollectionModal } from "src/content-scripts/combine";
 
 /**
  * Adds a combine button to the DOM if the current URL contains card details and the correct tab is selected.
@@ -70,57 +70,3 @@ const createCombineButton = (type: string): HTMLDivElement => {
     return button;
 };
 
-
-const launchCollectionModal = () => {
-    const selectedCards = getSelectedCards();
-
-
-    if (!selectedCards || selectedCards.length === 0) {
-        alert('Oops! No cards have been selected for combining. Please choose at least one card to proceed.');
-        return;
-    }
-
-    const cardIds = getCardIds(selectedCards);
-
-    launchModal(cardIds);
-}
-
-
-const getSelectedCards = (): NodeListOf<Element> | Element[] | null => {
-
-    // New method
-    const checkedBoxesNew = document.querySelectorAll('.c-gyOReJ.c-dcDALJ.c-gyOReJ-crmSPl-adjusted-true:checked:not(#check_all)');
-    if (checkedBoxesNew.length) {
-        const selectedCardRowsNew = Array.from(checkedBoxesNew)
-            .map(checkbox => checkbox.closest('tr'))
-            .filter(el => el !== null) as Element[];
-        return selectedCardRowsNew;
-    }
-
-    // Legacy method
-    const checkedBoxesLegacy = document.querySelectorAll('.card-checkbox.checked:not(#check_all)');
-    if (checkedBoxesLegacy.length) {
-        return checkedBoxesLegacy;
-    }
-
-    return null;
-};
-
-
-
-const getCardIds = (selectedCards: NodeListOf<Element> | Element[]): string => {
-
-    return Array.from(selectedCards).map(card => {
-        // New method
-        if (card instanceof HTMLTableRowElement) {
-            const tds = card.querySelectorAll('td');
-            if (tds.length > 1) {
-                return tds[tds.length - 3].textContent;
-            }
-        }
-        // Legacy method
-        else if (card instanceof HTMLElement) {
-            return card.getAttribute('card_id');
-        }
-    }).filter(id => id !== undefined && id !== null).join(',');
-};

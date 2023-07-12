@@ -1,67 +1,91 @@
 import { addCombineButton } from "src/content-scripts/combine/add-button";
-import { combineInProgress, handleCombine, handlePurchase, inProgressPurchase } from "src/content-scripts/combine/combine-modal";
+import { combineInProgress, handleCombine, handlePurchase, inProgressPurchase, launchModal } from "src/content-scripts/combine/combine-modal";
 import './combine.scss';
 
 let backgroundScriptPort: chrome.runtime.Port;
 
-const connectToBackgroundScript = () => {
+const connectToBackgroundScript = (): void => {
   backgroundScriptPort = chrome.runtime.connect({ name: 'content-script' });
 
-  backgroundScriptPort.onMessage.addListener((message) => {
+  backgroundScriptPort.onMessage.addListener((message: any) => {
     console.log("Message from background script:", message);
-    if (message.command === 'backgroundReady') {
-      console.log('Background script is ready.');
-      // Notify the background script that the content script is ready
-      backgroundScriptPort.postMessage({ command: 'contentReady' });
-      console.log('Sent contentReady message to background script');
-    } else if (message.command === 'combine-purchase') {
-      if (inProgressPurchase && inProgressPurchase.length !== 0) {
-        handlePurchase(message.data);
-      }
-    } else if (message.command === 'combine-combining') {
-      if (combineInProgress) {
-        handleCombine(message.data)
-      }
+
+    switch (message.command) {
+      case 'backgroundReady':
+        console.log('Background script is ready.');
+        sendToBackgroundScript('contentReady');
+        break;
+      case 'combine-purchase':
+        if (inProgressPurchase && inProgressPurchase.length !== 0) handlePurchase(message.data);
+        break;
+      case 'combine-combining':
+        if (combineInProgress) handleCombine(message.data);
+        break;
     }
-
-
-    // Handle other messages...
   });
 
-  // Notify the background script that the content script is ready
-  backgroundScriptPort.postMessage({ command: 'backgroundReady' });
-  console.log('Sent backgroundReady message to background script');
+  sendToBackgroundScript('backgroundReady');
 };
 
-/**
- * Checks for the existence of the conversion button in the specified classes and adds it if it doesn't already exist.
- */
-const checkButtonsExist = () => {
+const sendToBackgroundScript = (command: string): void => {
+  backgroundScriptPort.postMessage({ command });
+  console.log(`Sent ${command} message to background script`);
+}
+
+const checkButtonsExist = (): void => {
   const buttonsDivs = document.querySelectorAll('.buttons, .c-PJLV-ifKYhuQ-css > .c-PJLV-ihmcGFm-css');
-  if (buttonsDivs && buttonsDivs.length) {
-    if (!document.getElementById('btn_combine_sp')) {
-      addCombineButton();
-      console.log('Conversion button added.');
-    }
-  } else {
-    return;
+
+  if (buttonsDivs.length && !document.getElementById('btn_combine_sp')) {
+    addCombineButton();
+    console.log('Conversion button added.');
   }
 };
 
+export const launchCollectionModal = (): void => {
+  const selectedCards = getSelectedCards();
 
-// Connect to the background script
+  if (!selectedCards || selectedCards.length === 0) {
+    alert('Oops! No cards have been selected for combining. Please choose at least one card to proceed.');
+    return;
+  }
+
+  const cardIds = getCardIds(selectedCards);
+
+  launchModal(cardIds);
+}
+
+const getSelectedCards = (): NodeListOf<Element> | Element[] | null => {
+  const checkedBoxesNew = document.querySelectorAll('.c-gyOReJ.c-dcDALJ.c-gyOReJ-crmSPl-adjusted-true:checked:not(#check_all)');
+
+  if (checkedBoxesNew.length) {
+    return Array.from(checkedBoxesNew).map(checkbox => checkbox.closest('tr')).filter(el => el !== null) as Element[];
+  }
+
+  const checkedBoxesLegacy = document.querySelectorAll('.card-checkbox.checked:not(#check_all)');
+
+  if (checkedBoxesLegacy.length) {
+    return checkedBoxesLegacy;
+  }
+
+  return null;
+};
+
+const getCardIds = (selectedCards: NodeListOf<Element> | Element[]): string => {
+  return Array.from(selectedCards).map(card => {
+    if (card instanceof HTMLTableRowElement) {
+      const tds = card.querySelectorAll('td');
+      return tds.length > 1 ? tds[tds.length - 3].textContent : '';
+    } else if (card instanceof HTMLElement) {
+      return card.getAttribute('card_id') || '';
+    }
+  }).filter(Boolean).join(',');
+};
+
 connectToBackgroundScript();
 
-// Call the checkButtonsExist function on initial load
 checkButtonsExist();
 console.log('Content script loaded successfully.');
 
-// Watch for changes to the DOM and check for the existence of the conversion button on each change
-const observer = new MutationObserver(() => {
-  checkButtonsExist();
-});
+const observer = new MutationObserver(checkButtonsExist);
 
-observer.observe(document.body, {
-  childList: true,
-  subtree: true
-});
+observer.observe(document.body, { childList: true, subtree: true });
