@@ -7,7 +7,6 @@ const SETTINGS_REFRESH_INTERVAL_MINUTES = Number(process.env.SETTINGS_REFRESH_IN
 // The interval (in minutes) for checking the auto claim setting
 const CHECK_AUTO_CLAIM_SETTING_INTERVAL_MINUTES = Number(process.env.CHECK_AUTO_CLAIM_SETTING_INTERVAL_MINUTES) || 60;
 
-// Alarm names
 const CHECK_SETTINGS_ALARM = 'checkSettings';
 const CHECK_AUTO_CLAIM_SETTING_ALARM = 'checkAutoClaimSetting';
 

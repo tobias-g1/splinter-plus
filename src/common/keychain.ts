@@ -53,3 +53,18 @@ export const sendCustomJSONRequest = async (
     }
   });
 };
+
+export const sendRequestSignBuffer = async (username: string, message: string): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const request = {
+      type: KeychainRequestTypes.signBuffer,
+      request_id: generateSafeRandomNumber(),
+      username,
+      message,
+      method: KeychainKeyTypes.posting
+    } as KeychainRequest;
+    chrome.runtime.sendMessage(KEYCHAIN_EXTENSION_ID, request, (response) => {
+      resolve(response);
+    });
+  });
+};

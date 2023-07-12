@@ -1,0 +1,38 @@
+[
+    {
+      "name": "Fire",
+      "value": "Red",
+      "image": "/assets/icons/fire.png"
+    },
+    {
+      "name": "Water",
+      "value": "Blue",
+      "image": "/assets/icons/water.png"
+    },
+    {
+      "name": "Earth",
+      "value": "Green",
+      "image": "/assets/icons/earth.png"
+    },
+    {
+      "name": "Life",
+      "value": "White",
+      "image": "assets/icons/life.png"
+    },
+    {
+      "name": "Death",
+      "value": "Black",
+      "image": "/assets/icons/death.png"
+    },
+    {
+      "name": "Dragon",
+      "value": "Gold",
+      "image": "/assets/icons/dragon.webp"
+    },
+    {
+      "name": "Neutral",
+      "value": "Gray",
+      "image": "/assets/icons/neutral.webp"
+    }
+  ]
+  
