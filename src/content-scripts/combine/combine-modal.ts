@@ -252,13 +252,31 @@ export class CombineModal {
   }
 
   public addResultContainer(header: string, description: string) {
-    const resultContainer = this.createResultContent(header, description);
+    const resultContainer = this.createResultContent(header, description, this.globalModal, 'Done');
     this.setModalBodyContent(this.globalModal, resultContainer);
   }
 
-  private createResultContent(header: string, text: string): HTMLElement {
+  public createResultContent(header: string, text: string, modal: HTMLElement, buttonText: string): HTMLElement {
     const resultContent: HTMLDivElement = document.createElement('div');
-    resultContent.innerHTML = `<h2>${header}</h2><p>${text}</p>`;
+    resultContent.classList.add("result-content");
+
+    const closeButton: HTMLButtonElement = document.createElement('button');
+    closeButton.setAttribute("class", "gradient-button green");
+    closeButton.textContent = buttonText;
+
+    // Add event listener to the button
+    closeButton.addEventListener('click', () => {
+      this.launched = false;
+      modal.remove();
+    });
+
+    resultContent.innerHTML = `<h2 class="result-header">${header}</h2><p>${text}</p>`;
+
+    resultContent.appendChild(closeButton); // Appending the button to the resultContent div
+
     return resultContent;
   }
+
 }
+
+
