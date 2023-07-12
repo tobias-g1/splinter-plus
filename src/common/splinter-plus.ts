@@ -23,8 +23,8 @@ export const sendRequest = async (endpoint: string, method: string, token?: stri
     return responseData;
 };
 
-export const login = async (account: string, timestamp: number, signature: string, pubkey: string): Promise<{ access_token: string, refresh_token: string }> => {
-    const data = await sendRequest("login", "POST", undefined, undefined, { message: `${account} ${timestamp}`, signature, pubkey });
+export const login = async (message: string, signature: string, pubkey: string): Promise<{ access_token: string, refresh_token: string }> => {
+    const data = await sendRequest("login", "POST", undefined, undefined, { message, signature, pubkey });
     return data;
 };
 
