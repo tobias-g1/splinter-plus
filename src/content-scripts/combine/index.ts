@@ -1,6 +1,6 @@
 import { addCombineButton } from "src/content-scripts/combine/add-button";
-import { CombineModal } from "./combine-modal";
-import './combine.scss';
+import { CombineModal } from "../common/combine-modal";
+import '../common/modal.scss';
 
 let backgroundScriptPort: chrome.runtime.Port;
 let combineModal: CombineModal;

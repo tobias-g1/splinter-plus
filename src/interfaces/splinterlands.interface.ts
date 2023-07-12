@@ -905,3 +905,91 @@ export interface BalanceHistory {
     last_update_date: Date;
     is_archived: number;
 }
+
+export interface Collection {
+    player: string
+    cards: Card[]
+}
+
+export interface Card {
+    player: string
+    uid: string
+    card_detail_id: number
+    xp: number
+    gold: boolean
+    edition: number
+    market_id?: string
+    buy_price?: string
+    market_listing_type?: string
+    market_listing_status?: number
+    market_created_date?: string
+    rental_type?: string
+    last_used_block?: number
+    last_used_player?: string
+    last_used_date?: string
+    last_transferred_block?: number
+    last_transferred_date?: string
+    alpha_xp?: number
+    delegated_to?: string
+    delegation_tx?: string
+    skin: any
+    delegated_to_display_name?: string
+    display_name: string
+    lock_days?: number
+    unlock_date: any
+    created_date?: string
+    created_block?: number
+    created_tx?: string
+    expiration_date?: string
+    last_buy_price?: string
+    last_buy_currency?: string
+    level: number
+}
+
+export interface CardDetail {
+    id: number;
+    name: string;
+    color: string;
+    type: string;
+    sub_type: any;
+    rarity: number;
+    drop_rate: number;
+    stats: Stats;
+    is_starter: boolean;
+    editions: string;
+    created_block_num?: number;
+    last_update_tx?: string;
+    total_printed: number;
+    is_promo: boolean;
+    tier?: number;
+    secondary_color?: string;
+    distribution: Distribution[];
+}
+
+export interface CardDetailOwnership extends CardDetail {
+    cards: Card[];
+    owned: boolean;
+    rented: boolean;
+}
+
+export interface Stats {
+    mana: any
+    attack: any
+    ranged: any
+    magic: any
+    armor: any
+    health: any
+    speed: any
+    abilities?: any[]
+}
+
+export interface Distribution {
+    card_detail_id: number
+    gold: boolean
+    edition: number
+    num_cards: string
+    total_xp: string
+    num_burned: string
+    total_burned_xp: string
+}
+

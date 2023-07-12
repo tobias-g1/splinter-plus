@@ -1,7 +1,7 @@
 import { sendCustomJSONRequest } from "src/common/keychain";
 import { getSettingsFromLocalStorage } from "src/common/settings";
 import { KeychainKeyTypes } from "src/interfaces/keychain.interface";
-import { BalanceHistory, CardLevelInfo, ForSaleListing, SettingsWithIndexSignature, Transaction } from "src/interfaces/splinterlands.interface";
+import { BalanceHistory, CardLevelInfo, Collection, ForSaleListing, SettingsWithIndexSignature, Transaction } from "src/interfaces/splinterlands.interface";
 
 const BASE_URL = process.env.SPLINTERLANDS_BASE || 'https://api2.splinterlands.com';
 
@@ -24,7 +24,7 @@ export const fetchSettings = async () => {
 
 
 // Fetches card details from Splinterlands API
-export const getCardDetails = async (card_detail_id: number) => {
+export const getCardDetails = async (card_detail_id: number | number[]) => {
     try {
         const response = await fetch(`${BASE_URL}/cards/get_details`);
 
@@ -33,18 +33,26 @@ export const getCardDetails = async (card_detail_id: number) => {
         }
 
         const data = await response.json();
-        const card = data.find((card: any) => card.id === card_detail_id);
 
-        if (!card) {
-            throw new Error(`Card with ID ${card_detail_id} not found.`);
+        if (Array.isArray(card_detail_id)) {
+            const cards = data.filter((card: any) => card_detail_id.includes(card.id));
+            if (cards.length === 0) {
+                throw new Error(`No cards found with IDs ${card_detail_id.join(", ")}.`);
+            }
+            return cards;
+        } else {
+            const card = data.find((card: any) => card.id === card_detail_id);
+            if (!card) {
+                throw new Error(`Card with ID ${card_detail_id} not found.`);
+            }
+            return card;
         }
-
-        return card;
     } catch (error) {
         console.error('An error occurred while fetching card details:', error);
         throw error;
     }
 };
+
 
 // Retrieves level information for a given card
 export const getCardLevelInfo = async (card: any): Promise<CardLevelInfo> => {
@@ -318,6 +326,16 @@ function generateRandomString() {
     return result;
 }
 
+export const getCollection = async (username: string): Promise<Collection> => {
+    const apiUrl = `https://api2.splinterlands.com/cards/collection/${username}`;
+    const response = await fetch(apiUrl);
+
+    if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`);
+    }
+
+    return await response.json();
+};
 
 export const combineCards = async (username: string, cards: string[]): Promise<any> => {
     const json: string = JSON.stringify({
