@@ -1,8 +1,9 @@
 import { addCombineButton } from "src/content-scripts/combine/add-button";
-import { combineInProgress, handleCombine, handlePurchase, inProgressPurchase, launchModal } from "src/content-scripts/combine/combine-modal";
+import { CombineModal } from "./combine-modal";
 import './combine.scss';
 
 let backgroundScriptPort: chrome.runtime.Port;
+let combineModal: CombineModal;
 
 const connectToBackgroundScript = (): void => {
   backgroundScriptPort = chrome.runtime.connect({ name: 'content-script' });
@@ -16,10 +17,10 @@ const connectToBackgroundScript = (): void => {
         sendToBackgroundScript('contentReady');
         break;
       case 'combine-purchase':
-        if (inProgressPurchase && inProgressPurchase.length !== 0) handlePurchase(message.data);
+        if (combineModal.inProgressPurchase && combineModal.inProgressPurchase.length !== 0) combineModal.handlePurchase(message.data);
         break;
       case 'combine-combining':
-        if (combineInProgress) handleCombine(message.data);
+        if (combineModal.combineInProgress) combineModal.handleCombine(message.data);
         break;
     }
   });
@@ -40,19 +41,6 @@ const checkButtonsExist = (): void => {
     console.log('Conversion button added.');
   }
 };
-
-export const launchCollectionModal = (): void => {
-  const selectedCards = getSelectedCards();
-
-  if (!selectedCards || selectedCards.length === 0) {
-    alert('Oops! No cards have been selected for combining. Please choose at least one card to proceed.');
-    return;
-  }
-
-  const cardIds = getCardIds(selectedCards);
-
-  launchModal(cardIds);
-}
 
 const getSelectedCards = (): NodeListOf<Element> | Element[] | null => {
   const checkedBoxesNew = document.querySelectorAll('.c-gyOReJ.c-dcDALJ.c-gyOReJ-crmSPl-adjusted-true:checked:not(#check_all)');
@@ -81,11 +69,27 @@ const getCardIds = (selectedCards: NodeListOf<Element> | Element[]): string => {
   }).filter(Boolean).join(',');
 };
 
+export const launchCollectionModal = (): void => {
+  const selectedCards = getSelectedCards();
+
+  if (!selectedCards || selectedCards.length === 0) {
+    alert('Oops! No cards have been selected for combining. Please choose at least one card to proceed.');
+    return;
+  }
+
+  const cardIds = getCardIds(selectedCards);
+
+  combineModal = new CombineModal();
+
+  combineModal.launchModal(cardIds);
+}
+
 connectToBackgroundScript();
 
 checkButtonsExist();
-console.log('Content script loaded successfully.');
 
 const observer = new MutationObserver(checkButtonsExist);
 
 observer.observe(document.body, { childList: true, subtree: true });
+
+console.log('Content script loaded successfully.');
