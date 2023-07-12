@@ -3,42 +3,59 @@
   "description": "__MSG_description__",
   "default_locale": "en",
   "version": "1.0.0.0",
-  "permissions": ["storage", "idle", "webNavigation", "alarms"],
+  "permissions": [
+    "storage",
+    "idle",
+    "webNavigation",
+    "alarms",
+    "tabs",
+    "scripting",
+    "activeTab"
+  ],
   "host_permissions": ["https://*/*"],
   "action": {
     "default_icon": "/assets/images/plugin.png"
   },
   "content_scripts": [
     {
-      "matches": ["https://splinterlands.com/*"],
-      "js": ["usernameBundle.js"]
-    },
-    {
-      "matches": ["https://splinterlands.com/*"],
+: ["recommendationBundle.js"]
+      "matches": [
+        "https://splinterlands.com/*",
+        "https://next.splinterlands.com/*"
+      ],
       "js": ["combineBundle.js"]
     },
     {
-      "matches": ["https://splinterlands.com/*"],
-      "js": ["recommendationBundle.js"]
+      "matches": [
+        "https://splinterlands.com/*",
+        "https://next.splinterlands.com/*"
+      ],
+      "js": ["usernameBundle.js"]
     }
   ],
   "icons": {
     "128": "/assets/images/plugin.png"
   },
   "background": {
-    "service_worker": "backgroundBundle.js",
-    "type": "module"
+    "service_worker": "backgroundBundle.js"
   },
   "web_accessible_resources": [
     {
-      "resources": ["/images/logo.png", "_locales/*", "usernameBundle.js", "assets/icons/*"],
+      "resources": [
+        "images/logo.png",
+        "_locales/*",
+        "usernameBundle.js",
+        "assets/images/combine-new.svg",
+        "assets/images/combine-old.svg"
+      ],
       "matches": ["https://*/*", "http://0.0.0.0:1337/*", "http://*/*"],
       "extension_ids": []
     }
   ],
+
   "manifest_version": 3,
   "externally_connectable": {
-    "ids": ["fbjjilfdeadgdphnoikkhjhpnndlkgfn"],
+    "ids": ["cgbodljjckpjacbgjcfgljhacbeoojkb"],
     "matches": ["https://localhost:3000/*", "http://localhost:3000/*"],
     "accepts_tls_channel_id": false
   }

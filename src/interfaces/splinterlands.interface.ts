@@ -1,6 +1,7 @@
 export interface ForSaleListing {
     fee_percent: number;
     uid: string;
+    bcx: number;
     seller: string;
     card_detail_id: number;
     xp: number;
@@ -841,7 +842,9 @@ export interface CardLevelInfo {
 }
 
 export interface Transaction {
-    trx_info: TrxInfo
+    trx_info: TrxInfo,
+    error: string,
+    error_code: number
 }
 
 export interface TransactionUpdate extends Transaction {
@@ -886,4 +889,19 @@ export interface TokenBalance {
     last_update_date: string | null;
     last_reward_block?: number;
     last_reward_time?: string;
+}
+
+export interface BalanceHistory {
+    player: string;
+    token: string;
+    amount: string;
+    balance_start: string;
+    balance_end: string;
+    block_num: number;
+    trx_id: string;
+    type: string;
+    created_date: Date;
+    counterparty: string;
+    last_update_date: Date;
+    is_archived: number;
 }

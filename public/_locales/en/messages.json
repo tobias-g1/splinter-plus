@@ -22,5 +22,13 @@
   "claim_reward_hint": {
     "message": "Automatically claim staked SPS rewards every hour.",
     "description": "Hint for the 'Claim reward' setting."
+  },
+  "stake_reward_label": {
+    "message": "Automatically stake claimed SPS rewards",
+    "description": "Label for the 'Claim reward' setting."
+  },
+  "stake_reward_hint": {
+    "message": "Automatically stake claimed SPS rewards.",
+    "description": "Hint for the 'Claim reward' setting."
   }
 }
