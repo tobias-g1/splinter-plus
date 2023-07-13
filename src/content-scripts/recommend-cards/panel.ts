@@ -43,62 +43,63 @@ async function createCardItem(detail: CardDetailOwnership, format: string): Prom
     const username: string | null = await getUsernameFromLocalStorage();
 
 
-    // Filter cards that are being rented out to the user
-    const rentingCards = detail.cards.filter((c) => c.delegated_to === username);
-
     // Filter cards that are listed for rent or sale by the user
     const listedCards = detail.cards.filter((c) => (c.market_listing_type === "RENT" || c.market_listing_type === "SELL") && c.player === username);
 
     // Filter cards that are neither rented, listed, nor renting
     const nonAffectedCards = detail.cards.filter((c) => c.delegated_to === "" && !(c.market_listing_type === "RENT" || c.market_listing_type === "SELL"));
 
-    console.log(rentingCards, listedCards, nonAffectedCards)
+    console.log(detail)
 
-    if (nonAffectedCards.length === 0) {
+    if (detail.editions.includes("6") || detail.editions.includes("10")) {
+        description.innerText = "This card is not available for purchase or renting.";
+    } else {
+        if (nonAffectedCards.length === 0) {
 
-        if (listedCards.length !== 0) {
-            description.innerText = "You have this card listed on the market for sale or rent. Please unlist or buy another to use SplinterPlus to upgrade your card.";
-            buttons = [
-                {
-                    text: 'Buy',
-                    action: () => {
-                        const buyModal = new BuyModal(detail.id, false, parseInt(detail.editions[0]), 500)
-                        buyModal.launchBuyModal()
+            if (listedCards.length !== 0) {
+                description.innerText = "You have this card listed on the market for sale or rent. Please unlist or buy another to use SplinterPlus to upgrade your card.";
+                buttons = [
+                    {
+                        text: 'Buy',
+                        action: () => {
+                            const buyModal = new BuyModal(detail.id, false, parseInt(detail.editions[0]), 500)
+                            buyModal.launchBuyModal()
+                        },
+                    }
+                ]
+            } else {
+                description.innerText = "You don't have this in your collection. Use the options below to buy or rent to add it to your collection. ";
+                buttons = [
+                    {
+                        text: 'Buy',
+                        action: () => {
+                            const buyModal = new BuyModal(detail.id, false, parseInt(detail.editions[0]), 500)
+                            buyModal.launchBuyModal()
+                        },
                     },
-                }
-            ]
+                    {
+                        text: 'Rent',
+                        action: () => {
+                            const rentModal = new RentModal(detail.id, false, parseInt(detail.editions[0]), 500)
+                            rentModal.launchRentModal()
+                        },
+                    },
+                ];
+            }
+
+
         } else {
-            description.innerText = "You don't have this in your collection. Use the options below to buy or rent to add it to your collection. ";
+            description.innerText = 'You already own this card, you can combine your highest rated card to the next level by clicking the button below, or alternatively visit the collection page to combine multiple owned cards.';
             buttons = [
                 {
-                    text: 'Buy',
+                    text: 'Upgrade',
                     action: () => {
-                        const buyModal = new BuyModal(detail.id, false, parseInt(detail.editions[0]), 500)
-                        buyModal.launchBuyModal()
-                    },
-                },
-                {
-                    text: 'Rent',
-                    action: () => {
-                        const rentModal = new RentModal(detail.id, false, parseInt(detail.editions[0]), 500)
-                        rentModal.launchRentModal()
+                        const combineModal = new CombineModal()
+                        combineModal.launchModal(detail.cards[0].uid)
                     },
                 },
             ];
         }
-
-
-    } else {
-        description.innerText = 'You already own this card, you can combine your highest rated card to the next level by clicking the button below, or alternatively visit the collection page to combine multiple owned cards.';
-        buttons = [
-            {
-                text: 'Upgrade',
-                action: () => {
-                    const combineModal = new CombineModal()
-                    combineModal.launchModal(detail.cards[0].uid)
-                },
-            },
-        ];
     }
 
     const buyAction = buttons.find((button) => button.text === 'Buy')?.action;
@@ -126,7 +127,6 @@ async function createCardItem(detail: CardDetailOwnership, format: string): Prom
 
     return cardItem;
 }
-
 
 function createButton(text: string, format: string): HTMLButtonElement {
     const button = document.createElement('button');
