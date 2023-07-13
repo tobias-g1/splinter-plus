@@ -1003,6 +1003,7 @@ export interface CardDetail {
 
 export interface CardDetailOwnership extends CardDetail {
     cards: Card[];
+    avg_rating: number;
 }
 
 export interface Stats {

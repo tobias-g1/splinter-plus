@@ -5,7 +5,7 @@ import { BuyModal } from 'src/content-scripts/common/buy-modal';
 import { CombineModal } from 'src/content-scripts/common/combine-modal';
 import { RentModal } from 'src/content-scripts/common/rental-modal';
 import { CardResponse } from 'src/interfaces/spinter-plus.interface';
-import { Card, CardDetail, CardDetailOwnership, Collection } from 'src/interfaces/splinterlands.interface';
+import { Card, CardDetail, CardDetailOwnership, Collection, Distribution } from 'src/interfaces/splinterlands.interface';
 
 const EDITIONS: Record<string, string> = {
     "0": 'alpha',
@@ -21,14 +21,14 @@ const EDITIONS: Record<string, string> = {
     "10": 'soulbound'
 };
 
-async function createCardItem(detail: CardDetailOwnership, format: string): Promise<HTMLDivElement> {
+async function createCardItem(detail: CardDetailOwnership, format: string, rating: number): Promise<HTMLDivElement> {
     const cardItem = document.createElement('div');
     cardItem.classList.add('card-item');
 
     const cardImage = document.createElement('img');
     cardImage.classList.add('card-img');
 
-    const edition = EDITIONS[detail.editions];
+    const edition = getHighestEdition(detail.editions, detail.distribution);
 
     cardImage.src = `https://d36mxiodymuqjm.cloudfront.net/cards_by_level/${edition}/${detail.name}_lv1.png`;
     cardItem.appendChild(cardImage);
@@ -36,20 +36,26 @@ async function createCardItem(detail: CardDetailOwnership, format: string): Prom
     const cardButtonsContainer = document.createElement('div');
     cardButtonsContainer.classList.add('card-buttons-container');
 
+    const header = document.createElement('span');
+    header.classList.add('card-header');
+    header.innerHTML = detail.name
+
+    const stat = document.createElement('div');
+    stat.classList.add('card-stat');
+    stat.classList.add(format);
+    stat.innerHTML = `Rating: ${rating}`
+
     const description = document.createElement('p');
     description.classList.add('card-description');
 
     let buttons: { text: string; action: () => void }[] = [];
     const username: string | null = await getUsernameFromLocalStorage();
 
-
     // Filter cards that are listed for rent or sale by the user
     const listedCards = detail.cards.filter((c) => (c.market_listing_type === "RENT" || c.market_listing_type === "SELL") && c.player === username);
 
     // Filter cards that are neither rented, listed, nor renting
     const nonAffectedCards = detail.cards.filter((c) => c.delegated_to === "" && !(c.market_listing_type === "RENT" || c.market_listing_type === "SELL"));
-
-    console.log(detail)
 
     if (detail.editions.includes("6") || detail.editions.includes("10")) {
         description.innerText = "This card is not available for purchase or renting.";
@@ -120,6 +126,8 @@ async function createCardItem(detail: CardDetailOwnership, format: string): Prom
 
     const cardButtons = document.createElement('div');
     cardButtons.classList.add('card-buttons');
+    cardButtons.appendChild(header);
+    cardButtons.appendChild(stat);
     cardButtons.appendChild(description);
     cardButtons.appendChild(cardButtonsContainer);
 
@@ -166,12 +174,28 @@ function createHeader(format: string): HTMLDivElement {
     return headerDiv;
 }
 
+function getHighestEdition(editions: string, distribution: Distribution[]): string {
+    const editionList = editions.split(',').map(Number);
+    let highestEdition: number = editionList[0];
+    let highestNumCards: number = 0;
+
+    for (const edition of editionList) {
+        const editionDistribution = distribution.find((d) => d.edition === edition && !d.gold);
+        if (editionDistribution && parseInt(editionDistribution.num_cards) > highestNumCards) {
+            highestNumCards = parseInt(editionDistribution.num_cards);
+            highestEdition = edition;
+        }
+    }
+
+    return EDITIONS[highestEdition.toString()];
+}
+
 async function createCardList(details: CardDetailOwnership[], format: string): Promise<HTMLDivElement> {
     const cardList = document.createElement('div');
     cardList.classList.add('card-list');
 
     for (const detail of details) {
-        const cardItemElement = await createCardItem(detail, format);
+        const cardItemElement = await createCardItem(detail, format, detail.avg_rating);
         cardList.appendChild(cardItemElement);
     }
 
@@ -231,12 +255,13 @@ export async function buildAndInsertPanel(format: string) {
     recommendedCards.classList.add('recommended-cards');
 
     const cards: CardResponse = await getCards(
-        [99], [], [], "Novice", "modern", 15
+        [99], [], [], "Novice", format, 15
     )
     const cardIds: number[] = cards.cards.map(card => card.card_id);
     const cardData: CardDetail[] = await getCardDetails(cardIds);
 
     const username: string | null = await getUsernameFromLocalStorage();
+
     let collection: Collection | null = null;
     if (username) {
         collection = await getCollection(username);
@@ -252,7 +277,8 @@ export async function buildAndInsertPanel(format: string) {
 
         return {
             ...card,
-            cards: ownedCards.sort((a, b) => b.level - a.level)
+            cards: ownedCards.sort((a, b) => b.level - a.level),
+            avg_rating: cards.cards.find(c => c.card_id === card.id)?.avg_rating || 0
         };
     });
 
