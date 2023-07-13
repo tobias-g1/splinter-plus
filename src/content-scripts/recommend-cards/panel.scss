@@ -135,29 +135,6 @@
   }
 }
 
-.explore-button {
-  font-family: nanami-bold;
-  font-size: 18px;
-  text-transform: uppercase;
-  padding: 5px 20px;
-  border: 0;
-  border-radius: 5px;
-  color: white;
-  &.modern {
-    background: transparent linear-gradient(108deg, #004eff 0, #0ff 100%) 0 0
-      no-repeat padding-box;
-  }
-  &.wild {
-    background: transparent linear-gradient(108deg, #4200d8 0, #d752ff 100%) 0 0
-      no-repeat padding-box;
-  }
-}
-
-.explore-button.close-expand {
-  background: 0;
-  border: 2px solid;
-}
-
 .header-wrapper {
   display: flex;
   align-items: center;

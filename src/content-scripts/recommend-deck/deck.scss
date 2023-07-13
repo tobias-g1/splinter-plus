@@ -1,0 +1,37 @@
+.deck-panel {
+  background-color: 130f0c;
+  border-radius: 15px;
+  transition: max-height 0.3s;
+  padding: 25px;
+  max-height: 100px;
+  margin-top: 25px;
+
+  .header {
+    color: white;
+    font-family: nanami-bold;
+    font-size: 22px;
+    text-transform: uppercase;
+  }
+
+  &.expanded {
+    max-height: initial;
+    .panel-content {
+      display: block;
+    }
+  }
+}
+
+.deck-builder-page2__cards {
+  margin-top: 155px;
+}
+
+.deck-panel-wrapper {
+  font-family: OpenSans;
+  font-size: 14px;
+  text-transform: uppercase;
+  position: fixed;
+  margin-top: 240px;
+  padding-left: 340px;
+  width: calc(100% - 25px);
+  z-index: 150;
+}

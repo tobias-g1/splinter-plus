@@ -36,6 +36,13 @@
         "https://splinterlands.com/*",
         "https://next.splinterlands.com/*"
       ],
+      "js": ["deckBundle.js"]
+    },
+    {
+      "matches": [
+        "https://splinterlands.com/*",
+        "https://next.splinterlands.com/*"
+      ],
       "js": ["usernameBundle.js"]
     }
   ],
