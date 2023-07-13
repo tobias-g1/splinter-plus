@@ -14,8 +14,11 @@ const EDITIONS: Record<string, string> = {
     "3": 'reward',
     "4": 'untamed',
     "5": 'dice',
-    "6": 'rift',
-    "7": 'chaos'
+    "6": 'gladiator',
+    "7": 'chaos',
+    "8": 'rift',
+    "9": 'zola',
+    "10": 'soulbound'
 };
 
 function createCardItem(detail: CardDetailOwnership, format: string): HTMLDivElement {
@@ -40,7 +43,7 @@ function createCardItem(detail: CardDetailOwnership, format: string): HTMLDivEle
 
     if (!detail.owned && !detail.rented) {
         description.innerText =
-            "You don't have this in your collection. Use the options below to buy or rent to add it to your collection.";
+            "You don't have this in your collection. Use the options below to buy or rent to add it to your collection. ";
 
         buttons = [
             {
