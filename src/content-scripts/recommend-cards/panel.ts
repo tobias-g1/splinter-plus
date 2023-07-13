@@ -5,7 +5,6 @@ import { createCardItem, createHeader } from 'src/content-scripts/common/common'
 import { CardResponse } from 'src/interfaces/spinter-plus.interface';
 import { Card, CardDetail, CardDetailOwnership, Collection } from 'src/interfaces/splinterlands.interface';
 
-
 async function createCardList(details: CardDetailOwnership[], format: string): Promise<HTMLDivElement> {
     const cardList = document.createElement('div');
     cardList.classList.add('card-list');
@@ -35,7 +34,7 @@ export async function buildAndInsertPanel(format: string) {
     const panelDiv = document.createElement('div');
     panelDiv.classList.add('custom-panel');
 
-    const headerDiv = createHeader(format);
+    const headerDiv = createHeader(format, 'Recommended Collection');
     panelDiv.appendChild(headerDiv);
 
     const contentDiv = document.createElement('div');

@@ -14,7 +14,7 @@ if (window.location.href === battleHistoryUrl) {
   const checkPanelExists = async () => {
     const panel = document.createElement('div');
     panel.classList.add('deck-panel');
-    const headerDiv = createHeader(format);
+    const headerDiv = createHeader(format, 'Recommended Deck');
     panel.appendChild(headerDiv);
     const battleContainer: any = document.querySelector('.deck-builder-page2__filters');
 

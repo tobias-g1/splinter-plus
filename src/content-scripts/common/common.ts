@@ -143,13 +143,13 @@ export function createResultContent(header: string, text: string, modal: HTMLEle
     return resultContent;
 }
 
-export function createHeader(format: string): HTMLDivElement {
+export function createHeader(text: string, format: string): HTMLDivElement {
     const headerDiv = document.createElement('div');
     headerDiv.classList.add('header-wrapper');
 
     const header = document.createElement('span');
     header.classList.add('header');
-    header.innerText = 'Recommended Collection';
+    header.innerText = text;
     headerDiv.appendChild(header);
 
     const exploreButton = document.createElement('button');
