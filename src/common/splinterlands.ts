@@ -350,7 +350,7 @@ export const rentCardsFromMarket = async (
     username: string,
     cards: Listing[],
     currency: string,
-    days: number,
+    days: string,
 ): Promise<any> => {
     const items = cards.map(card => card.market_id);
     const total_price = cards.reduce((sum, card) => {
@@ -359,7 +359,6 @@ export const rentCardsFromMarket = async (
     }, 0).toFixed(3);
     const json: string = JSON.stringify({
         items,
-        price: total_price,
         currency,
         days,
         app: process.env.APP

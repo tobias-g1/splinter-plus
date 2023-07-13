@@ -45,7 +45,7 @@ function createCardItem(detail: CardDetailOwnership): HTMLDivElement {
             {
                 text: 'Buy',
                 action: () => {
-                    const buyModal = new BuyModal(1, false, 0, 500)
+                    const buyModal = new BuyModal(454, false, 3, 500)
                     buyModal.launchBuyModal()
                 },
             },
@@ -214,7 +214,7 @@ export async function buildAndInsertPanel(format: string) {
         "cards": [
             {
                 "avg_rating": 810,
-                "card_id": 380,
+                "card_id": 454,
                 "deck_cnt": 8
             },
             {

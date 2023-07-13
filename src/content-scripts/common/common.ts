@@ -56,7 +56,7 @@ export async function createMarketTable(forSaleListings: MarketListing[]): Promi
             if (listing.type === 'RENT') {
                 const days = prompt('Enter the number of days for rent:', '2');
                 if (days) {
-                    rentCardsFromMarket(username, [listing], 'DEC', parseInt(days, 10));
+                    rentCardsFromMarket(username, [listing], 'DEC', days);
                 }
             } else {
                 buyCardsFromMarket(username, [listing], 'DEC');
@@ -81,7 +81,7 @@ export async function createMarketTable(forSaleListings: MarketListing[]): Promi
 
 export function setModalBodyContent(modal: HTMLElement, content: HTMLElement | string): void {
     const modalBody: HTMLElement = modal.querySelector('.modal-body') as HTMLElement;
-    modalBody.innerHTML = ''; // Clear the existing content
+    modalBody.innerHTML = '';
     if (typeof content === 'string') {
         modalBody.innerHTML = content;
     } else {

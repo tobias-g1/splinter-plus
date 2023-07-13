@@ -15,15 +15,14 @@ export const initializeBackgroundScriptConnection = (modal: any): void => {
                 console.log('Background script is ready.');
                 sendToBackgroundScript('contentReady');
                 break;
-            case 'combine-purchase':
-                if (modalInstance.inProgressPurchase && modalInstance.inProgressPurchase.length !== 0) {
-                    modalInstance.handlePurchase(message.data);
-                }
+            case 'rent':
+                modalInstance.handlePurchase(message.data);
                 break;
-            case 'combine-combining':
-                if (modalInstance.combineInProgress) {
-                    modalInstance.handleCombine(message.data);
-                }
+            case 'purchase':
+                modalInstance.handlePurchase(message.data);
+                break;
+            case 'combine':
+                modalInstance.handleCombine(message.data);
                 break;
         }
     });

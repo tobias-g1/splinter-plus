@@ -1,5 +1,5 @@
-import { fetchMarketData } from "src/common/splinterlands";
-import { createMarketTable } from "src/content-scripts/common/common";
+import { fetchMarketData, verifySuccessfulPurchases } from "src/common/splinterlands";
+import { addLoadingIndicator, addResultContainer, createMarketTable } from "src/content-scripts/common/common";
 import { initializeBackgroundScriptConnection } from "src/content-scripts/common/connector";
 import { MarketListing } from "src/interfaces/splinterlands.interface";
 import '../common/common.scss';
@@ -68,6 +68,43 @@ export class BuyModal {
       contentDiv.appendChild(tableContainer);
     } catch (error) {
       console.error('An error occurred while creating the table:', error);
+    }
+  }
+
+  public async handlePurchase(data: any) {
+    addLoadingIndicator(this.globalModal!, "Hang tight! We're processing your card purchase.");
+
+    const { tx_id } = data;
+    const cardsBought = await verifySuccessfulPurchases(tx_id);
+
+    const { allSuccessful, successful, unsuccessful } = cardsBought;
+    let successfulCards: any[] = [];
+    let unsuccessfulCards: any[] = [];
+
+    if (successful && successful.length > 0) {
+      successful.forEach((purchase: any) => {
+        if (purchase.cards && purchase.cards.length > 0) {
+          purchase.cards.forEach((card: any) => {
+            successfulCards.push(card);
+          });
+        }
+      });
+    }
+
+    if (unsuccessful && unsuccessful.length > 0) {
+      unsuccessful.forEach((purchase: any) => {
+        if (purchase.cards && purchase.cards.length > 0) {
+          purchase.cards.forEach((card: any) => {
+            unsuccessfulCards.push(card);
+          });
+        }
+      });
+    }
+
+    if (allSuccessful) {
+      addResultContainer(this.globalModal!, 'Your cards have been purchased successfully!', 'Congratulations! Your cards were successfully bought.')
+    } else {
+      addResultContainer(this.globalModal!, 'There has been an error purchasing your cards', "We're sorry, but an error occurred while trying to process your card purchase. Please ensure you have the correct amount to complete the purchase and try again.")
     }
   }
 

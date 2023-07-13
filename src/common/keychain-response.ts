@@ -20,9 +20,11 @@ export const handleKeyChainResponse = async (message: any) => {
             case "sm_stake_tokens":
                 return attemptAutoStake(username, tx_id);
             case "sm_market_purchase":
-                return sendMessageToContentScript({ command: "combine-purchase", data: { tx_id } });
+                return sendMessageToContentScript({ command: "purchase", data: { tx_id } });
             case "sm_combine_cards":
-                return sendMessageToContentScript({ command: "combine-combining", data: { tx_id } });
+                return sendMessageToContentScript({ command: "combine", data: { tx_id } });
+            case "sm_market_rent":
+                return sendMessageToContentScript({ command: "rent", data: { tx_id } });
             default:
                 console.log("unhandled response", response);
                 break;

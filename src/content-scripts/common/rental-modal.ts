@@ -1,5 +1,5 @@
-import { fetchMarketData } from 'src/common/splinterlands';
-import { createMarketTable } from 'src/content-scripts/common/common';
+import { fetchMarketData, waitForTransactionSuccess } from 'src/common/splinterlands';
+import { addLoadingIndicator, addResultContainer, createMarketTable } from 'src/content-scripts/common/common';
 import { initializeBackgroundScriptConnection } from 'src/content-scripts/common/connector';
 import { MarketListing } from 'src/interfaces/splinterlands.interface';
 import '../common/common.scss';
@@ -69,6 +69,20 @@ export class RentModal {
     } catch (error) {
       console.error('An error occurred while creating the table:', error);
     }
+  }
+
+  public async handlePurchase(data: any) {
+    addLoadingIndicator(this.globalModal!, "Hang tight! We're processing your card purchase.");
+
+    const { tx_id } = data;
+    const success = await waitForTransactionSuccess(tx_id, 4, 5);
+
+    if (success) {
+      addResultContainer(this.globalModal!, 'Your cards have been rented successfully!', 'Congratulations! Your cards were successfully rented. You can now view the rented card in your inventory.')
+    } else {
+      addResultContainer(this.globalModal!, 'There has been an error combining your cards', "We're sorry, but an error occurred while trying to process your card combine.")
+    }
+
   }
 
   public async launchRentModal(): Promise<void> {
