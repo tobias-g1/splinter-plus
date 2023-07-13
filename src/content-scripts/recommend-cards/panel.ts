@@ -18,7 +18,7 @@ const EDITIONS: Record<string, string> = {
     "7": 'chaos'
 };
 
-function createCardItem(detail: CardDetailOwnership): HTMLDivElement {
+function createCardItem(detail: CardDetailOwnership, format: string): HTMLDivElement {
     const cardItem = document.createElement('div');
     cardItem.classList.add('card-item');
 
@@ -87,7 +87,7 @@ function createCardItem(detail: CardDetailOwnership): HTMLDivElement {
     const buyAction = buttons.find((button) => button.text === 'Buy')?.action;
 
     if (buyAction) {
-        const buyButton = createButton('Buy');
+        const buyButton = createButton('Buy', format);
         buyButton.addEventListener('click', buyAction);
         cardButtonsContainer.appendChild(buyButton);
     }
@@ -95,7 +95,7 @@ function createCardItem(detail: CardDetailOwnership): HTMLDivElement {
     buttons
         .filter((button) => button.text !== 'Buy')
         .forEach(({ text, action }) => {
-            const button = createButton(text);
+            const button = createButton(text, format);
             button.addEventListener('click', action);
             cardButtonsContainer.appendChild(button);
         });
@@ -111,14 +111,15 @@ function createCardItem(detail: CardDetailOwnership): HTMLDivElement {
 }
 
 
-function createButton(text: string): HTMLButtonElement {
+function createButton(text: string, format: string): HTMLButtonElement {
     const button = document.createElement('button');
     button.classList.add('buy-button');
+    button.classList.add(format);
     button.innerText = text;
     return button;
 }
 
-function createHeader(): HTMLDivElement {
+function createHeader(format: string): HTMLDivElement {
     const headerDiv = document.createElement('div');
     headerDiv.classList.add('header-wrapper');
 
@@ -130,6 +131,7 @@ function createHeader(): HTMLDivElement {
     const exploreButton = document.createElement('button');
     exploreButton.classList.add('explore-button');
     exploreButton.innerText = 'Explore';
+    exploreButton.classList.add(format);
     exploreButton.onclick = (event: any) => {
         event.stopPropagation();
         const panelDiv: any = event.target.closest('.custom-panel');
@@ -147,12 +149,12 @@ function createHeader(): HTMLDivElement {
     return headerDiv;
 }
 
-function createCardList(details: CardDetailOwnership[]): HTMLDivElement {
+function createCardList(details: CardDetailOwnership[], format: string): HTMLDivElement {
     const cardList = document.createElement('div');
     cardList.classList.add('card-list');
 
     for (const detail of details) {
-        const cardItemElement = createCardItem(detail);
+        const cardItemElement = createCardItem(detail, format);
         cardList.appendChild(cardItemElement);
     }
 
@@ -199,7 +201,7 @@ export async function buildAndInsertPanel(format: string) {
     const panelDiv = document.createElement('div');
     panelDiv.classList.add('custom-panel');
 
-    const headerDiv = createHeader();
+    const headerDiv = createHeader(format);
     panelDiv.appendChild(headerDiv);
 
     const contentDiv = document.createElement('div');
@@ -243,7 +245,7 @@ export async function buildAndInsertPanel(format: string) {
     });
 
 
-    recommendedCards.appendChild(createCardList(ownership));
+    recommendedCards.appendChild(createCardList(ownership, format));
     contentDiv.appendChild(recommendedCards);
 
     panelDiv.appendChild(contentDiv);
