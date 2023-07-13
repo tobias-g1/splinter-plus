@@ -21,7 +21,7 @@ const EDITIONS: Record<string, string> = {
     "10": 'soulbound'
 };
 
-function createCardItem(detail: CardDetailOwnership, format: string): HTMLDivElement {
+async function createCardItem(detail: CardDetailOwnership, format: string): Promise<HTMLDivElement> {
     const cardItem = document.createElement('div');
     cardItem.classList.add('card-item');
 
@@ -40,48 +40,62 @@ function createCardItem(detail: CardDetailOwnership, format: string): HTMLDivEle
     description.classList.add('card-description');
 
     let buttons: { text: string; action: () => void }[] = [];
+    const username: string | null = await getUsernameFromLocalStorage();
 
-    if (!detail.owned && !detail.rented) {
-        description.innerText =
-            "You don't have this in your collection. Use the options below to buy or rent to add it to your collection. ";
 
-        buttons = [
-            {
-                text: 'Buy',
-                action: () => {
-                    const buyModal = new BuyModal(detail.id, false, parseInt(detail.editions[0]), 500)
-                    buyModal.launchBuyModal()
+    // Filter cards that are being rented out to the user
+    const rentingCards = detail.cards.filter((c) => c.delegated_to === username);
+
+    // Filter cards that are listed for rent or sale by the user
+    const listedCards = detail.cards.filter((c) => (c.market_listing_type === "RENT" || c.market_listing_type === "SELL") && c.player === username);
+
+    // Filter cards that are neither rented, listed, nor renting
+    const nonAffectedCards = detail.cards.filter((c) => c.delegated_to === "" && !(c.market_listing_type === "RENT" || c.market_listing_type === "SELL"));
+
+    console.log(rentingCards, listedCards, nonAffectedCards)
+
+    if (nonAffectedCards.length === 0) {
+
+        if (listedCards.length !== 0) {
+            description.innerText = "You have this card listed on the market for sale or rent. Please unlist or buy another to use SplinterPlus to upgrade your card.";
+            buttons = [
+                {
+                    text: 'Buy',
+                    action: () => {
+                        const buyModal = new BuyModal(detail.id, false, parseInt(detail.editions[0]), 500)
+                        buyModal.launchBuyModal()
+                    },
+                }
+            ]
+        } else {
+            description.innerText = "You don't have this in your collection. Use the options below to buy or rent to add it to your collection. ";
+            buttons = [
+                {
+                    text: 'Buy',
+                    action: () => {
+                        const buyModal = new BuyModal(detail.id, false, parseInt(detail.editions[0]), 500)
+                        buyModal.launchBuyModal()
+                    },
                 },
-            },
-            {
-                text: 'Rent',
-                action: () => {
-                    const rentModal = new RentModal(detail.id, false, parseInt(detail.editions[0]), 500)
-                    rentModal.launchRentModal()
+                {
+                    text: 'Rent',
+                    action: () => {
+                        const rentModal = new RentModal(detail.id, false, parseInt(detail.editions[0]), 500)
+                        rentModal.launchRentModal()
+                    },
                 },
-            },
-        ];
+            ];
+        }
 
-    } else if (detail.rented) {
-        description.innerText = 'You have this card rented, but you can own it.';
-        buttons = [
-            {
-                text: 'Buy',
-                action: () => {
-                    const buyModal = new BuyModal(detail.id, false, parseInt(detail.editions[0]), 500)
-                    buyModal.launchBuyModal()
-                },
-            },
-        ];
 
-    } else if (detail.owned) {
-        description.innerText = 'Upgrade';
+    } else {
+        description.innerText = 'You already own this card, you can combine your highest rated card to the next level by clicking the button below, or alternatively visit the collection page to combine multiple owned cards.';
         buttons = [
             {
                 text: 'Upgrade',
                 action: () => {
                     const combineModal = new CombineModal()
-                    combineModal.launchModal('1')
+                    combineModal.launchModal(detail.cards[0].uid)
                 },
             },
         ];
@@ -152,12 +166,12 @@ function createHeader(format: string): HTMLDivElement {
     return headerDiv;
 }
 
-function createCardList(details: CardDetailOwnership[], format: string): HTMLDivElement {
+async function createCardList(details: CardDetailOwnership[], format: string): Promise<HTMLDivElement> {
     const cardList = document.createElement('div');
     cardList.classList.add('card-list');
 
     for (const detail of details) {
-        const cardItemElement = createCardItem(detail, format);
+        const cardItemElement = await createCardItem(detail, format);
         cardList.appendChild(cardItemElement);
     }
 
@@ -229,26 +243,20 @@ export async function buildAndInsertPanel(format: string) {
     }
 
     const ownership: CardDetailOwnership[] = cardData.map((card) => {
+
         const ownedCards: Card[] = [];
-        let rented = false;
         if (username && collection) {
             const cards = collection.cards.filter((c) => c.card_detail_id === card.id);
             ownedCards.push(...cards);
-            // Check if any card is listed for rent
-            rented = cards.some((c) => c.market_listing_type === "RENT");
         }
-        const owned: boolean = ownedCards.length > 0;
 
         return {
             ...card,
-            owned,
-            rented,
             cards: ownedCards.sort((a, b) => b.level - a.level)
         };
     });
 
-
-    recommendedCards.appendChild(createCardList(ownership, format));
+    recommendedCards.appendChild(await createCardList(ownership, format));
     contentDiv.appendChild(recommendedCards);
 
     panelDiv.appendChild(contentDiv);

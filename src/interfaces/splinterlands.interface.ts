@@ -1003,8 +1003,6 @@ export interface CardDetail {
 
 export interface CardDetailOwnership extends CardDetail {
     cards: Card[];
-    owned: boolean;
-    rented: boolean;
 }
 
 export interface Stats {
