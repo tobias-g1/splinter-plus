@@ -18,7 +18,13 @@
   },
   "content_scripts": [
     {
-: ["recommendationBundle.js"]
+      "matches": [
+        "https://splinterlands.com/*",
+        "https://next.splinterlands.com/*"
+      ],
+      "js": ["recommendationBundle.js"]
+    },
+    {
       "matches": [
         "https://splinterlands.com/*",
         "https://next.splinterlands.com/*"
@@ -43,6 +49,7 @@
     {
       "resources": [
         "images/logo.png",
+        "images/icons/*",
         "_locales/*",
         "usernameBundle.js",
         "assets/images/combine-new.svg",

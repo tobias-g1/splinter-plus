@@ -19,36 +19,28 @@ export const getUsernameFromLocalStorage = (): Promise<string | null> => {
     });
 };
 
-const init = async () => {
-    const username = await getUsernameFromLocalStorage();
-    if (username) {
-        console.log(`Username from local storage: ${username}`);
-        const accessToken = await getAccessToken();
-        if (accessToken) {
-            try {
-                await refreshToken();
-                console.log('Token successfully refreshed');
-            } catch (error) {
-                console.error('Failed to refresh token, requesting login', error);
-                try {
-                    const newAccessToken = await login();
-                    console.log('Login successful, new access token:', newAccessToken);
-                } catch (loginError) {
-                    console.error('Login failed', loginError);
-                }
-            }
-        } else {
-            console.log('No access token found, requesting login');
+export const init = async () => {
+    const accessToken = await getAccessToken();
+    if (accessToken) {
+        try {
+            await refreshToken();
+            console.log('Token successfully refreshed');
+        } catch (error) {
+            console.error('Failed to refresh token, requesting login', error);
             try {
                 const newAccessToken = await login();
                 console.log('Login successful, new access token:', newAccessToken);
-            } catch (error) {
-                console.error('Login failed', error);
+            } catch (loginError) {
+                console.error('Login failed', loginError);
             }
         }
     } else {
-        console.log('No username found in local storage');
+        console.log('No access token found, requesting login');
+        try {
+            const newAccessToken = await login();
+            console.log('Login successful, new access token:', newAccessToken);
+        } catch (error) {
+            console.error('Login failed', error);
+        }
     }
 };
-
-init();

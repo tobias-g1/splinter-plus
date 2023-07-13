@@ -2,7 +2,8 @@ import { sendRequestSignBuffer } from "src/common/keychain";
 import { sendRequest } from "src/common/splinter-plus";
 import { getUsernameFromLocalStorage } from "src/common/user";
 
-const LOGIN_STORAGE_KEY = 'dw_access_token';
+const LOGIN_STORAGE_KEY = 'sp_access_token';
+const REFRESH_TOKEN_STORAGE_KEY = 'sp_refresh_token';
 
 export const getAccessToken = async (): Promise<string | undefined> => {
     return new Promise((resolve) => {
@@ -20,22 +21,37 @@ export const setAccessToken = async (token: string): Promise<void> => {
     });
 };
 
+export const getRefreshToken = async (): Promise<string | undefined> => {
+    return new Promise((resolve) => {
+        chrome.storage.local.get(REFRESH_TOKEN_STORAGE_KEY, (data) => {
+            resolve(data[REFRESH_TOKEN_STORAGE_KEY]);
+        });
+    });
+};
 
-export const login = async (): Promise<string> => {
-    const message = 'Login to Splinter Plus';
-    const username = await getUsernameFromLocalStorage()
-    const { signature, pubkey } = await sendRequestSignBuffer(username as string, message);
-    const { access_token } = await sendRequest('login', 'POST', undefined, undefined, { message, signature, pubkey });
-    await setAccessToken(access_token);
-    return access_token;
+export const setRefreshToken = async (token: string): Promise<void> => {
+    return new Promise((resolve) => {
+        chrome.storage.local.set({ [REFRESH_TOKEN_STORAGE_KEY]: token }, () => {
+            resolve();
+        });
+    });
+};
+
+export const login = async () => {
+    const username = await getUsernameFromLocalStorage();
+    const message = username + ' ' + Math.floor(Date.now() / 1000);
+    await sendRequestSignBuffer(username as string, message);
 };
 
 export const refreshToken = async (): Promise<void> => {
     const access_token = await getAccessToken();
-    if (access_token) {
-        const { access_token: new_access_token } = await sendRequest('refresh', 'GET', 'refresh');
+    const refresh_token = await getRefreshToken();
+    if (access_token && refresh_token) {
+        const { access_token: new_access_token, refresh_token: new_refresh_token } = await sendRequest('refresh', 'GET', refresh_token);
         await setAccessToken(new_access_token);
+        await setRefreshToken(new_refresh_token);
         console.log('Refreshed access token:', new_access_token);
+        console.log('Refreshed refresh token:', new_refresh_token);
     } else {
         console.warn('Cannot refresh access token: no token found');
     }

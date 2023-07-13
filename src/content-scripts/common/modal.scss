@@ -9,6 +9,9 @@
   background-size: contain;
   margin-left: 7.5px;
 }
+.modal-dialog {
+  top: 100px;
+}
 
 .sp_button_container {
   display: flex;
@@ -30,8 +33,8 @@
 p {
   color: white;
   font-family: 'Eczar', serif;
-  font-size: 22px;
-  line-height: 32px;
+  font-size: 18px;
+  line-height: 24px;
 }
 
 .sp-loading {

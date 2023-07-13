@@ -21,7 +21,6 @@ export const addCombineButton = (): void => {
     }
 };
 
-
 /**
  * Adds a combine button to the DOM if it doesn't already exist.
  * @param buttonsDivs - The buttons container divs on the page.
