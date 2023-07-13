@@ -64,7 +64,7 @@ export class RentModal {
 
     try {
       const marketListings: MarketListing[] = await fetchMarketData(this.cardDetailId, this.gold, this.edition, this.fee, 'rent', 'daily', 1000, 'price_bcx_asc');
-      const tableContainer = createMarketTable(marketListings);
+      const tableContainer = await createMarketTable(marketListings);
       contentDiv.appendChild(tableContainer);
     } catch (error) {
       console.error('An error occurred while creating the table:', error);

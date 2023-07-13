@@ -324,14 +324,18 @@ export async function waitForTransactionSuccess(
         }
     }
 }
+type Listing = ForSaleListing | MarketListing;
 
 export const buyCardsFromMarket = async (
     username: string,
-    cards: ForSaleListing[],
+    cards: Listing[],
     currency: string
 ): Promise<any> => {
     const items = cards.map(card => card.market_id);
-    const total_price = cards.reduce((sum, card) => sum + parseFloat(card.buy_price), 0).toFixed(3);
+    const total_price = cards.reduce((sum, card) => {
+        const buy_price = typeof card.buy_price === 'string' ? parseFloat(card.buy_price) : card.buy_price;
+        return sum + (buy_price || 0);
+    }, 0).toFixed(3);
     const json: string = JSON.stringify({
         items,
         price: total_price,
@@ -340,6 +344,27 @@ export const buyCardsFromMarket = async (
         app: process.env.APP
     });
     sendCustomJSONRequest('sm_market_purchase', json, username, KeychainKeyTypes.active);
+};
+
+export const rentCardsFromMarket = async (
+    username: string,
+    cards: Listing[],
+    currency: string,
+    days: number,
+): Promise<any> => {
+    const items = cards.map(card => card.market_id);
+    const total_price = cards.reduce((sum, card) => {
+        const buy_price = typeof card.buy_price === 'string' ? parseFloat(card.buy_price) : card.buy_price;
+        return sum + (buy_price || 0);
+    }, 0).toFixed(3);
+    const json: string = JSON.stringify({
+        items,
+        price: total_price,
+        currency,
+        days,
+        app: process.env.APP
+    });
+    sendCustomJSONRequest('sm_market_rent', json, username, KeychainKeyTypes.active);
 };
 
 export const fetchBalances = async (username: string): Promise<Balance[]> => {

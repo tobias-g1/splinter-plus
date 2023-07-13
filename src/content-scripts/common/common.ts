@@ -1,6 +1,8 @@
+import { buyCardsFromMarket, rentCardsFromMarket } from "src/common/splinterlands";
+import { getUsernameFromLocalStorage } from "src/common/user";
 import { MarketListing } from "src/interfaces/splinterlands.interface";
 
-export function createMarketTable(forSaleListings: MarketListing[]): HTMLElement {
+export async function createMarketTable(forSaleListings: MarketListing[]): Promise<HTMLElement> {
     // Create table and its container
     const table: HTMLElement = document.createElement('table');
     const tableContainer: HTMLElement = document.createElement('div');
@@ -29,7 +31,8 @@ export function createMarketTable(forSaleListings: MarketListing[]): HTMLElement
     table.appendChild(headerRow);
 
     // Add table rows based on fetched data
-    forSaleListings.forEach(listing => {
+    for (let i = 0; i < forSaleListings.length; i++) {
+        const listing = forSaleListings[i];
         let row: HTMLElement = document.createElement('tr');
         let priceCell: HTMLElement = document.createElement('td');
         priceCell.innerText = listing.currency === 'USD' ? '$' + listing.buy_price.toString() : listing.buy_price.toString() + ' DEC';
@@ -48,7 +51,17 @@ export function createMarketTable(forSaleListings: MarketListing[]): HTMLElement
         actionButton.id = `action-button-${listing.card_id}`;
         actionButton.className = 'action-button';
         actionButton.innerText = listing.type === 'RENT' ? 'Rent' : 'Buy';
-        actionButton.addEventListener('click', () => alert(`Clicked ${actionButton.innerText} for card ID: ${listing.card_id}`));
+        actionButton.addEventListener('click', async () => {
+            const username: string = (await getUsernameFromLocalStorage()) ?? '';
+            if (listing.type === 'RENT') {
+                const days = prompt('Enter the number of days for rent:', '2');
+                if (days) {
+                    rentCardsFromMarket(username, [listing], 'DEC', parseInt(days, 10));
+                }
+            } else {
+                buyCardsFromMarket(username, [listing], 'DEC');
+            }
+        });
         actionButtonCell.appendChild(actionButton);
 
         row.appendChild(priceCell);
@@ -58,7 +71,7 @@ export function createMarketTable(forSaleListings: MarketListing[]): HTMLElement
         row.appendChild(cardIdCell);
         row.appendChild(actionButtonCell);
         table.appendChild(row);
-    });
+    }
 
     // Append table to its container
     tableContainer.appendChild(table);
