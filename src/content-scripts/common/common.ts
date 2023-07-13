@@ -78,3 +78,64 @@ export async function createMarketTable(forSaleListings: MarketListing[]): Promi
 
     return tableContainer;
 }
+
+export function setModalBodyContent(modal: HTMLElement, content: HTMLElement | string): void {
+    const modalBody: HTMLElement = modal.querySelector('.modal-body') as HTMLElement;
+    modalBody.innerHTML = ''; // Clear the existing content
+    if (typeof content === 'string') {
+        modalBody.innerHTML = content;
+    } else {
+        modalBody.appendChild(content);
+    }
+}
+
+export function createLoadingIndicator(loadingText: string): HTMLDivElement {
+    const loadingIndicator: HTMLDivElement = document.createElement('div');
+    loadingIndicator.classList.add('sp-loading');
+
+    const img: HTMLImageElement = document.createElement('img');
+    img.src = 'https://d36mxiodymuqjm.cloudfront.net/website/loading-spinner_500.gif';
+    img.alt = 'Loading Indicator';
+
+    loadingIndicator.appendChild(img);
+
+    const text: HTMLDivElement = document.createElement('div');
+    text.innerText = loadingText;
+    text.style.fontSize = '20px';
+    text.style.color = '#fff';
+    text.style.textAlign = 'center';
+
+    loadingIndicator.appendChild(text);
+
+    return loadingIndicator;
+}
+
+export function addLoadingIndicator(modal: HTMLElement, text: string) {
+    const loadingIndicator = createLoadingIndicator(text);
+    setModalBodyContent(modal, loadingIndicator);
+}
+
+export function addResultContainer(modal: HTMLElement, header: string, description: string) {
+    const resultContainer = createResultContent(header, description, modal, 'Done');
+    setModalBodyContent(modal, resultContainer);
+}
+
+export function createResultContent(header: string, text: string, modal: HTMLElement, buttonText: string): HTMLElement {
+    const resultContent: HTMLDivElement = document.createElement('div');
+    resultContent.classList.add('result-content');
+
+    const closeButton: HTMLButtonElement = document.createElement('button');
+    closeButton.setAttribute('class', 'gradient-button green');
+    closeButton.textContent = buttonText;
+
+    // Add event listener to the button
+    closeButton.addEventListener('click', () => {
+        modal.remove();
+    });
+
+    resultContent.innerHTML = `<h2 class="result-header">${header}</h2><p>${text}</p>`;
+
+    resultContent.appendChild(closeButton); // Appending the button to the resultContent div
+
+    return resultContent;
+}

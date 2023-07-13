@@ -1,12 +1,13 @@
 import { getPricesFromLocalStorage } from "src/common/prices";
 import { buyCardsFromMarket, calculateCheapestCards, combineCards, fetchCardData, fetchCardSaleData, getCardLevelInfo, sumCards, verifySuccessfulPurchases, waitForTransactionSuccess } from "src/common/splinterlands";
 import { getUsernameFromLocalStorage } from "src/common/user";
+import { addLoadingIndicator, addResultContainer } from "src/content-scripts/common/common";
 import { initializeBackgroundScriptConnection } from "src/content-scripts/common/connector";
 import { CardLevelInfo, ForSaleListing } from "src/interfaces/splinterlands.interface";
 
 export class CombineModal {
   private launched: boolean = false;
-  private globalModal: any = null;
+  private globalModal: HTMLElement | null = null;
   private cardsToCombine: string[] = [];
   public combineInProgress: boolean = false;
   public inProgressPurchase: ForSaleListing[] = [];
@@ -120,7 +121,7 @@ export class CombineModal {
     const cheapestCards: ForSaleListing[] | null = await calculateCheapestCards(marketData, levelInfo.xp_required, levelInfo.base_xp);
     const modal: HTMLElement = this.createModal();
 
-    this.globalModal = modal;
+    this.globalModal! = modal;
 
     this.setCombineInfo(modal, levelInfo.level + 1, levelInfo.cards_required);
 
@@ -146,12 +147,12 @@ export class CombineModal {
 
   private async submitBuyRequest(username: string | null, cheapestCards: ForSaleListing[] | null): Promise<any | null> {
     if (!cheapestCards) {
-      this.addResultContainer("We weren't able to find any cards on the market.", "Unfortunately, we couldn't find any available cards in the market at this time. Please check back later for updates. We apologize for any inconvenience caused.")
+      addResultContainer(this.globalModal!, "We weren't able to find any cards on the market.", "Unfortunately, we couldn't find any available cards in the market at this time. Please check back later for updates. We apologize for any inconvenience caused.")
       return null;
     }
 
     if (!username) {
-      this.addResultContainer("An unexpected error occurred", "We're very sorry, but an unexpected error occurred while processing your request. Please try again later.")
+      addResultContainer(this.globalModal!, "An unexpected error occurred", "We're very sorry, but an unexpected error occurred while processing your request. Please try again later.")
       return null;
     }
 
@@ -161,7 +162,7 @@ export class CombineModal {
   }
 
   public async handlePurchase(data: any) {
-    this.addLoadingIndicator("Hang tight! We're processing your card purchase.");
+    addLoadingIndicator(this.globalModal!, "Hang tight! We're processing your card purchase.");
 
     const { tx_id } = data;
     const cardsBought = await verifySuccessfulPurchases(tx_id);
@@ -200,87 +201,22 @@ export class CombineModal {
         await combineCards(username, cardCombine);
       }
     } else {
-      this.addResultContainer('There has been an error purchasing your cards', "We're sorry, but an error occurred while trying to process your card purchase. Please ensure you have the correct amount to complete the purchase and try again.")
+      addResultContainer(this.globalModal!, 'There has been an error purchasing your cards', "We're sorry, but an error occurred while trying to process your card purchase. Please ensure you have the correct amount to complete the purchase and try again.")
     }
   }
 
   public async handleCombine(data: any) {
-    this.addLoadingIndicator("Your cards we're purchased successfully. We're processing your card combine.");
+    addLoadingIndicator(this.globalModal!, "Your cards we're purchased successfully. We're processing your card combine.");
 
     const { tx_id } = data;
     const success = await waitForTransactionSuccess(tx_id, 4, 5);
 
     if (success) {
-      this.addResultContainer('Your cards have been combined successfully!', 'Congratulations! Your cards were successfully combined. You can now view the combined card in your inventory.')
+      addResultContainer(this.globalModal!, 'Your cards have been combined successfully!', 'Congratulations! Your cards were successfully combined. You can now view the combined card in your inventory.')
     } else {
-      this.addResultContainer('There has been an error combining your cards', "We're sorry, but an error occurred while trying to process your card combine.")
+      addResultContainer(this.globalModal!, 'There has been an error combining your cards', "We're sorry, but an error occurred while trying to process your card combine.")
     }
 
     this.combineInProgress = false;
   }
-
-  private setModalBodyContent(modal: HTMLElement, content: HTMLElement | string): void {
-    const modalBody: HTMLElement = modal.querySelector('.modal-body') as HTMLElement;
-    modalBody.innerHTML = ''; // Clear the existing content
-    if (typeof content === 'string') {
-      modalBody.innerHTML = content;
-    } else {
-      modalBody.appendChild(content);
-    }
-  }
-
-  private createLoadingIndicator(loadingText: string): HTMLDivElement {
-    const loadingIndicator: HTMLDivElement = document.createElement('div');
-    loadingIndicator.classList.add('sp-loading');
-
-    const img: HTMLImageElement = document.createElement('img');
-    img.src = 'https://d36mxiodymuqjm.cloudfront.net/website/loading-spinner_500.gif';
-    img.alt = 'Loading Indicator';
-
-    loadingIndicator.appendChild(img);
-
-    const text: HTMLDivElement = document.createElement('div');
-    text.innerText = loadingText;
-    text.style.fontSize = '20px';
-    text.style.color = '#fff';
-    text.style.textAlign = 'center';
-
-    loadingIndicator.appendChild(text);
-
-    return loadingIndicator;
-  }
-
-  public addLoadingIndicator(text: string) {
-    const loadingIndicator = this.createLoadingIndicator(text);
-    this.setModalBodyContent(this.globalModal, loadingIndicator);
-  }
-
-  public addResultContainer(header: string, description: string) {
-    const resultContainer = this.createResultContent(header, description, this.globalModal, 'Done');
-    this.setModalBodyContent(this.globalModal, resultContainer);
-  }
-
-  public createResultContent(header: string, text: string, modal: HTMLElement, buttonText: string): HTMLElement {
-    const resultContent: HTMLDivElement = document.createElement('div');
-    resultContent.classList.add("result-content");
-
-    const closeButton: HTMLButtonElement = document.createElement('button');
-    closeButton.setAttribute("class", "gradient-button green");
-    closeButton.textContent = buttonText;
-
-    // Add event listener to the button
-    closeButton.addEventListener('click', () => {
-      this.launched = false;
-      modal.remove();
-    });
-
-    resultContent.innerHTML = `<h2 class="result-header">${header}</h2><p>${text}</p>`;
-
-    resultContent.appendChild(closeButton); // Appending the button to the resultContent div
-
-    return resultContent;
-  }
-
 }
-
-
