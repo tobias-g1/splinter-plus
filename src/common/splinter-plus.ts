@@ -15,11 +15,17 @@ export const sendRequest = async (
     const config: RequestInit = { method };
 
     if (token) {
-        config.headers = { "Authorization": `Bearer ${token}` };
+        config.headers = {
+            ...config.headers,
+            "Authorization": `Bearer ${token}`
+        };
     }
 
     if (data) {
-        config.headers = { "Content-Type": "application/json" };
+        config.headers = {
+            ...config.headers,
+            "Content-Type": "application/json"
+        };
         config.body = JSON.stringify(data);
     }
 
@@ -28,9 +34,7 @@ export const sendRequest = async (
         endpoint += `?${urlParams.toString()}`;
     }
 
-    const modifiedMethod = method === "GET" ? "GET" : method; // Use original method for non-GET requests
-
-    const response = await fetch(`${BASE_URL}/${endpoint}`, { ...config, method: modifiedMethod });
+    const response = await fetch(`${BASE_URL}/${endpoint}`, config);
     const responseData = await response.json();
 
     if (response.status !== 200) {
@@ -39,8 +43,6 @@ export const sendRequest = async (
 
     return responseData;
 };
-
-
 
 export const login = async (message: string, signature: string, pubkey: string): Promise<{ access_token: string, refresh_token: string }> => {
     const data = await sendRequest("login", "POST", undefined, undefined, { message, signature, pubkey });
@@ -75,7 +77,7 @@ export const getDecks = async (
         count,
         offset,
     };
-    const data = await sendRequest("decks", "GET", await getAccessToken(), params);
+    const data = await sendRequest("decks", "POST", await getAccessToken(), params);
     return data as DeckResponse;
 };
 
@@ -87,7 +89,9 @@ export const getCards = async (
     format: string,
     top_cnt: number
 ): Promise<CardResponse> => {
-    const data = await sendRequest("cards", "GET", await getAccessToken(), undefined, {
+    const accessToken = await getAccessToken();
+    console.log(accessToken);
+    const data = await sendRequest("cards", "POST", accessToken, undefined, {
         mana,
         rulesets: ruleset,
         elements,
@@ -97,5 +101,3 @@ export const getCards = async (
     });
     return data as CardResponse;
 };
-
-
