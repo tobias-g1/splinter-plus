@@ -49,14 +49,14 @@ function createCardItem(detail: CardDetailOwnership, format: string): HTMLDivEle
             {
                 text: 'Buy',
                 action: () => {
-                    const buyModal = new BuyModal(454, false, 3, 500)
+                    const buyModal = new BuyModal(detail.id, false, parseInt(detail.editions[0]), 500)
                     buyModal.launchBuyModal()
                 },
             },
             {
                 text: 'Rent',
                 action: () => {
-                    const rentModal = new RentModal(1, false, 0, 500)
+                    const rentModal = new RentModal(detail.id, false, parseInt(detail.editions[0]), 500)
                     rentModal.launchRentModal()
                 },
             },
@@ -68,7 +68,7 @@ function createCardItem(detail: CardDetailOwnership, format: string): HTMLDivEle
             {
                 text: 'Buy',
                 action: () => {
-                    const buyModal = new BuyModal(1, false, 0, 500)
+                    const buyModal = new BuyModal(detail.id, false, parseInt(detail.editions[0]), 500)
                     buyModal.launchBuyModal()
                 },
             },
