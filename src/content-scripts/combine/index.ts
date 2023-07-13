@@ -3,12 +3,15 @@ import { CombineModal } from "../common/combine-modal";
 import '../common/modal.scss';
 
 let combineModal: CombineModal;
+let buttonAdded = false;
 
 const checkButtonsExist = (): void => {
+  const combineButton = document.getElementById('btn_combine_sp');
   const buttonsDivs = document.querySelectorAll('.buttons, .c-PJLV-ifKYhuQ-css > .c-PJLV-ihmcGFm-css');
 
-  if (buttonsDivs.length && !document.getElementById('btn_combine_sp')) {
+  if (buttonsDivs.length && !combineButton && !buttonAdded) {
     addCombineButton();
+    buttonAdded = true;
     console.log('Conversion button added.');
   }
 };

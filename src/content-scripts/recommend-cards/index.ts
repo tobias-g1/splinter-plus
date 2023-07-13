@@ -7,9 +7,14 @@ let inProgress = false;
 
 // Check if the current page is the battle history page
 if (window.location.href === battleHistoryUrl) {
-    // Extract the selected format
-    const formatElement: any = document.querySelector('.bh-selectable-obj a.selected');
-    const format = formatElement?.innerText.toLowerCase() ?? 'unknown';
+
+    const formatElement: HTMLElement | null = document.querySelector('.bh-selectable-obj a.selected');
+    console.log(formatElement)
+    let format = '';
+
+    if (formatElement) {
+        format = formatElement.innerText.toLowerCase();
+    }
 
     // Function to check for the existence of the history-header div and add the panel if it doesn't already exist
     const checkPanelExists = async () => { // Change function to async
@@ -21,7 +26,7 @@ if (window.location.href === battleHistoryUrl) {
         if (historyHeaderDiv && !customPanelDiv) {
             // Disconnect the observer
             observer.disconnect();
-            // Call buildAndInsertPanel and wait for it to finish before reconnecting the observer
+
             await buildAndInsertPanel(format);
             observer.observe(document.body, {
                 childList: true,
