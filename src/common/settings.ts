@@ -1,13 +1,14 @@
 import { Settings } from "http2";
 import { fetchSettings } from "src/common/splinterlands";
+import { SettingsWithIndexSignature } from "src/interfaces/splinterlands.interface";
 
 /**
  * Fetches the settings and updates the localStorage with the fetched settings.
  * @returns {Promise<Settings>} The fetched settings.
  */
-export const fetchSettingsAndUpdateStorage = async (): Promise<Settings> => {
+export const fetchSettingsAndUpdateStorage = async (): Promise<SettingsWithIndexSignature> => {
     try {
-        const settings: Settings = await fetchSettings();
+        const settings: SettingsWithIndexSignature = await fetchSettings();
         localStorage.setItem('settings', JSON.stringify(settings));
         return settings;
     } catch (error) {
@@ -22,10 +23,10 @@ export const fetchSettingsAndUpdateStorage = async (): Promise<Settings> => {
  * and updates the storage.
  * @returns {Promise<Settings>} The retrieved or fetched settings.
  */
-export const getSettingsFromLocalStorage = async (): Promise<Settings> => {
+export const getSettingsFromLocalStorage = async (): Promise<SettingsWithIndexSignature> => {
     try {
         const data = localStorage.getItem('settings');
-        let settings: Settings = data ? JSON.parse(data) : null;
+        let settings: SettingsWithIndexSignature = data ? JSON.parse(data) : null;
         if (!settings) {
             settings = await fetchSettingsAndUpdateStorage();
         }

@@ -22,6 +22,32 @@ export interface ForSaleListing {
     price_per_base_xp: number;
 }
 
+export interface MarketListing {
+    market_id: string
+    card_id: string
+    xp: number
+    alpha_xp: any
+    buy_price: number
+    seller: string
+    fee_percent: number
+    bcx: number
+    price_bcx: number
+    type: string
+    rental_type: any
+    expiration_date: string
+    last_used_block: any
+    last_used_date: any
+    last_transferred_block: any
+    last_transferred_date: any
+    last_used_player: any
+    gold: boolean
+    edition: number
+    card_detail_id: number
+    currency: string
+    level: number
+    uid: string
+}
+
 export interface Settings {
     asset_url: string
     gold_percent: number
@@ -944,6 +970,15 @@ export interface Card {
     last_buy_price?: string
     last_buy_currency?: string
     level: number
+}
+
+export interface Balance {
+    player: string
+    token: string
+    balance: any
+    last_update_date?: string
+    last_reward_block?: number
+    last_reward_time?: string
 }
 
 export interface CardDetail {

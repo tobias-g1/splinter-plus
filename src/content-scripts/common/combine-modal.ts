@@ -1,6 +1,7 @@
 import { getPricesFromLocalStorage } from "src/common/prices";
 import { buyCardsFromMarket, calculateCheapestCards, combineCards, fetchCardData, fetchCardSaleData, getCardLevelInfo, sumCards, verifySuccessfulPurchases, waitForTransactionSuccess } from "src/common/splinterlands";
 import { getUsernameFromLocalStorage } from "src/common/user";
+import { initializeBackgroundScriptConnection } from "src/content-scripts/common/connector";
 import { CardLevelInfo, ForSaleListing } from "src/interfaces/splinterlands.interface";
 
 export class CombineModal {
@@ -93,7 +94,10 @@ export class CombineModal {
   }
 
   public async launchModal(cardIds: string): Promise<void> {
+
     if (this.launched) return;
+
+    initializeBackgroundScriptConnection(this);
 
     this.launched = true;
     this.cardsToCombine = [];

@@ -5,7 +5,6 @@ import { CombineModal } from 'src/content-scripts/common/combine-modal';
 import { RentModal } from 'src/content-scripts/common/rental-modal';
 import { CardResponse } from 'src/interfaces/spinter-plus.interface';
 import { Card, CardDetail, CardDetailOwnership, Collection } from 'src/interfaces/splinterlands.interface';
-import elementsData from '../../json/elements.json';
 
 const EDITIONS: Record<string, string> = {
     "0": 'alpha',
@@ -46,14 +45,14 @@ function createCardItem(detail: CardDetailOwnership): HTMLDivElement {
             {
                 text: 'Buy',
                 action: () => {
-                    const buyModal = new BuyModal()
+                    const buyModal = new BuyModal(1, false, 0, 500)
                     buyModal.launchBuyModal()
                 },
             },
             {
                 text: 'Rent',
                 action: () => {
-                    const rentModal = new RentModal()
+                    const rentModal = new RentModal(1, false, 0, 500)
                     rentModal.launchRentModal()
                 },
             },
@@ -65,7 +64,7 @@ function createCardItem(detail: CardDetailOwnership): HTMLDivElement {
             {
                 text: 'Buy',
                 action: () => {
-                    const buyModal = new BuyModal()
+                    const buyModal = new BuyModal(1, false, 0, 500)
                     buyModal.launchBuyModal()
                 },
             },
@@ -167,26 +166,28 @@ function createContentHeader(): HTMLDivElement {
     description.innerText = 'Unlock your full potential in every battle with the ultimate collection handpicked for your league and collection! Based on our extensive analysis of thousands of battles, we recommend these cards. ';
     contentHeader.append(description);
 
-    const options = document.createElement('div');
-    options.classList.add('options');
+    // Elements selection UI for a later release
 
-    elementsData.forEach(element => {
-        const optionDiv = document.createElement('div');
-        optionDiv.classList.add('option');
-
-        const img = document.createElement('img');
-        img.src = chrome.runtime.getURL(element.image);
-        img.alt = element.name;
-        optionDiv.appendChild(img);
-
-        optionDiv.addEventListener('click', () => {
-            alert(element.name);
+    /*     const options = document.createElement('div');
+        options.classList.add('options');
+    
+        elementsData.forEach(element => {
+            const optionDiv = document.createElement('div');
+            optionDiv.classList.add('option');
+    
+            const img = document.createElement('img');
+            img.src = chrome.runtime.getURL(element.image);
+            img.alt = element.name;
+            optionDiv.appendChild(img);
+    
+            optionDiv.addEventListener('click', () => {
+                alert(element.name);
+            });
+    
+            options.appendChild(optionDiv);
         });
-
-        options.appendChild(optionDiv);
-    });
-
-    contentHeader.appendChild(options);
+    
+        contentHeader.appendChild(options); */
 
     return contentHeader;
 }

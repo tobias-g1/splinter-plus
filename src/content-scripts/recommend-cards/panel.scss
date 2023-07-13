@@ -9,8 +9,9 @@
   .header {
     color: white;
     font-family: nanami-bold;
-    font-size: 20px;
+    font-size: 22px;
     text-transform: uppercase;
+    margin-bottom: 10px;
   }
 
   &.expanded {
@@ -22,7 +23,6 @@
 
   .panel-content {
     display: none;
-
     p {
       font-family: OpenSans;
       font-size: 14px;
