@@ -63,6 +63,8 @@ export async function buildAndInsertPanel(format: string, league: string) {
         };
     });
 
+    ownership.sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0));
+
     recommendedCards.appendChild(await createCardList(ownership, format));
     contentDiv.appendChild(recommendedCards);
 
