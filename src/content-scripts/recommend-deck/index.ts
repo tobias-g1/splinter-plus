@@ -22,10 +22,9 @@ if (window.location.href === battleHistoryUrl) {
     if (battleContainer && !panelAdded) {
 
       panelAdded = true;
-
       // Check if the panel already exists
       const existingPanel = battleContainer.querySelector('.deck-panel');
-      if (!existingPanel && !panelAdded) {
+      if (!existingPanel) {
         const panel = document.createElement('div');
         panel.classList.add('deck-panel');
 
@@ -83,9 +82,9 @@ if (window.location.href === battleHistoryUrl) {
         battleContainer.appendChild(panel);
 
         panelAdded = true;
-        observer.disconnect(); // Disconnect the observer after adding the panel
+        observer.disconnect();
       } else {
-        panelAdded = true; // Set the flag to true if the panel already exists
+        panelAdded = true;
       }
     }
   };
@@ -108,3 +107,6 @@ if (window.location.href === battleHistoryUrl) {
     subtree: true,
   });
 }
+
+
+console.log('Loaded')

@@ -158,6 +158,12 @@ export function createHeader(text: string, format: string): HTMLDivElement {
     exploreButton.classList.add(format);
     exploreButton.onclick = (event: any) => {
         event.stopPropagation();
+        const cardContainer = document.querySelector('.deck-builder-page2__cards');
+
+        if (cardContainer) {
+            cardContainer.classList.toggle('expanded');
+        }
+
         const panelDiv: any = event.target.closest('.deck-panel, .custom-panel');
         panelDiv.classList.toggle('expanded');
         if (panelDiv.classList.contains('expanded')) {
