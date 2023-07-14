@@ -159,13 +159,6 @@ export function createHeader(text: string, format: string): HTMLDivElement {
     exploreButton.onclick = (event: any) => {
         event.stopPropagation();
         const panelDiv: any = event.target.closest('.deck-panel, .custom-panel');
-
-        const cardContainer = document.querySelector('.deck-builder-page2__cards');
-
-        if (cardContainer) {
-            cardContainer.classList.toggle('expanded');
-        }
-
         panelDiv.classList.toggle('expanded');
         if (panelDiv.classList.contains('expanded')) {
             exploreButton.innerText = 'Close';
