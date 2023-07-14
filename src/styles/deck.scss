@@ -1,10 +1,11 @@
 .deck-panel {
-  background-color: 130f0c;
   border-radius: 15px;
   transition: max-height 0.3s;
-  padding: 25px;
+  padding: 15px 20px;
   max-height: 80px;
   margin-top: 10px;
+  width: calc(100% - 20px);
+  background: #130f0c;
 
   .header {
     color: white;
@@ -28,12 +29,16 @@
       font-size: 14px;
       margin: 0;
       line-height: 20px;
+      text-transform: none;
     }
   }
 }
 
 .deck-builder-page2__cards {
-  margin-top: 155px;
+  margin-top: 115px;
+  &.expanded {
+    margin-top: 380px;
+  }
 }
 
 .deck-panel-wrapper {

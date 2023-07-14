@@ -18,19 +18,22 @@ if (window.location.href === battleHistoryUrl) {
   // Function to check for the existence of the panel and add it if it doesn't already exist
   const checkPanelExists = async () => {
     const battleContainer = document.querySelector('.deck-builder-page2__filters');
-
     // Check if the battleContainer exists and the panel has not been added
     if (battleContainer && !panelAdded) {
+
+      panelAdded = true;
+
       // Check if the panel already exists
-      if (!battleContainer.querySelector('.deck-panel')) {
+      const existingPanel = battleContainer.querySelector('.deck-panel');
+      if (!existingPanel) {
         const panel = document.createElement('div');
         panel.classList.add('deck-panel');
+
         const headerDiv = createHeader("Recommended Deck", format);
         panel.appendChild(headerDiv);
 
-        const panelWrapper = document.createElement('div');
-        panelWrapper.classList.add('panel-content');
-        panelWrapper.appendChild(panel);
+        const panelContent = document.createElement('div');
+        panelContent.classList.add('panel-content');
 
         const recommendedCards = document.createElement('div');
         recommendedCards.classList.add('recommended-cards');
@@ -75,12 +78,14 @@ if (window.location.href === battleHistoryUrl) {
           recommendedCards.appendChild(cardItem);
         }
 
-        panel.appendChild(recommendedCards);
-        panelWrapper.appendChild(panel);
-        battleContainer.appendChild(panelWrapper);
+        panelContent.appendChild(recommendedCards);
+        panel.appendChild(panelContent);
+        battleContainer.appendChild(panel);
 
         panelAdded = true;
         observer.disconnect(); // Disconnect the observer after adding the panel
+      } else {
+        panelAdded = true; // Set the flag to true if the panel already exists
       }
     }
   };

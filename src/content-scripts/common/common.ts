@@ -159,6 +159,13 @@ export function createHeader(text: string, format: string): HTMLDivElement {
     exploreButton.onclick = (event: any) => {
         event.stopPropagation();
         const panelDiv: any = event.target.closest('.deck-panel, .custom-panel');
+
+        const cardContainer = document.querySelector('.deck-builder-page2__cards');
+
+        if (cardContainer) {
+            cardContainer.classList.toggle('expanded');
+        }
+
         panelDiv.classList.toggle('expanded');
         if (panelDiv.classList.contains('expanded')) {
             exploreButton.innerText = 'Close';
@@ -197,6 +204,7 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
     stat.classList.add(format);
     stat.innerHTML = `Rating: ${rating}`
 
+
     const description = document.createElement('p');
     description.classList.add('card-description');
 
@@ -215,7 +223,7 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
         if (nonAffectedCards.length === 0) {
 
             if (listedCards.length !== 0) {
-                description.innerText = "You have this card listed on the market for sale or rent. Please unlist or buy another to use SplinterPlus to upgrade your card.";
+                description.innerText = "Please remove or replace your listed card to utilize SplinterPlus for upgrades.";
                 buttons = [
                     {
                         text: 'Buy',
@@ -226,7 +234,7 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
                     }
                 ]
             } else {
-                description.innerText = "You don't have this in your collection. Use the options below to buy or rent to add it to your collection. ";
+                description.innerText = "To add this item to your collection, use the options below to purchase or rent it.";
                 buttons = [
                     {
                         text: 'Buy',
@@ -247,7 +255,7 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
 
 
         } else {
-            description.innerText = 'You already own this card, you can combine your highest rated card to the next level by clicking the button below, or alternatively visit the collection page to combine multiple owned cards.';
+            description.innerText = "You own this card. Upgrade it by combining with your highest-rated card or visit the collection page for more options."
             buttons = [
                 {
                     text: 'Upgrade',
@@ -279,7 +287,11 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
     const cardButtons = document.createElement('div');
     cardButtons.classList.add('card-buttons');
     cardButtons.appendChild(header);
-    cardButtons.appendChild(stat);
+
+    if (rating) {
+        cardButtons.appendChild(stat);
+    }
+
     cardButtons.appendChild(description);
     cardButtons.appendChild(cardButtonsContainer);
 
