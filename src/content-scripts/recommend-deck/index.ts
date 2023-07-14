@@ -1,12 +1,7 @@
-import { getDecks } from 'src/common/splinter-plus';
-import { getCardDetails, getCollection } from 'src/common/splinterlands';
-import { getUsernameFromLocalStorage } from 'src/common/user';
-import { DeckResponse } from 'src/interfaces/spinter-plus.interface';
-import { Card, CardDetail, CardDetailOwnership, Collection } from 'src/interfaces/splinterlands.interface';
 import '../../styles/common.scss';
 import '../../styles/deck.scss';
 import '../../styles/modal.scss';
-import { createCardItem, createHeader } from '../common/common';
+import { createHeader } from '../common/common';
 
 const battleHistoryUrl = 'https://splinterlands.com/?p=create_team2';
 let format: string = 'wild';
@@ -22,7 +17,7 @@ if (window.location.href === battleHistoryUrl) {
     // Check if the battleContainer exists and the panel has not been added
     if (battleContainer && !panelAdded) {
       // Check if the panel already exists
-      if (!battleContainer.querySelector('.deck-panel')) {
+      if (!battleContainer.querySelector('.panel-content')) {
         const panel = document.createElement('div');
         panel.classList.add('deck-panel');
         const headerDiv = createHeader("Recommended Deck", format);
@@ -35,7 +30,7 @@ if (window.location.href === battleHistoryUrl) {
         const recommendedCards = document.createElement('div');
         recommendedCards.classList.add('recommended-cards');
 
-        const decks: DeckResponse = await getDecks(99, ["Standard"], [], 'Novice', 'modern', 1, 0);
+        /* const decks: DeckResponse = await getDecks(99, ["Standard"], [], 'Novice', 'modern', 1, 0);
         const deck = decks.decks[0];
         const cardIds: number[] = [];
         for (const property in deck) {
@@ -75,7 +70,7 @@ if (window.location.href === battleHistoryUrl) {
           recommendedCards.appendChild(cardItem);
         }
 
-        panel.appendChild(recommendedCards);
+        panel.appendChild(recommendedCards); */
         panelWrapper.appendChild(panel);
         battleContainer.appendChild(panelWrapper);
 
