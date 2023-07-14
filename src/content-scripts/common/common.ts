@@ -306,7 +306,7 @@ const EDITIONS: Record<string, string> = {
     "3": 'reward',
     "4": 'untamed',
     "5": 'dice',
-    "6": 'gladiator',
+    "6": 'gladius',
     "7": 'chaos',
     "8": 'rift',
     "9": 'zola',
@@ -339,7 +339,7 @@ function getHighestEdition(editions: string, distribution: Distribution[]): stri
 }
 
 // Function to get the value from localStorage
-export function getValueFromLocalStorage<T>(key: string): Promise<T | undefined> {
+export function getValueFromLocalStorage<T>(key: string): Promise<T | string> {
     return new Promise((resolve) => {
         chrome.storage.local.get(key, (result) => {
             resolve(result[key]);
@@ -364,5 +364,15 @@ export function convertToTitleCase(input: string): string {
     }
 
     return words.join(' ');
+}
+
+export function extractElementText(selector: string): string {
+    const element = document.querySelector(selector) as HTMLElement | null;
+
+    if (element) {
+        return element.innerText.trim();
+    }
+
+    return '';
 }
 

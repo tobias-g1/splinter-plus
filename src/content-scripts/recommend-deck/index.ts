@@ -6,17 +6,18 @@ import { Card, CardDetail, CardDetailOwnership, Collection } from 'src/interface
 import '../../styles/common.scss';
 import '../../styles/deck.scss';
 import '../../styles/modal.scss';
-import { createCardItem, createHeader } from '../common/common';
+import { createCardItem, createHeader, extractElementText, getValueFromLocalStorage } from '../common/common';
 
-const battleHistoryUrl = 'https://splinterlands.com/?p=create_team2';
-let format: string = 'wild';
-let panelAdded = false; // Flag to track if the panel has been added
+const selectTeamUrl = 'https://splinterlands.com/?p=create_team2';
+let panelAdded = false;
 
 // Check if the current page is the battle history page
-if (window.location.href === battleHistoryUrl) {
+if (window.location.href === selectTeamUrl) {
 
   // Function to check for the existence of the panel and add it if it doesn't already exist
   const checkPanelExists = async () => {
+
+
     const battleContainer = document.querySelector('.deck-builder-page2__filters');
     // Check if the battleContainer exists and the panel has not been added
     if (battleContainer && !panelAdded) {
@@ -25,6 +26,33 @@ if (window.location.href === battleHistoryUrl) {
       // Check if the panel already exists
       const existingPanel = battleContainer.querySelector('.deck-panel');
       if (!existingPanel) {
+
+        const league: string = await getValueFromLocalStorage('league');
+        const format: string = await getValueFromLocalStorage('format');
+        const mana = extractElementText('.mana-cap')
+
+        // Extract Ruleset
+
+        const createTeamRulesetDiv: any = document.querySelector('#create-team-ruleset > div > div > img');
+        const originalTitle: any = createTeamRulesetDiv.getAttribute('data-original-title');
+        const trimmedText: any = originalTitle.split('-')[0].trim();
+        const ruleset = trimmedText;
+
+        // Extract Elements
+
+        const elementsDiv: any = document.querySelector('#create-team-splinters > .splinter-grid');
+        const splinterElements: any = elementsDiv.querySelectorAll('.splinter');
+        const filteredElements: string[] = [];
+
+        splinterElements.forEach((splinterElement: any) => {
+          const originalTitle = splinterElement.querySelector('img').getAttribute('data-original-title');
+          if (originalTitle.includes('Active')) {
+            // Filter out the ": Active" part and add to the array
+            const filteredElement = originalTitle.split(': Active')[0].trim();
+            filteredElements.push(filteredElement);
+          }
+        });
+
         const panel = document.createElement('div');
         panel.classList.add('deck-panel');
 
@@ -37,7 +65,7 @@ if (window.location.href === battleHistoryUrl) {
         const recommendedCards = document.createElement('div');
         recommendedCards.classList.add('recommended-cards');
 
-        const decks: DeckResponse = await getDecks(99, ["Standard"], [], 'Novice', 'modern', 1, 0);
+        const decks: DeckResponse = await getDecks(parseInt(mana), [ruleset], filteredElements, league, format, 1, 0);
         const deck = decks.decks[0];
         const cardIds: number[] = [];
         for (const property in deck) {
@@ -107,6 +135,3 @@ if (window.location.href === battleHistoryUrl) {
     subtree: true,
   });
 }
-
-
-console.log('Loaded')
