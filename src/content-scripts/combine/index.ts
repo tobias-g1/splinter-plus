@@ -7,7 +7,6 @@ let buttonAdded = false;
 
 const checkButtonsExist = (): void => {
   if (document.hidden) {
-    // If the page is hidden, do not perform the check
     return;
   }
 

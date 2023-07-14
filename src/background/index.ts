@@ -67,6 +67,18 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   handleAlarm(alarm);
 });
 
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (changeInfo.status === 'complete' && tab.url && /^https/.test(tab.url)) {
+    chrome.scripting.executeScript({
+      target: { tabId: tabId },
+      files: ['deckBundle.js']
+    })
+      .catch(err => console.error(err));
+  }
+});
+
+
+
 console.log('Background Script Loaded');
 
 

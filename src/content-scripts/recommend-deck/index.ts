@@ -25,7 +25,7 @@ if (window.location.href === battleHistoryUrl) {
 
       // Check if the panel already exists
       const existingPanel = battleContainer.querySelector('.deck-panel');
-      if (!existingPanel) {
+      if (!existingPanel && !panelAdded) {
         const panel = document.createElement('div');
         panel.classList.add('deck-panel');
 
