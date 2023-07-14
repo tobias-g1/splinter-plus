@@ -183,6 +183,7 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
     const cardItem = document.createElement('div');
     cardItem.classList.add('card-item');
 
+
     const cardImage = document.createElement('img');
     cardImage.classList.add('card-img');
 
@@ -190,6 +191,13 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
 
     cardImage.src = `https://d36mxiodymuqjm.cloudfront.net/cards_by_level/${edition}/${detail.name}_lv1.png`;
     cardItem.appendChild(cardImage);
+
+    if (detail.key) {
+        const key = document.createElement('div');
+        key.classList.add('key');
+        key.innerHTML = `${detail.key}`
+        cardItem.appendChild(key);
+    }
 
     const cardButtonsContainer = document.createElement('div');
     cardButtonsContainer.classList.add('card-buttons-container');
@@ -202,7 +210,6 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
     stat.classList.add('card-stat');
     stat.classList.add(format);
     stat.innerHTML = `Rating: ${rating}`
-
 
     const description = document.createElement('p');
     description.classList.add('card-description');

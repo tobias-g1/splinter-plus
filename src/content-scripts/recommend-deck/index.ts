@@ -71,11 +71,22 @@ if (window.location.href === selectTeamUrl) {
         const decks: DeckResponse = await getDecks(parseInt(mana), [ruleset], filteredElements, league, format, 1, 0);
         const deck = decks.decks[0];
         const cardIds: number[] = [];
+        const cardKeys: string[] = [];
+
+        if ('summoner_id' in deck) {
+          const summonerId = deck['summoner_id'];
+          if (typeof summonerId === 'number') {
+            cardIds.push(summonerId);
+            cardKeys.push('Summoner');
+          }
+        }
+
         for (const property in deck) {
           if (property.startsWith('monster') || property === 'summoner_id') {
             const cardId = deck[property as keyof typeof deck];
             if (typeof cardId === 'number') {
               cardIds.push(cardId);
+              cardKeys.push('Monster ' + (parseInt(property.slice(7)) + 1));
             }
           }
         }
@@ -88,7 +99,7 @@ if (window.location.href === selectTeamUrl) {
           collection = await getCollection(username);
         }
 
-        const ownership: CardDetailOwnership[] = cardData.map((card) => {
+        const ownership: CardDetailOwnership[] = cardData.map((card, index) => {
           const ownedCards: Card[] = [];
           if (username && collection) {
             const cards = collection.cards.filter((c) => c.card_detail_id === card.id);
@@ -98,7 +109,7 @@ if (window.location.href === selectTeamUrl) {
           return {
             ...card,
             cards: ownedCards.sort((a, b) => b.level - a.level),
-            avg_rating: null
+            key: cardKeys[index],  // Using the corresponding key from cardKeys array
           };
         });
 

@@ -68,7 +68,17 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  max-height: 300px;
+  max-width: 200px;
+  margin: auto;
+
+  .key {
+    font-size: 16px;
+    text-align: center;
+    font-weight: bold;
+    color: #fff;
+    margin-top: 5px;
+    font-family: nanami-bold;
+  }
 
   .card-header {
     color: #fff;
