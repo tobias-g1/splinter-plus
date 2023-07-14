@@ -1,38 +1,39 @@
-.panel-content {
-  display: none;
-  margin-top: 10px;
-  background-color: #120c06;
+.deck-panel {
+  background-color: 130f0c;
   border-radius: 15px;
   transition: max-height 0.3s;
   padding: 25px;
   max-height: 80px;
   margin-top: 10px;
-  width: calc(100% - 20px);
-  p {
-    font-family: OpenSans;
-    font-size: 14px;
-    margin: 0;
-    line-height: 20px;
-  }
-  .deck-panel {
-    .header {
-      color: white;
-      font-family: nanami-bold;
-      font-size: 22px;
-      text-transform: uppercase;
-    }
 
-    &.expanded {
-      max-height: initial;
-      .panel-content {
-        display: block;
-      }
+  .header {
+    color: white;
+    font-family: nanami-bold;
+    font-size: 22px;
+    text-transform: uppercase;
+  }
+
+  &.expanded {
+    max-height: initial;
+    .panel-content {
+      display: block;
+    }
+  }
+
+  .panel-content {
+    display: none;
+    margin-top: 10px;
+    p {
+      font-family: OpenSans;
+      font-size: 14px;
+      margin: 0;
+      line-height: 20px;
     }
   }
 }
 
 .deck-builder-page2__cards {
-  margin-top: 135px;
+  margin-top: 155px;
 }
 
 .deck-panel-wrapper {
