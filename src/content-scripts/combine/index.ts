@@ -6,13 +6,22 @@ let combineModal: CombineModal;
 let buttonAdded = false;
 
 const checkButtonsExist = (): void => {
+  if (document.hidden) {
+    // If the page is hidden, do not perform the check
+    return;
+  }
+
   const combineButton = document.getElementById('btn_combine_sp');
   const buttonsDivs = document.querySelectorAll('.buttons, .c-PJLV-ifKYhuQ-css > .c-PJLV-ihmcGFm-css');
 
-  if (buttonsDivs.length && !combineButton && !buttonAdded) {
-    addCombineButton();
-    buttonAdded = true;
-    console.log('Conversion button added.');
+  if (buttonsDivs.length && !combineButton) {
+    if (!buttonAdded) {
+      addCombineButton();
+      buttonAdded = true;
+      console.log('Conversion button added.');
+    }
+  } else {
+    buttonAdded = false;
   }
 };
 
@@ -56,12 +65,19 @@ export const launchCollectionModal = (): void => {
   combineModal = new CombineModal();
 
   combineModal.launchModal(cardIds);
-}
+};
 
 checkButtonsExist();
 
 const observer = new MutationObserver(checkButtonsExist);
 
 observer.observe(document.body, { childList: true, subtree: true });
+
+// Check for visibility changes
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === 'visible') {
+    checkButtonsExist();
+  }
+});
 
 console.log('Content script loaded successfully.');
