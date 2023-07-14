@@ -1,4 +1,4 @@
-# SplinterPlus Readme
+# SplinterPlus
 
 SplinterPlus is a plugin for Hive Keychain that provides several features to enhance the Splinterlands gaming experience. With SplinterPlus, users can automate the process of staking SPS tokens, upgrade their Splinterlands collection, and get recommendations for the best decks to use in battles.
 
