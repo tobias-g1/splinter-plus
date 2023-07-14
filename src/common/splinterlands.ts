@@ -361,6 +361,7 @@ export const rentCardsFromMarket = async (
         items,
         currency,
         days,
+        market: process.env.MARKET,
         app: process.env.APP
     });
     sendCustomJSONRequest('sm_market_rent', json, username, KeychainKeyTypes.active);
