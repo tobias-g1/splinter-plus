@@ -376,3 +376,14 @@ export function extractElementText(selector: string): string {
     return '';
 }
 
+export function createContentHeader(text: string): HTMLDivElement {
+    const contentHeader = document.createElement('div');
+    contentHeader.classList.add('content-header');
+
+    const description = document.createElement('p');
+    description.innerText = text;
+    contentHeader.append(description);
+
+    return contentHeader;
+}
+

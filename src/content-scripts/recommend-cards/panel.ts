@@ -1,7 +1,7 @@
 import { getCards } from 'src/common/splinter-plus';
 import { getCardDetails, getCollection } from 'src/common/splinterlands';
 import { getUsernameFromLocalStorage } from 'src/common/user';
-import { createCardItem, createHeader } from 'src/content-scripts/common/common';
+import { createCardItem, createContentHeader, createHeader } from 'src/content-scripts/common/common';
 import { CardResponse } from 'src/interfaces/spinter-plus.interface';
 import { Card, CardDetail, CardDetailOwnership, Collection } from 'src/interfaces/splinterlands.interface';
 
@@ -17,17 +17,6 @@ async function createCardList(details: CardDetailOwnership[], format: string): P
     return cardList;
 }
 
-function createContentHeader(): HTMLDivElement {
-    const contentHeader = document.createElement('div');
-    contentHeader.classList.add('content-header');
-
-    const description = document.createElement('p');
-    description.innerText = 'Unlock your full potential in every battle with the ultimate collection handpicked for your league and collection! Based on our extensive analysis of thousands of battles, we recommend these cards. ';
-    contentHeader.append(description);
-
-    return contentHeader;
-}
-
 export async function buildAndInsertPanel(format: string, league: string) {
     console.log(`Building and inserting panel for format: ${format}`);
 
@@ -40,7 +29,7 @@ export async function buildAndInsertPanel(format: string, league: string) {
     const contentDiv = document.createElement('div');
     contentDiv.classList.add('panel-content');
 
-    const contentHeader = createContentHeader();
+    const contentHeader = createContentHeader('Unlock your full potential in every battle with the ultimate collection handpicked for your league and collection! Based on our extensive analysis of thousands of battles, we recommend these cards.');
     contentDiv.appendChild(contentHeader);
 
     const recommendedCards = document.createElement('div');

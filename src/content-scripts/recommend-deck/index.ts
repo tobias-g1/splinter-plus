@@ -6,7 +6,7 @@ import { Card, CardDetail, CardDetailOwnership, Collection } from 'src/interface
 import '../../styles/common.scss';
 import '../../styles/deck.scss';
 import '../../styles/modal.scss';
-import { createCardItem, createHeader, extractElementText, getValueFromLocalStorage } from '../common/common';
+import { createCardItem, createContentHeader, createHeader, extractElementText, getValueFromLocalStorage } from '../common/common';
 
 const selectTeamUrl = 'https://splinterlands.com/?p=create_team2';
 let panelAdded = false;
@@ -61,6 +61,9 @@ if (window.location.href === selectTeamUrl) {
 
         const panelContent = document.createElement('div');
         panelContent.classList.add('panel-content');
+
+        const contentHeader = createContentHeader("Discover the ultimate deck tailored to your ruleset, splinters, mana, league, and game format. Our expert analysis has identified the top-performing decks, ensuring you have access to the very best. Choose from the options below to purchase or rent the cards you need to dominate the game.");
+        panelContent.appendChild(contentHeader);
 
         const recommendedCards = document.createElement('div');
         recommendedCards.classList.add('recommended-cards');
