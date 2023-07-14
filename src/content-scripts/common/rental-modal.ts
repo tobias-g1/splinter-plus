@@ -2,7 +2,7 @@ import { fetchMarketData, waitForTransactionSuccess } from 'src/common/splinterl
 import { addLoadingIndicator, addResultContainer, createMarketTable } from 'src/content-scripts/common/common';
 import { initializeBackgroundScriptConnection } from 'src/content-scripts/common/connector';
 import { MarketListing } from 'src/interfaces/splinterlands.interface';
-import '../common/common.scss';
+import '../../styles/common.scss';
 export class RentModal {
   private launched: boolean = false;
   private globalModal: HTMLElement | null = null;

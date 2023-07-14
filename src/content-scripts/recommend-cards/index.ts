@@ -1,6 +1,7 @@
 import { buildAndInsertPanel } from 'src/content-scripts/recommend-cards/panel';
-import '../common/modal.scss';
-import './panel.scss';
+import '../../styles/common.scss';
+import '../../styles/modal.scss';
+import '../../styles/panel.scss';
 
 const battleHistoryUrl = 'https://splinterlands.com/?p=battle_history';
 let inProgress = false;

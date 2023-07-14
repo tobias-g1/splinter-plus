@@ -1,6 +1,6 @@
 import { addCombineButton } from "src/content-scripts/combine/add-button";
+import '../../styles/modal.scss';
 import { CombineModal } from "../common/combine-modal";
-import '../common/modal.scss';
 
 let combineModal: CombineModal;
 let buttonAdded = false;

@@ -173,7 +173,7 @@ export function createHeader(text: string, format: string): HTMLDivElement {
     return headerDiv;
 }
 
-export async function createCardItem(detail: CardDetailOwnership, format: string, rating: number): Promise<HTMLDivElement> {
+export async function createCardItem(detail: CardDetailOwnership, format: string, rating: number | null | undefined): Promise<HTMLDivElement> {
     const cardItem = document.createElement('div');
     cardItem.classList.add('card-item');
 

@@ -34,11 +34,9 @@ export const handleKeyChainResponse = async (message: any) => {
     const handleSignBuffer = async () => {
         const { message } = data;
         const { publicKey, result, success } = response;
-
         if (success) {
             const token = await login(message, result, publicKey);
             const { access_token, refresh_token } = token;
-
             setAccessToken(access_token);
             setRefreshToken(refresh_token);
         }

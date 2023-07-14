@@ -34,7 +34,7 @@ export async function buildAndInsertPanel(format: string) {
     const panelDiv = document.createElement('div');
     panelDiv.classList.add('custom-panel');
 
-    const headerDiv = createHeader(format, 'Recommended Collection');
+    const headerDiv = createHeader("Recommended Collection", format);
     panelDiv.appendChild(headerDiv);
 
     const contentDiv = document.createElement('div');

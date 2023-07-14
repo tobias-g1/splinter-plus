@@ -10,23 +10,23 @@ export const sendRequest = async (
     method: string,
     token?: string,
     params?: Params,
-    data?: any
+    body?: any
 ): Promise<any> => {
     const config: RequestInit = { method };
 
     if (token) {
         config.headers = {
             ...config.headers,
-            "Authorization": `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
         };
     }
 
-    if (data) {
+    if (body) {
         config.headers = {
             ...config.headers,
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         };
-        config.body = JSON.stringify(data);
+        config.body = JSON.stringify(body);
     }
 
     if (params) {
@@ -37,25 +37,42 @@ export const sendRequest = async (
     const response = await fetch(`${BASE_URL}/${endpoint}`, config);
     const responseData = await response.json();
 
-    if (response.status !== 200) {
-        throw new Error(`Request to ${endpoint} failed: ${responseData.error || responseData.message}`);
+    if (!response.ok) {
+        throw new Error(responseData.error || responseData.message);
     }
 
-    return responseData;
+    return { data: responseData, status: response.status };
 };
 
-export const login = async (message: string, signature: string, pubkey: string): Promise<{ access_token: string, refresh_token: string }> => {
-    const data = await sendRequest("login", "POST", undefined, undefined, { message, signature, pubkey });
+export const login = async (
+    message: string,
+    signature: string,
+    pubkey: string
+): Promise<{ access_token: string; refresh_token: string }> => {
+    const { data } = await sendRequest("login", "POST", undefined, undefined, {
+        message,
+        signature,
+        pubkey,
+    });
     return data;
 };
 
-export const logout = async (tokens?: string[]): Promise<{ message: string }> => {
-    const data = await sendRequest("logout", "POST", "refresh", undefined, tokens ? { tokens } : undefined);
+export const logout = async (
+    tokens?: string[]
+): Promise<{ message: string }> => {
+    const { data } = await sendRequest(
+        "logout",
+        "POST",
+        "refresh",
+        undefined,
+        tokens ? { tokens } : undefined
+    );
     return data;
 };
 
 export const refreshToken = async (): Promise<{ access_token: string }> => {
-    const data = await sendRequest("refresh", "GET", "refresh");
+
+    const { data } = await sendRequest("refresh", "GET", "refresh");
     return data;
 };
 
@@ -68,16 +85,21 @@ export const getDecks = async (
     count: number,
     offset: number
 ): Promise<DeckResponse> => {
-    const params: Params = {
-        mana,
-        rulesets: JSON.stringify(ruleset),
-        elements: JSON.stringify(elements),
-        league,
-        format,
-        count,
-        offset,
-    };
-    const data = await sendRequest("decks", "POST", await getAccessToken(), params);
+    const { data } = await sendRequest(
+        "decks",
+        "POST",
+        await getAccessToken(),
+        undefined,
+        {
+            mana,
+            rulesets: ruleset,
+            elements,
+            league,
+            format,
+            count,
+            offset,
+        }
+    );
     return data as DeckResponse;
 };
 
@@ -90,14 +112,19 @@ export const getCards = async (
     top_cnt: number
 ): Promise<CardResponse> => {
     const accessToken = await getAccessToken();
-    console.log(accessToken);
-    const data = await sendRequest("cards", "POST", accessToken, undefined, {
-        mana,
-        rulesets: ruleset,
-        elements,
-        league,
-        format,
-        top_cnt,
-    });
+    const { data } = await sendRequest(
+        "cards",
+        "POST",
+        accessToken,
+        undefined,
+        {
+            mana,
+            rulesets: ruleset,
+            elements,
+            league,
+            format,
+            top_cnt,
+        }
+    );
     return data as CardResponse;
 };

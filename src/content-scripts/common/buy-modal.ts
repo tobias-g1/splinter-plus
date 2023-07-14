@@ -1,8 +1,8 @@
 import { fetchMarketData, verifySuccessfulPurchases } from "src/common/splinterlands";
-import { addLoadingIndicator, addResultContainer, createMarketTable } from "src/content-scripts/common/common";
 import { initializeBackgroundScriptConnection } from "src/content-scripts/common/connector";
 import { MarketListing } from "src/interfaces/splinterlands.interface";
-import '../common/common.scss';
+import '../../styles/common.scss';
+import { addLoadingIndicator, addResultContainer, createMarketTable } from "../common/common";
 export class BuyModal {
   private launched: boolean = false;
   private globalModal: HTMLElement | null = null;

@@ -11,6 +11,7 @@ const config = {
     username: './src/content-scripts/username/username.js',
     recommendation: './src/content-scripts/recommend-cards/index.ts',
     deck: './src/content-scripts/recommend-deck/index.ts',
+    auth: './src/content-scripts/auth/index.ts',
   },
   module: {
     rules: [

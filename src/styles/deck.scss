@@ -3,8 +3,8 @@
   border-radius: 15px;
   transition: max-height 0.3s;
   padding: 25px;
-  max-height: 100px;
-  margin-top: 25px;
+  max-height: 80px;
+  margin-top: 10px;
 
   .header {
     color: white;
@@ -17,6 +17,17 @@
     max-height: initial;
     .panel-content {
       display: block;
+    }
+  }
+
+  .panel-content {
+    display: none;
+    margin-top: 10px;
+    p {
+      font-family: OpenSans;
+      font-size: 14px;
+      margin: 0;
+      line-height: 20px;
     }
   }
 }
@@ -34,4 +45,11 @@
   padding-left: 340px;
   width: calc(100% - 25px);
   z-index: 150;
+}
+
+.recommended-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(7%, 1fr));
+  grid-gap: 15px;
+  max-width: 100%;
 }
