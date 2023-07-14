@@ -28,7 +28,7 @@ function createContentHeader(): HTMLDivElement {
     return contentHeader;
 }
 
-export async function buildAndInsertPanel(format: string) {
+export async function buildAndInsertPanel(format: string, league: string) {
     console.log(`Building and inserting panel for format: ${format}`);
 
     const panelDiv = document.createElement('div');

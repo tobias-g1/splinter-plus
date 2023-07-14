@@ -326,3 +326,32 @@ function getHighestEdition(editions: string, distribution: Distribution[]): stri
 
     return EDITIONS[highestEdition.toString()];
 }
+
+// Function to get the value from localStorage
+export function getValueFromLocalStorage<T>(key: string): Promise<T | undefined> {
+    return new Promise((resolve) => {
+        chrome.storage.local.get(key, (result) => {
+            resolve(result[key]);
+        });
+    });
+}
+
+// Function to set the value in localStorage
+export function setValueInLocalStorage<T>(key: string, value: T): Promise<void> {
+    return new Promise((resolve) => {
+        chrome.storage.local.set({ [key]: value }, () => {
+            resolve();
+        });
+    });
+}
+
+export function convertToTitleCase(input: string): string {
+    const words = input.toLowerCase().split(' ');
+
+    for (let i = 0; i < words.length; i++) {
+        words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+    }
+
+    return words.join(' ');
+}
+
