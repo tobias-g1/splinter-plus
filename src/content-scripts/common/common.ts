@@ -212,9 +212,6 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
         key.innerHTML = `${detail.key}`
         cardItem.appendChild(key);
     }
-
-    console.log(detail)
-
     const cardButtonsContainer = document.createElement('div');
     cardButtonsContainer.classList.add('card-buttons-container');
 
@@ -241,8 +238,6 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
 
     // Filter cards that are neither rented, listed, nor renting
     const rentedCards = detail.cards.filter((c) => c.player !== username);
-
-    console.log(rentedCards)
 
     if (detail.editions.includes("6") || detail.editions.includes("10")) {
         description.innerText = "This card is not available for purchase or renting.";

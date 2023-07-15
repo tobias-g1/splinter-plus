@@ -49,7 +49,7 @@ export const login = async (
     signature: string,
     pubkey: string
 ): Promise<{ access_token: string; refresh_token: string }> => {
-    const { data } = await sendRequest("login", "POST", undefined, undefined, {
+    const { data, error } = await sendRequest("login", "POST", undefined, undefined, {
         message,
         signature,
         pubkey,
