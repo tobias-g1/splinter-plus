@@ -25,6 +25,9 @@ const checkPanelExists = async () => {
     // Check if the panel already exists
     const existingPanel = battleContainer.querySelector('.deck-panel');
     if (!existingPanel) {
+
+      document.addEventListener('purchaseCompleted', requestRefresh);
+
       const format: string = await getValueFromLocalStorage('format');
 
       panel = document.createElement('div');
@@ -178,6 +181,14 @@ async function refreshDeckPanel() {
     if (contentDiv) {
       contentDiv.appendChild(cards);
     }
+  }
+}
+
+async function requestRefresh() {
+  const refreshChoice = confirm("To make your newly purchased/rented cards available for battle, please refresh the page. Click 'OK' to do so now.");
+
+  if (refreshChoice) {
+    location.reload();
   }
 }
 

@@ -79,6 +79,7 @@ export class RentModal {
 
     setTimeout(() => {
       document.dispatchEvent(new CustomEvent('purchaseCompleted'));
+      document.dispatchEvent(new CustomEvent('requestRefresh'));
     }, 3000);
 
     if (success) {
