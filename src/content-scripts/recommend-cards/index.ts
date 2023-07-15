@@ -13,7 +13,6 @@ let league: string = '';
 // Check if the current page is the battle history page
 if (window.location.href === battleHistoryUrl) {
 
-
     // Function to check for the existence of the history-header div and add the panel if it doesn't already exist
     const checkPanelExists = async () => { // Change function to async
         if (inProgress) return;
@@ -22,7 +21,7 @@ if (window.location.href === battleHistoryUrl) {
         const historyHeaderDiv = document.querySelector('.history-header');
         const customPanelDiv = document.querySelector('.custom-panel');
         if (historyHeaderDiv && !customPanelDiv) {
-            // Disconnect the observer
+
             observer.disconnect();
 
             format = extractElementText('.bh-selectable-obj a.selected')

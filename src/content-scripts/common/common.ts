@@ -5,6 +5,20 @@ import { CombineModal } from "src/content-scripts/common/combine-modal";
 import { RentModal } from "src/content-scripts/common/rental-modal";
 import { CardDetailOwnership, Distribution, MarketListing } from "src/interfaces/splinterlands.interface";
 
+const EDITIONS: Record<string, string> = {
+    "0": 'alpha',
+    "1": 'beta',
+    "2": 'promo',
+    "3": 'reward',
+    "4": 'untamed',
+    "5": 'dice',
+    "6": 'gladius',
+    "7": 'chaos',
+    "8": 'rift',
+    "9": 'zola',
+    "10": 'soulbound'
+};
+
 export async function createMarketTable(forSaleListings: MarketListing[]): Promise<HTMLElement> {
     // Create table and its container
     const table: HTMLElement = document.createElement('table');
@@ -221,15 +235,18 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
     const listedCards = detail.cards.filter((c) => (c.market_listing_type === "RENT" || c.market_listing_type === "SELL") && c.player === username);
 
     // Filter cards that are neither rented, listed, nor renting
-    const nonAffectedCards = detail.cards.filter((c) => c.delegated_to === "" && !(c.market_listing_type === "RENT" || c.market_listing_type === "SELL"));
+    const nonAffectedCards = detail.cards.filter((c) => c.delegated_to === null && c.market_listing_type === null);
+
+    console.log(detail)
 
     if (detail.editions.includes("6") || detail.editions.includes("10")) {
         description.innerText = "This card is not available for purchase or renting.";
     } else {
+        console.log(nonAffectedCards)
         if (nonAffectedCards.length === 0) {
 
             if (listedCards.length !== 0) {
-                description.innerText = "Please remove or replace your listed card to utilize SplinterPlus for upgrades.";
+                description.innerText = "Please remove your listed card from the market to use SplinterPlus for upgrades.";
                 buttons = [
                     {
                         text: 'Buy',
@@ -305,21 +322,6 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
 
     return cardItem;
 }
-
-const EDITIONS: Record<string, string> = {
-    "0": 'alpha',
-    "1": 'beta',
-    "2": 'promo',
-    "3": 'reward',
-    "4": 'untamed',
-    "5": 'dice',
-    "6": 'gladius',
-    "7": 'chaos',
-    "8": 'rift',
-    "9": 'zola',
-    "10": 'soulbound'
-};
-
 
 function createButton(text: string, format: string): HTMLButtonElement {
     const button = document.createElement('button');
