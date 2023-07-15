@@ -32,7 +32,7 @@
       "js": ["combineBundle.js"]
     },
     {
-      "matches": ["https://splinterlands.com/?p=create_team2"],
+      "matches": ["https://splinterlands.com/*"],
       "js": ["deckBundle.js"]
     },
     {

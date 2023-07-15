@@ -62,16 +62,10 @@ export const setRefreshToken = async (token: string): Promise<void> => {
 export const login = async () => {
     try {
         const username = await getUsernameFromLocalStorage();
-
-        console.log(username)
-
         if (!username) {
             throw new Error('Failed to retrieve username from local storage');
         }
         const message = username + ' ' + Math.floor(Date.now() / 1000);
-
-        console.log(message)
-
         sendRequestSignBuffer(username as string, message);
 
     } catch (error) {
@@ -84,8 +78,6 @@ export const refreshToken = async (): Promise<void> => {
     try {
         const access_token = await getAccessToken();
         const refresh_token = await getRefreshToken();
-        console.log(access_token, refresh_token)
-        console.log((access_token && refresh_token))
         if (access_token && refresh_token) {
             const { access_token: new_access_token, refresh_token: new_refresh_token } = await sendRequest('refresh', 'GET', refresh_token);
             await setAccessToken(new_access_token);

@@ -5,6 +5,7 @@ import { sendPluginData } from './plugin';
 
 let contentScriptPort: chrome.runtime.Port | null = null;
 let contentScriptReady = false;
+let scriptInjected = false;
 
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name === "content-script") {
@@ -67,26 +68,20 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   handleAlarm(alarm);
 });
 
-let scriptInjected = false;
-
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (changeInfo.status === 'complete' && tab.url && /^https/.test(tab.url)) {
-    if (!scriptInjected) {
-      chrome.scripting.executeScript({
-        target: { tabId: tabId },
-        files: ['deckBundle.js']
-      })
-        .then(() => {
-          scriptInjected = true;
-        })
-        .catch(err => console.error(err));
+    if (tab.url === 'https://splinterlands.com/?p=create_team2') {
+
+      scriptInjected = true;
+
+      chrome.tabs.executeScript(tabId, {
+        file: 'deckBundle.js',
+        runAt: 'document_start'
+      }, () => {
+        console.log('Script injected successfully.');
+      });
     }
   }
 });
 
-
-
-
 console.log('Background Script Loaded');
-
-

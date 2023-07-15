@@ -10,16 +10,21 @@ import { CardResponse } from 'src/interfaces/spinter-plus.interface';
 import { Card, CardDetail, CardDetailOwnership, Collection } from 'src/interfaces/splinterlands.interface';
 
 const battleHistoryUrl = 'https://splinterlands.com/?p=battle_history';
-let inProgress = false;
 let panelDiv: HTMLDivElement | null = null;
 let format: string = '';
 let league: string = '';
 
-if (window.location.href === battleHistoryUrl) {
-    const checkPanelExists = async () => {
-        if (inProgress) return;
-        inProgress = true;
+function checkBattleHistoryUrl() {
+    if (window.location.href === battleHistoryUrl) {
+        return true;
+    } else {
+        return false;
+    }
+}
 
+if (checkBattleHistoryUrl()) {
+
+    const checkPanelExists = async () => {
         const historyHeaderDiv = document.querySelector('.history-header');
         const customPanelDiv = document.querySelector('.custom-panel');
         if (historyHeaderDiv && !customPanelDiv) {
@@ -34,8 +39,6 @@ if (window.location.href === battleHistoryUrl) {
                 subtree: true
             });
         }
-
-        inProgress = false;
     };
 
     checkPanelExists();
@@ -63,6 +66,8 @@ async function createCardList(details: CardDetailOwnership[], format: string): P
 }
 
 async function buildRecommendedCards(): Promise<HTMLDivElement> {
+
+    document.addEventListener('purchaseCompleted', refreshCardsPanel);
 
     format = extractElementText('.bh-selectable-obj a.selected')
     setValueInLocalStorage('format', format);
@@ -126,7 +131,7 @@ export async function buildAndInsertPanel() {
     panelDiv?.appendChild(contentDiv);
 }
 
-export async function refreshCardsPanel() {
+async function refreshCardsPanel() {
 
     if (panelDiv) {
         const cardDiv = panelDiv.querySelector('.recommended-cards');
@@ -142,5 +147,3 @@ export async function refreshCardsPanel() {
         }
     }
 }
-
-

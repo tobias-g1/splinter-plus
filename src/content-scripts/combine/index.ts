@@ -18,7 +18,6 @@ const checkButtonsExist = (): void => {
     if (!buttonAdded) {
       addCombineButton();
       buttonAdded = true;
-      console.log('Conversion button added.');
     }
   } else {
     buttonAdded = false;

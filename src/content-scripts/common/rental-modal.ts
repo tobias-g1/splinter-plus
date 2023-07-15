@@ -1,8 +1,6 @@
 import { fetchMarketData, waitForTransactionSuccess } from 'src/common/splinterlands';
 import { addLoadingIndicator, addResultContainer, createMarketTable } from 'src/content-scripts/common/common';
 import { initializeBackgroundScriptConnection } from 'src/content-scripts/common/connector';
-import { refreshCardsPanel } from 'src/content-scripts/recommend-cards';
-import { refreshDeckPanel } from 'src/content-scripts/recommend-deck';
 import { MarketListing } from 'src/interfaces/splinterlands.interface';
 import '../../styles/common.scss';
 export class RentModal {
@@ -79,9 +77,8 @@ export class RentModal {
     const { tx_id } = data;
     const success = await waitForTransactionSuccess(tx_id, 4, 5);
 
-    setTimeout(async () => {
-      await refreshDeckPanel();
-      await refreshCardsPanel();
+    setTimeout(() => {
+      document.dispatchEvent(new CustomEvent('purchaseCompleted'));
     }, 3000);
 
     if (success) {

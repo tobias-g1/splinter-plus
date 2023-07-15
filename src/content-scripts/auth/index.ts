@@ -26,7 +26,6 @@ async function runContentScript() {
                     console.error('Failed to refresh token:', error);
                     await clearAccessToken();
                     await login();
-                    console.log('Login successful');
                 }
             } else {
                 console.log('Access token valid, no action needed');
