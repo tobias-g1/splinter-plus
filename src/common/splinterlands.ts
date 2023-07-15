@@ -1,6 +1,8 @@
 import { sendCustomJSONRequest } from "src/common/keychain";
+import { getPricesFromLocalStorage } from "src/common/prices";
 import { getSettingsFromLocalStorage } from "src/common/settings";
 import { KeychainKeyTypes } from "src/interfaces/keychain.interface";
+import { Prices } from "src/interfaces/prices.interface";
 import {
     Balance,
     BalanceHistory,
@@ -344,21 +346,31 @@ export const buyCardsFromMarket = async (
         return sum + (buy_price || 0);
     }, 0).toFixed(3);
 
+    const prices: Prices | undefined = await getPricesFromLocalStorage();
 
-    if (!tokenBalance || (tokenBalance > parseFloat(total_price))) {
-        console.log(1)
-        alert(`You don't have enough ${currency} to complete this purchase.`);
-        return;
+    if (prices) {
+        const totalPriceDEC = (parseFloat(total_price) / prices.dec).toFixed(3);
+
+        console.log(totalPriceDEC)
+
+        if (!tokenBalance || (tokenBalance < parseFloat(totalPriceDEC))) {
+
+            alert(`You don't have enough ${currency} to complete this purchase.`);
+            return;
+        }
+
+        const json: string = JSON.stringify({
+            items,
+            price: total_price,
+            currency,
+            market: process.env.MARKET,
+            app: process.env.APP
+        });
+        sendCustomJSONRequest('sm_market_purchase', json, username, KeychainKeyTypes.active);
+    } else {
+        alert('Unable to complete purchases unable to calculate prices in DEC');
     }
 
-    const json: string = JSON.stringify({
-        items,
-        price: total_price,
-        currency,
-        market: process.env.MARKET,
-        app: process.env.APP
-    });
-    sendCustomJSONRequest('sm_market_purchase', json, username, KeychainKeyTypes.active);
 };
 
 export const rentCardsFromMarket = async (
@@ -370,6 +382,7 @@ export const rentCardsFromMarket = async (
 
     const balances = await fetchBalances(username);
     const tokenBalance: number | undefined = getTokenBalance(balances, currency);
+    const prices: Prices | undefined = await getPricesFromLocalStorage();
 
     const items = cards.map(card => card.market_id);
     const total_price = cards.reduce((sum, card) => {
@@ -377,19 +390,25 @@ export const rentCardsFromMarket = async (
         return sum + (buy_price || 0);
     }, 0).toFixed(3);
 
-    if (!tokenBalance || tokenBalance > parseFloat(total_price)) {
-        alert(`You don't have enough ${currency} to complete this rental.`);
-        return;
-    }
+    if (prices) {
+        const totalPriceDEC = (parseFloat(total_price) / prices.dec).toFixed(3);
 
-    const json: string = JSON.stringify({
-        items,
-        currency,
-        days,
-        market: process.env.MARKET,
-        app: process.env.APP
-    });
-    sendCustomJSONRequest('sm_market_rent', json, username, KeychainKeyTypes.active);
+        if (!tokenBalance || tokenBalance < parseFloat(total_price)) {
+            alert(`You don't have enough ${currency} to complete this rental.`);
+            return;
+        }
+
+        const json: string = JSON.stringify({
+            items,
+            currency,
+            days,
+            market: process.env.MARKET,
+            app: process.env.APP
+        });
+        sendCustomJSONRequest('sm_market_rent', json, username, KeychainKeyTypes.active);
+    } else {
+        alert('Unable to complete rental unable to calculate prices in DEC');
+    }
 };
 
 export const fetchBalances = async (username: string): Promise<Balance[]> => {
