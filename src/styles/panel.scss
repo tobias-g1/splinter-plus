@@ -16,10 +16,7 @@
 
   @media screen and (max-width: 900px) {
     .card-list {
-      grid-template-columns: repeat(
-        3,
-        1fr
-      ); /* Set the number of columns to 3 for smaller screens */
+      grid-template-columns: repeat(3, 1fr);
     }
   }
 
