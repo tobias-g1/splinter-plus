@@ -23,7 +23,6 @@
     "@types/chrome": "^0.0.177",
     "jwt-decode": "^3.1.2",
     "node-polyfill-webpack-plugin": "^1.1.4",
-    "path": "^0.12.7",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "sscjs": "^0.0.9",
@@ -47,7 +46,7 @@
     "babel-plugin-module-resolver": "^4.1.0",
     "copy-webpack-plugin": "^10.2.0",
     "css-loader": "^6.5.1",
-    "dotenv": "^14.3.2",
+    "dotenv": "^14.2.0",
     "hive-keychain-commons": "github:hive-keychain/hive-keychain-commons",
     "node-sass": "^7.0.1",
     "react-hot-loader": "^4.13.0",
@@ -62,7 +61,7 @@
     "webpack-bundle-analyzer": "^4.5.0",
     "webpack-cli": "^4.7.2",
     "webpack-dev-server": "^4.7.3",
-    "webpack-merge": "^5.9.0"
+    "webpack-merge": "^5.8.0"
   },
   "browser": {
     "crypto": false
