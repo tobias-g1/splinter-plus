@@ -1,14 +1,18 @@
-
-import { convertToTitleCase, extractElementText, setValueInLocalStorage } from 'src/content-scripts/common/common';
-import { buildAndInsertPanel } from 'src/content-scripts/recommend-cards/panel';
 import '../../styles/common.scss';
 import '../../styles/modal.scss';
 import '../../styles/panel.scss';
 
+import { getCards } from 'src/common/splinter-plus';
+import { getCardDetails, getCollection } from 'src/common/splinterlands';
+import { getUsernameFromLocalStorage } from 'src/common/user';
+import { convertToTitleCase, createCardItem, createContentHeader, createHeader, extractElementText, setValueInLocalStorage } from 'src/content-scripts/common/common';
+import { CardResponse } from 'src/interfaces/spinter-plus.interface';
+import { Card, CardDetail, CardDetailOwnership, Collection } from 'src/interfaces/splinterlands.interface';
+
 const battleHistoryUrl = 'https://splinterlands.com/?p=battle_history';
 let inProgress = false;
-let format: string = '';
-let league: string = '';
+
+let panelDiv: HTMLDivElement | null = null; // Declare panelDiv outside the function to make it accessible for refreshing
 
 // Check if the current page is the battle history page
 if (window.location.href === battleHistoryUrl) {
@@ -24,14 +28,7 @@ if (window.location.href === battleHistoryUrl) {
 
             observer.disconnect();
 
-            format = extractElementText('.bh-selectable-obj a.selected')
-            setValueInLocalStorage('format', format);
-
-            league = extractElementText('#current_league_text')
-            league = convertToTitleCase(league);
-            setValueInLocalStorage('league', league);
-
-            await buildAndInsertPanel(format, league);
+            await buildAndInsertPanel();
             observer.observe(document.body, {
                 childList: true,
                 subtree: true
@@ -53,4 +50,99 @@ if (window.location.href === battleHistoryUrl) {
         childList: true,
         subtree: true
     });
+}
+
+
+async function createCardList(details: CardDetailOwnership[], format: string): Promise<HTMLDivElement> {
+    const cardList = document.createElement('div');
+    cardList.classList.add('card-list');
+
+    for (const detail of details) {
+        const cardItemElement = await createCardItem(detail, format, detail.avg_rating);
+        cardList.appendChild(cardItemElement);
+    }
+
+    return cardList;
+}
+
+export async function buildAndInsertPanel() {
+    let format: string = '';
+    let league: string = '';
+
+    console.log(`Building and inserting panel for format: ${format}`);
+
+    format = extractElementText('.bh-selectable-obj a.selected')
+    setValueInLocalStorage('format', format);
+
+    league = extractElementText('#current_league_text')
+    league = convertToTitleCase(league);
+    setValueInLocalStorage('league', league);
+
+    panelDiv = document.createElement('div');
+    panelDiv.classList.add('custom-panel');
+
+    const headerDiv = createHeader("Recommended Collection", format);
+    panelDiv.appendChild(headerDiv);
+
+    const contentDiv = document.createElement('div');
+    contentDiv.classList.add('panel-content');
+
+    const contentHeader = createContentHeader('Unlock your full potential in every battle with the ultimate collection handpicked for your league and collection! Based on our extensive analysis of thousands of battles, we recommend these cards.');
+    contentDiv.appendChild(contentHeader);
+
+    const recommendedCards = document.createElement('div');
+    recommendedCards.classList.add('recommended-cards');
+
+    const cards: CardResponse = await getCards([99], [], [], "Novice", format, 15);
+    const cardIds: number[] = cards.cards.map(card => card.card_id);
+    const cardData: CardDetail[] = await getCardDetails(cardIds);
+
+    const username: string | null = await getUsernameFromLocalStorage();
+
+    let collection: Collection | null = null;
+    if (username) {
+        collection = await getCollection(username);
+    }
+
+    const ownership: CardDetailOwnership[] = cardData.map((card) => {
+
+        const ownedCards: Card[] = [];
+        if (username && collection) {
+            const cards = collection.cards.filter((c) => c.card_detail_id === card.id);
+            ownedCards.push(...cards);
+        }
+
+        return {
+            ...card,
+            cards: ownedCards.sort((a, b) => b.level - a.level),
+            avg_rating: cards.cards.find(c => c.card_id === card.id)?.avg_rating || 0
+        };
+    });
+
+    ownership.sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0));
+
+    recommendedCards.appendChild(await createCardList(ownership, format));
+    contentDiv.appendChild(recommendedCards);
+
+    panelDiv.appendChild(contentDiv);
+
+    const historyHeaderDiv = document.querySelector('.history-header');
+    if (historyHeaderDiv) {
+        historyHeaderDiv.parentNode?.insertBefore(panelDiv, historyHeaderDiv.nextSibling);
+    }
+}
+
+// Function to refresh the panel and get the cards again
+export async function refreshCardsPanel() {
+    if (panelDiv) {
+
+        // Clear the existing panel content
+        const contentDiv = panelDiv.querySelector('.panel-content');
+        if (contentDiv) {
+            contentDiv.innerHTML = "";
+        }
+
+        // Rebuild and insert the panel with the updated cards
+        await buildAndInsertPanel();
+    }
 }

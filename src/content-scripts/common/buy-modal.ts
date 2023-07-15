@@ -1,5 +1,7 @@
 import { fetchMarketData, verifySuccessfulPurchases } from "src/common/splinterlands";
 import { initializeBackgroundScriptConnection } from "src/content-scripts/common/connector";
+import { refreshCardsPanel } from "src/content-scripts/recommend-cards";
+import { refreshDeckPanel } from "src/content-scripts/recommend-deck";
 import { MarketListing } from "src/interfaces/splinterlands.interface";
 import '../../styles/common.scss';
 import { addLoadingIndicator, addResultContainer, createMarketTable } from "../common/common";
@@ -100,6 +102,11 @@ export class BuyModal {
         }
       });
     }
+
+    setTimeout(async () => {
+      await refreshDeckPanel();
+      await refreshCardsPanel();
+    }, 3000);
 
     if (allSuccessful) {
       addResultContainer(this.globalModal!, 'Your cards have been purchased successfully!', 'Congratulations! Your cards were successfully bought.')

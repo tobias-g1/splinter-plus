@@ -3,6 +3,8 @@ import { buyCardsFromMarket, calculateCheapestCards, combineCards, fetchCardData
 import { getUsernameFromLocalStorage } from "src/common/user";
 import { addLoadingIndicator, addResultContainer } from "src/content-scripts/common/common";
 import { initializeBackgroundScriptConnection } from "src/content-scripts/common/connector";
+import { refreshCardsPanel } from "src/content-scripts/recommend-cards";
+import { refreshDeckPanel } from "src/content-scripts/recommend-deck";
 import { CardLevelInfo, ForSaleListing } from "src/interfaces/splinterlands.interface";
 
 export class CombineModal {
@@ -218,5 +220,11 @@ export class CombineModal {
     }
 
     this.combineInProgress = false;
+
+    setTimeout(async () => {
+      await refreshDeckPanel();
+      await refreshCardsPanel();
+    }, 3000);
+
   }
 }
