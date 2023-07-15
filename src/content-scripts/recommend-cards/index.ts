@@ -11,23 +11,23 @@ import { Card, CardDetail, CardDetailOwnership, Collection } from 'src/interface
 
 const battleHistoryUrl = 'https://splinterlands.com/?p=battle_history';
 let inProgress = false;
+let panelDiv: HTMLDivElement | null = null;
+let format: string = '';
+let league: string = '';
 
-let panelDiv: HTMLDivElement | null = null; // Declare panelDiv outside the function to make it accessible for refreshing
-
-// Check if the current page is the battle history page
 if (window.location.href === battleHistoryUrl) {
-
-    // Function to check for the existence of the history-header div and add the panel if it doesn't already exist
-    const checkPanelExists = async () => { // Change function to async
+    const checkPanelExists = async () => {
         if (inProgress) return;
         inProgress = true;
 
         const historyHeaderDiv = document.querySelector('.history-header');
         const customPanelDiv = document.querySelector('.custom-panel');
         if (historyHeaderDiv && !customPanelDiv) {
+            panelDiv = document.createElement('div');
+            panelDiv.classList.add('custom-panel');
+            historyHeaderDiv.parentNode?.insertBefore(panelDiv, historyHeaderDiv.nextSibling);
 
             observer.disconnect();
-
             await buildAndInsertPanel();
             observer.observe(document.body, {
                 childList: true,
@@ -38,10 +38,8 @@ if (window.location.href === battleHistoryUrl) {
         inProgress = false;
     };
 
-    // Call the checkPanelExists function on initial load
     checkPanelExists();
 
-    // Watch for changes to the DOM and check for the existence of the panel on each change
     const observer = new MutationObserver(() => {
         checkPanelExists();
     });
@@ -51,7 +49,6 @@ if (window.location.href === battleHistoryUrl) {
         subtree: true
     });
 }
-
 
 async function createCardList(details: CardDetailOwnership[], format: string): Promise<HTMLDivElement> {
     const cardList = document.createElement('div');
@@ -65,11 +62,7 @@ async function createCardList(details: CardDetailOwnership[], format: string): P
     return cardList;
 }
 
-export async function buildAndInsertPanel() {
-    let format: string = '';
-    let league: string = '';
-
-    console.log(`Building and inserting panel for format: ${format}`);
+async function buildRecommendedCards(): Promise<HTMLDivElement> {
 
     format = extractElementText('.bh-selectable-obj a.selected')
     setValueInLocalStorage('format', format);
@@ -77,18 +70,6 @@ export async function buildAndInsertPanel() {
     league = extractElementText('#current_league_text')
     league = convertToTitleCase(league);
     setValueInLocalStorage('league', league);
-
-    panelDiv = document.createElement('div');
-    panelDiv.classList.add('custom-panel');
-
-    const headerDiv = createHeader("Recommended Collection", format);
-    panelDiv.appendChild(headerDiv);
-
-    const contentDiv = document.createElement('div');
-    contentDiv.classList.add('panel-content');
-
-    const contentHeader = createContentHeader('Unlock your full potential in every battle with the ultimate collection handpicked for your league and collection! Based on our extensive analysis of thousands of battles, we recommend these cards.');
-    contentDiv.appendChild(contentHeader);
 
     const recommendedCards = document.createElement('div');
     recommendedCards.classList.add('recommended-cards');
@@ -105,7 +86,6 @@ export async function buildAndInsertPanel() {
     }
 
     const ownership: CardDetailOwnership[] = cardData.map((card) => {
-
         const ownedCards: Card[] = [];
         if (username && collection) {
             const cards = collection.cards.filter((c) => c.card_detail_id === card.id);
@@ -122,27 +102,45 @@ export async function buildAndInsertPanel() {
     ownership.sort((a, b) => (b.avg_rating || 0) - (a.avg_rating || 0));
 
     recommendedCards.appendChild(await createCardList(ownership, format));
+
+    return recommendedCards;
+}
+
+export async function buildAndInsertPanel() {
+
+    format = extractElementText('.bh-selectable-obj a.selected')
+    setValueInLocalStorage('format', format);
+
+    const headerDiv = createHeader("Recommended Collection", format);
+    panelDiv?.appendChild(headerDiv);
+
+    const contentDiv = document.createElement('div');
+    contentDiv.classList.add('panel-content');
+
+    const contentHeader = createContentHeader('Unlock your full potential in every battle with the ultimate collection handpicked for your league and collection! Based on our extensive analysis of thousands of battles, we recommend these cards.');
+    contentDiv.appendChild(contentHeader);
+
+    const recommendedCards = await buildRecommendedCards();
     contentDiv.appendChild(recommendedCards);
 
-    panelDiv.appendChild(contentDiv);
-
-    const historyHeaderDiv = document.querySelector('.history-header');
-    if (historyHeaderDiv) {
-        historyHeaderDiv.parentNode?.insertBefore(panelDiv, historyHeaderDiv.nextSibling);
-    }
+    panelDiv?.appendChild(contentDiv);
 }
 
-// Function to refresh the panel and get the cards again
 export async function refreshCardsPanel() {
-    if (panelDiv) {
 
-        // Clear the existing panel content
-        const contentDiv = panelDiv.querySelector('.panel-content');
-        if (contentDiv) {
-            contentDiv.innerHTML = "";
+    if (panelDiv) {
+        const cardDiv = panelDiv.querySelector('.recommended-cards');
+        if (cardDiv) {
+            cardDiv.remove();
         }
 
-        // Rebuild and insert the panel with the updated cards
-        await buildAndInsertPanel();
+        const cards = await buildRecommendedCards();
+
+        const contentDiv = panelDiv.querySelector('.panel-content');
+        if (contentDiv) {
+            contentDiv.appendChild(cards);
+        }
     }
 }
+
+
