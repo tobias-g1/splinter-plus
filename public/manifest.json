@@ -73,7 +73,7 @@
 
   "manifest_version": 3,
   "externally_connectable": {
-    "ids": [],
+    "ids": ["cgbodljjckpjacbgjcfgljhacbeoojkb"],
     "matches": ["https://localhost:3000/*", "http://localhost:3000/*"],
     "accepts_tls_channel_id": false
   }
