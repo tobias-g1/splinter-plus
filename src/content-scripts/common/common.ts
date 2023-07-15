@@ -237,12 +237,9 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
     // Filter cards that are neither rented, listed, nor renting
     const nonAffectedCards = detail.cards.filter((c) => c.delegated_to === null && c.market_listing_type === null);
 
-    console.log(detail)
-
     if (detail.editions.includes("6") || detail.editions.includes("10")) {
         description.innerText = "This card is not available for purchase or renting.";
     } else {
-        console.log(nonAffectedCards)
         if (nonAffectedCards.length === 0) {
 
             if (listedCards.length !== 0) {
