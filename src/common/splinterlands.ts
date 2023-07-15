@@ -331,11 +331,22 @@ export const buyCardsFromMarket = async (
     cards: Listing[],
     currency: string
 ): Promise<any> => {
+
+    const balances = await fetchBalances(username);
+    const tokenBalance: number | undefined = getTokenBalance(balances, currency);
+
     const items = cards.map(card => card.market_id);
     const total_price = cards.reduce((sum, card) => {
         const buy_price = typeof card.buy_price === 'string' ? parseFloat(card.buy_price) : card.buy_price;
         return sum + (buy_price || 0);
     }, 0).toFixed(3);
+
+
+    if (tokenBalance && tokenBalance < parseFloat(total_price)) {
+        alert(`You don't have enough ${currency} to complete this purchase.`);
+        return;
+    }
+
     const json: string = JSON.stringify({
         items,
         price: total_price,
@@ -352,11 +363,22 @@ export const rentCardsFromMarket = async (
     currency: string,
     days: string,
 ): Promise<any> => {
+
+    const balances = await fetchBalances(username);
+    const tokenBalance: number | undefined = getTokenBalance(balances, currency);
+
     const items = cards.map(card => card.market_id);
     const total_price = cards.reduce((sum, card) => {
         const buy_price = typeof card.buy_price === 'string' ? parseFloat(card.buy_price) : card.buy_price;
         return sum + (buy_price || 0);
     }, 0).toFixed(3);
+
+    if (tokenBalance && tokenBalance < parseFloat(total_price)) {
+        alert(`You don't have enough ${currency} to complete this purchase.`);
+        return;
+    }
+
+
     const json: string = JSON.stringify({
         items,
         currency,
