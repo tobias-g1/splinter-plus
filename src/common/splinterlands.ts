@@ -378,7 +378,6 @@ export const rentCardsFromMarket = async (
         return;
     }
 
-
     const json: string = JSON.stringify({
         items,
         currency,
