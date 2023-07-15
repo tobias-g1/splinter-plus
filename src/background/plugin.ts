@@ -6,14 +6,7 @@ export const getPlugin = async () => {
     definition: {
       title: await getMessage('plugin_name'),
       description: await getMessage('description'),
-      generalSettings: [
-        {
-          label: await getMessage('enable_plugin_label'),
-          key: 'enablePluginSetting',
-          type: PluginSettingType.CHECKBOX,
-          hint: await getMessage('enable_plugin_hint'),
-        } as CheckboxSetting,
-      ],
+      generalSettings: [],
       userSettings: [
         {
           label: await getMessage('claim_reward_label'),
