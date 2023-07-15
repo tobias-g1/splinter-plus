@@ -21,7 +21,7 @@ export class BuyModal {
   }
 
   private modalToAdd: string = `
-    <div id="buy_dialog" class="modal fade show neon in" tabindex="-1" role="dialog" style="display: block; padding-right: 10px;">
+    <div id="buy_dialog" class="sp_modal modal fade show neon in" tabindex="-1" role="dialog" style="display: block; padding-right: 10px;">
       <div class="modal-dialog battle-dialog" style="width: 800px;">
         <div class="modal-content">
           <div class="modal-header">
