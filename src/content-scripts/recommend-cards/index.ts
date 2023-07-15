@@ -79,7 +79,7 @@ async function buildRecommendedCards(): Promise<HTMLDivElement> {
     const recommendedCards = document.createElement('div');
     recommendedCards.classList.add('recommended-cards');
 
-    const cards: CardResponse = await getCards([99], [], [], "Novice", format, 15);
+    const cards: CardResponse = await getCards([99], [], [], league, format, 25);
     const cardIds: number[] = cards.cards.map(card => card.card_id);
     const cardData: CardDetail[] = await getCardDetails(cardIds);
 

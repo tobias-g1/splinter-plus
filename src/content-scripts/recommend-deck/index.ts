@@ -1,11 +1,12 @@
+import '../../styles/common.scss';
+import '../../styles/deck.scss';
+import '../../styles/modal.scss';
+
 import { getDecks } from 'src/common/splinter-plus';
 import { getCardDetails, getCollection } from 'src/common/splinterlands';
 import { getUsernameFromLocalStorage } from 'src/common/user';
 import { DeckResponse } from 'src/interfaces/spinter-plus.interface';
 import { Card, CardDetail, CardDetailOwnership, Collection } from 'src/interfaces/splinterlands.interface';
-import '../../styles/common.scss';
-import '../../styles/deck.scss';
-import '../../styles/modal.scss';
 import { createCardItem, createContentHeader, createHeader, extractElementText, getValueFromLocalStorage } from '../common/common';
 
 const selectTeamUrl = 'https://splinterlands.com/?p=create_team2';
@@ -51,9 +52,7 @@ const checkPanelExists = async () => {
       }
     }
   } else {
-    console.log(12232323)
-    // Retry after a certain delay
-    setTimeout(checkPanelExists, 1000);
+    setTimeout(checkPanelExists, 500);
   }
 };
 
