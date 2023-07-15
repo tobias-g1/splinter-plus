@@ -5,7 +5,7 @@ const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const path = require('path');
 const fs = require('fs');
 
-module.exports = {
+const config = {
   entry: {
     background: './src/background/index.ts',
     combine: './src/content-scripts/combine/index.ts',
@@ -109,3 +109,4 @@ module.exports = {
     filename: '[name]Bundle.js',
   },
 };
+module.exports = config;
