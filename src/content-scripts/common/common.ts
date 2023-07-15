@@ -213,6 +213,8 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
         cardItem.appendChild(key);
     }
 
+    console.log(detail)
+
     const cardButtonsContainer = document.createElement('div');
     cardButtonsContainer.classList.add('card-buttons-container');
 
@@ -237,6 +239,11 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
     // Filter cards that are neither rented, listed, nor renting
     const nonAffectedCards = detail.cards.filter((c) => c.delegated_to === null && c.market_listing_type === null);
 
+    // Filter cards that are neither rented, listed, nor renting
+    const rentedCards = detail.cards.filter((c) => c.player !== username);
+
+    console.log(rentedCards)
+
     if (detail.editions.includes("6") || detail.editions.includes("10")) {
         description.innerText = "This card is not available for purchase or renting.";
     } else {
@@ -244,6 +251,17 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
 
             if (listedCards.length !== 0) {
                 description.innerText = "Please remove your listed card from the market to use SplinterPlus for upgrades.";
+                buttons = [
+                    {
+                        text: 'Buy',
+                        action: () => {
+                            const buyModal = new BuyModal(detail.id, false, parseInt(detail.editions[0]), 500)
+                            buyModal.launchBuyModal()
+                        },
+                    }
+                ]
+            } else if (rentedCards.length !== 0) {
+                description.innerText = "You've rented this card, but you can buy and add to your collection using the options below";
                 buttons = [
                     {
                         text: 'Buy',
@@ -272,8 +290,6 @@ export async function createCardItem(detail: CardDetailOwnership, format: string
                     },
                 ];
             }
-
-
         } else {
             description.innerText = "You own this card. Upgrade it by combining with your highest-rated card or visit the collection page for more options."
             buttons = [
