@@ -13,7 +13,7 @@ export class CombineModal {
   public inProgressPurchase: ForSaleListing[] = [];
 
   private modalToAdd: string = `
-    <div id="combine_dialog" class="modal fade show neon in" tabindex="-1" role="dialog" style="display: block; padding-right: 10px;">
+    <div id="combine_dialog" class="sp_modal modal fade show neon in" tabindex="-1" role="dialog" style="display: block; padding-right: 10px;">
       <div class="modal-dialog battle-dialog" style="width: 800px;">
         <div class="modal-content">
           <div class="modal-header">
@@ -218,5 +218,10 @@ export class CombineModal {
     }
 
     this.combineInProgress = false;
+
+    setTimeout(() => {
+      document.dispatchEvent(new CustomEvent('purchaseCompleted'));
+    }, 3000);
+
   }
 }

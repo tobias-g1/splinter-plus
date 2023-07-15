@@ -1,8 +1,8 @@
 import { fetchMarketData, verifySuccessfulPurchases } from "src/common/splinterlands";
-import { addLoadingIndicator, addResultContainer, createMarketTable } from "src/content-scripts/common/common";
 import { initializeBackgroundScriptConnection } from "src/content-scripts/common/connector";
 import { MarketListing } from "src/interfaces/splinterlands.interface";
-import '../common/common.scss';
+import '../../styles/common.scss';
+import { addLoadingIndicator, addResultContainer, createMarketTable } from "../common/common";
 export class BuyModal {
   private launched: boolean = false;
   private globalModal: HTMLElement | null = null;
@@ -19,7 +19,7 @@ export class BuyModal {
   }
 
   private modalToAdd: string = `
-    <div id="buy_dialog" class="modal fade show neon in" tabindex="-1" role="dialog" style="display: block; padding-right: 10px;">
+    <div id="buy_dialog" class="sp_modal modal fade show neon in" tabindex="-1" role="dialog" style="display: block; padding-right: 10px;">
       <div class="modal-dialog battle-dialog" style="width: 800px;">
         <div class="modal-content">
           <div class="modal-header">
@@ -100,6 +100,11 @@ export class BuyModal {
         }
       });
     }
+
+    setTimeout(() => {
+      document.dispatchEvent(new CustomEvent('purchaseCompleted'));
+      document.dispatchEvent(new CustomEvent('requestRefresh'));
+    }, 3000);
 
     if (allSuccessful) {
       addResultContainer(this.globalModal!, 'Your cards have been purchased successfully!', 'Congratulations! Your cards were successfully bought.')

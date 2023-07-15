@@ -47,7 +47,6 @@ export const stakeTokens = async (username: string, quantity: number, symbol: st
 export const attemptAutoStake = async (user: string, trxId: string): Promise<any> => {
   try {
     const userSettings = await getUserSettings();
-    console.log(user);
     if (userSettings[user].autoStakeSetting) {
       let retryCount = 0;
       const checkBalanceHistory = async () => {

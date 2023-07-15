@@ -1,4 +1,3 @@
-import { getAccessToken, login, refreshToken } from "src/common/auth";
 
 export const getUsernameFromLocalStorage = (): Promise<string | null> => {
     const script: HTMLScriptElement = document.createElement('script');
@@ -17,30 +16,4 @@ export const getUsernameFromLocalStorage = (): Promise<string | null> => {
             }
         }, false);
     });
-};
-
-export const init = async () => {
-    const accessToken = await getAccessToken();
-    if (accessToken) {
-        try {
-            await refreshToken();
-            console.log('Token successfully refreshed');
-        } catch (error) {
-            console.error('Failed to refresh token, requesting login', error);
-            try {
-                const newAccessToken = await login();
-                console.log('Login successful, new access token:', newAccessToken);
-            } catch (loginError) {
-                console.error('Login failed', loginError);
-            }
-        }
-    } else {
-        console.log('No access token found, requesting login');
-        try {
-            const newAccessToken = await login();
-            console.log('Login successful, new access token:', newAccessToken);
-        } catch (error) {
-            console.error('Login failed', error);
-        }
-    }
 };

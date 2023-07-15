@@ -32,11 +32,22 @@
       "js": ["combineBundle.js"]
     },
     {
+      "matches": ["https://splinterlands.com/*"],
+      "js": ["deckBundle.js"]
+    },
+    {
       "matches": [
         "https://splinterlands.com/*",
         "https://next.splinterlands.com/*"
       ],
       "js": ["usernameBundle.js"]
+    },
+    {
+      "matches": [
+        "https://splinterlands.com/*",
+        "https://next.splinterlands.com/*"
+      ],
+      "js": ["authBundle.js"]
     }
   ],
   "icons": {

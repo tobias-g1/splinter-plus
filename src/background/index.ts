@@ -1,11 +1,11 @@
 import { PluginMessage } from 'hive-keychain-commons/lib/plugins';
 import { handleKeyChainResponse } from 'src/common/keychain-response';
-import { init } from 'src/common/user';
 import { createAlarms, handleAlarm } from './alarms';
 import { sendPluginData } from './plugin';
 
 let contentScriptPort: chrome.runtime.Port | null = null;
 let contentScriptReady = false;
+let scriptInjected = false;
 
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name === "content-script") {
@@ -68,8 +68,6 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   handleAlarm(alarm);
 });
 
-init();
+
 
 console.log('Background Script Loaded');
-
-

@@ -1,3 +1,12 @@
+.sp_modal {
+  p {
+    color: white;
+    font-family: 'Eczar', serif;
+    font-size: 18px;
+    line-height: 24px;
+  }
+}
+
 .sp_combine.btn_combine {
   width: 50px;
   height: 25px;
@@ -28,13 +37,6 @@
     background-attachment: #573e41;
     color: #573e41;
   }
-}
-
-p {
-  color: white;
-  font-family: 'Eczar', serif;
-  font-size: 18px;
-  line-height: 24px;
 }
 
 .sp-loading {

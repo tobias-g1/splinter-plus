@@ -1,6 +1,23 @@
 import { buyCardsFromMarket, rentCardsFromMarket } from "src/common/splinterlands";
 import { getUsernameFromLocalStorage } from "src/common/user";
-import { MarketListing } from "src/interfaces/splinterlands.interface";
+import { BuyModal } from "src/content-scripts/common/buy-modal";
+import { CombineModal } from "src/content-scripts/common/combine-modal";
+import { RentModal } from "src/content-scripts/common/rental-modal";
+import { CardDetailOwnership, Distribution, MarketListing } from "src/interfaces/splinterlands.interface";
+
+const EDITIONS: Record<string, string> = {
+    "0": 'alpha',
+    "1": 'beta',
+    "2": 'promo',
+    "3": 'reward',
+    "4": 'untamed',
+    "5": 'dice',
+    "6": 'gladius',
+    "7": 'chaos',
+    "8": 'rift',
+    "9": 'zola',
+    "10": 'soulbound'
+};
 
 export async function createMarketTable(forSaleListings: MarketListing[]): Promise<HTMLElement> {
     // Create table and its container
@@ -139,3 +156,256 @@ export function createResultContent(header: string, text: string, modal: HTMLEle
 
     return resultContent;
 }
+
+export function createHeader(text: string, format: string): HTMLDivElement {
+    const headerDiv = document.createElement('div');
+    headerDiv.classList.add('header-wrapper');
+
+    const header = document.createElement('span');
+    header.classList.add('header');
+    header.innerText = text;
+    headerDiv.appendChild(header);
+
+    const exploreButton = document.createElement('button');
+    exploreButton.classList.add('explore-button');
+    exploreButton.innerText = 'Explore';
+    exploreButton.classList.add(format);
+    exploreButton.onclick = (event: any) => {
+        event.stopPropagation();
+        const cardContainer = document.querySelector('.deck-builder-page2__cards');
+        const filtersContainer = document.querySelector('.deck-builder-page2__filters');
+
+        if (cardContainer) {
+            cardContainer.classList.toggle('expanded');
+        }
+
+        if (filtersContainer) {
+            filtersContainer.classList.toggle('expanded');
+        }
+
+        const panelDiv: any = event.target.closest('.deck-panel, .custom-panel');
+        panelDiv.classList.toggle('expanded');
+        if (panelDiv.classList.contains('expanded')) {
+            exploreButton.innerText = 'Close';
+            exploreButton.classList.add('close-expand');
+        } else {
+            exploreButton.innerText = 'Explore';
+            exploreButton.classList.remove('close-expand');
+        }
+    };
+    headerDiv.appendChild(exploreButton);
+
+    return headerDiv;
+}
+
+export async function createCardItem(detail: CardDetailOwnership, format: string, rating: number | null | undefined): Promise<HTMLDivElement> {
+    const cardItem = document.createElement('div');
+    cardItem.classList.add('card-item');
+
+
+    const cardImage = document.createElement('img');
+    cardImage.classList.add('card-img');
+
+    const edition = getHighestEdition(detail.editions, detail.distribution);
+
+    cardImage.src = `https://d36mxiodymuqjm.cloudfront.net/cards_by_level/${edition}/${detail.name}_lv1.png`;
+    cardItem.appendChild(cardImage);
+
+    if (detail.key) {
+        const key = document.createElement('div');
+        key.classList.add('key');
+        key.innerHTML = `${detail.key}`
+        cardItem.appendChild(key);
+    }
+    const cardButtonsContainer = document.createElement('div');
+    cardButtonsContainer.classList.add('card-buttons-container');
+
+    const header = document.createElement('span');
+    header.classList.add('card-header');
+    header.innerHTML = detail.name
+
+    const stat = document.createElement('div');
+    stat.classList.add('card-stat');
+    stat.classList.add(format);
+    stat.innerHTML = `Rating: ${rating}`
+
+    const description = document.createElement('p');
+    description.classList.add('card-description');
+
+    let buttons: { text: string; action: () => void }[] = [];
+    const username: string | null = await getUsernameFromLocalStorage();
+
+    // Filter cards that are listed for rent or sale by the user
+    const listedCards = detail.cards.filter((c) => (c.market_listing_type === "RENT" || c.market_listing_type === "SELL") && c.player === username);
+
+    // Filter cards that are neither rented, listed, nor renting
+    const nonAffectedCards = detail.cards.filter((c) => c.delegated_to === null && c.market_listing_type === null);
+
+    // Filter cards that are neither rented, listed, nor renting
+    const rentedCards = detail.cards.filter((c) => c.player !== username);
+
+    if (detail.editions.includes("6") || detail.editions.includes("10")) {
+        description.innerText = "This card is not available for purchase or renting.";
+    } else {
+        if (nonAffectedCards.length === 0) {
+
+            if (listedCards.length !== 0) {
+                description.innerText = "Please remove your listed card from the market to use SplinterPlus for upgrades.";
+                buttons = [
+                    {
+                        text: 'Buy',
+                        action: () => {
+                            const buyModal = new BuyModal(detail.id, false, parseInt(detail.editions[0]), 500)
+                            buyModal.launchBuyModal()
+                        },
+                    }
+                ]
+            } else if (rentedCards.length !== 0) {
+                description.innerText = "You've rented this card, but you can buy and add to your collection using the options below";
+                buttons = [
+                    {
+                        text: 'Buy',
+                        action: () => {
+                            const buyModal = new BuyModal(detail.id, false, parseInt(detail.editions[0]), 500)
+                            buyModal.launchBuyModal()
+                        },
+                    }
+                ]
+            } else {
+                description.innerText = "To add this item to your collection, use the options below to purchase or rent it.";
+                buttons = [
+                    {
+                        text: 'Buy',
+                        action: () => {
+                            const buyModal = new BuyModal(detail.id, false, parseInt(detail.editions[0]), 500)
+                            buyModal.launchBuyModal()
+                        },
+                    },
+                    {
+                        text: 'Rent',
+                        action: () => {
+                            const rentModal = new RentModal(detail.id, false, parseInt(detail.editions[0]), 500)
+                            rentModal.launchRentModal()
+                        },
+                    },
+                ];
+            }
+        } else {
+            description.innerText = "You own this card. Upgrade it by combining with your highest-rated card or visit the collection page for more options."
+            buttons = [
+                {
+                    text: 'Upgrade',
+                    action: () => {
+                        const combineModal = new CombineModal()
+                        combineModal.launchModal(detail.cards[0].uid)
+                    },
+                },
+            ];
+        }
+    }
+
+    const buyAction = buttons.find((button) => button.text === 'Buy')?.action;
+
+    if (buyAction) {
+        const buyButton = createButton('Buy', format);
+        buyButton.addEventListener('click', buyAction);
+        cardButtonsContainer.appendChild(buyButton);
+    }
+
+    buttons
+        .filter((button) => button.text !== 'Buy')
+        .forEach(({ text, action }) => {
+            const button = createButton(text, format);
+            button.addEventListener('click', action);
+            cardButtonsContainer.appendChild(button);
+        });
+
+    const cardButtons = document.createElement('div');
+    cardButtons.classList.add('card-buttons');
+    cardButtons.appendChild(header);
+
+    if (rating) {
+        cardButtons.appendChild(stat);
+    }
+
+    cardButtons.appendChild(description);
+    cardButtons.appendChild(cardButtonsContainer);
+
+    cardItem.appendChild(cardButtons);
+
+    return cardItem;
+}
+
+function createButton(text: string, format: string): HTMLButtonElement {
+    const button = document.createElement('button');
+    button.classList.add('buy-button');
+    button.classList.add(format);
+    button.innerText = text;
+    return button;
+}
+
+function getHighestEdition(editions: string, distribution: Distribution[]): string {
+    const editionList = editions.split(',').map(Number);
+    let highestEdition: number = editionList[0];
+    let highestNumCards: number = 0;
+
+    for (const edition of editionList) {
+        const editionDistribution = distribution.find((d) => d.edition === edition && !d.gold);
+        if (editionDistribution && parseInt(editionDistribution.num_cards) > highestNumCards) {
+            highestNumCards = parseInt(editionDistribution.num_cards);
+            highestEdition = edition;
+        }
+    }
+
+    return EDITIONS[highestEdition.toString()];
+}
+
+// Function to get the value from localStorage
+export function getValueFromLocalStorage<T>(key: string): Promise<T | string> {
+    return new Promise((resolve) => {
+        chrome.storage.local.get(key, (result) => {
+            resolve(result[key]);
+        });
+    });
+}
+
+// Function to set the value in localStorage
+export function setValueInLocalStorage<T>(key: string, value: T): Promise<void> {
+    return new Promise((resolve) => {
+        chrome.storage.local.set({ [key]: value }, () => {
+            resolve();
+        });
+    });
+}
+
+export function convertToTitleCase(input: string): string {
+    const words = input.toLowerCase().split(' ');
+
+    for (let i = 0; i < words.length; i++) {
+        words[i] = words[i].charAt(0).toUpperCase() + words[i].slice(1);
+    }
+
+    return words.join(' ');
+}
+
+export function extractElementText(selector: string): string {
+    const element = document.querySelector(selector) as HTMLElement | null;
+
+    if (element) {
+        return element.innerText.trim();
+    }
+
+    return '';
+}
+
+export function createContentHeader(text: string): HTMLDivElement {
+    const contentHeader = document.createElement('div');
+    contentHeader.classList.add('content-header');
+
+    const description = document.createElement('p');
+    description.innerText = text;
+    contentHeader.append(description);
+
+    return contentHeader;
+}
+

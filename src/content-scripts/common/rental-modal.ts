@@ -2,7 +2,7 @@ import { fetchMarketData, waitForTransactionSuccess } from 'src/common/splinterl
 import { addLoadingIndicator, addResultContainer, createMarketTable } from 'src/content-scripts/common/common';
 import { initializeBackgroundScriptConnection } from 'src/content-scripts/common/connector';
 import { MarketListing } from 'src/interfaces/splinterlands.interface';
-import '../common/common.scss';
+import '../../styles/common.scss';
 export class RentModal {
   private launched: boolean = false;
   private globalModal: HTMLElement | null = null;
@@ -19,7 +19,7 @@ export class RentModal {
   }
 
   private modalToAdd: string = `
-    <div id="rent_dialog" class="modal fade show neon in" tabindex="-1" role="dialog" style="display: block; padding-right: 10px;">
+    <div id="rent_dialog" class="sp_modal modal fade show neon in" tabindex="-1" role="dialog" style="display: block; padding-right: 10px;">
       <div class="modal-dialog battle-dialog" style="width: 800px;">
         <div class="modal-content">
           <div class="modal-header">
@@ -76,6 +76,11 @@ export class RentModal {
 
     const { tx_id } = data;
     const success = await waitForTransactionSuccess(tx_id, 4, 5);
+
+    setTimeout(() => {
+      document.dispatchEvent(new CustomEvent('purchaseCompleted'));
+      document.dispatchEvent(new CustomEvent('requestRefresh'));
+    }, 3000);
 
     if (success) {
       addResultContainer(this.globalModal!, 'Your cards have been rented successfully!', 'Congratulations! Your cards were successfully rented. You can now view the rented card in your inventory.')
