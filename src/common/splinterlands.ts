@@ -335,6 +335,9 @@ export const buyCardsFromMarket = async (
     const balances = await fetchBalances(username);
     const tokenBalance: number | undefined = getTokenBalance(balances, currency);
 
+    console.log(balances)
+    console.log(tokenBalance)
+
     const items = cards.map(card => card.market_id);
     const total_price = cards.reduce((sum, card) => {
         const buy_price = typeof card.buy_price === 'string' ? parseFloat(card.buy_price) : card.buy_price;
@@ -342,7 +345,8 @@ export const buyCardsFromMarket = async (
     }, 0).toFixed(3);
 
 
-    if (tokenBalance && tokenBalance < parseFloat(total_price)) {
+    if (tokenBalance && (tokenBalance > parseFloat(total_price))) {
+        console.log(1)
         alert(`You don't have enough ${currency} to complete this purchase.`);
         return;
     }
@@ -373,7 +377,7 @@ export const rentCardsFromMarket = async (
         return sum + (buy_price || 0);
     }, 0).toFixed(3);
 
-    if (tokenBalance && tokenBalance < parseFloat(total_price)) {
+    if (tokenBalance && (tokenBalance > parseFloat(total_price))) {
         alert(`You don't have enough ${currency} to complete this purchase.`);
         return;
     }
