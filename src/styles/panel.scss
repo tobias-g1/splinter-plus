@@ -6,6 +6,29 @@
   max-height: 100px;
   margin-top: 25px;
 
+  .card-list {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    grid-auto-rows: auto;
+    grid-gap: 15px;
+    max-width: 100%;
+  }
+
+  @media screen and (max-width: 900px) {
+    .card-list {
+      grid-template-columns: repeat(
+        3,
+        1fr
+      ); /* Set the number of columns to 3 for smaller screens */
+    }
+  }
+
+  @media screen and (max-width: 600px) {
+    .card-list {
+      grid-template-columns: 1fr;
+    }
+  }
+
   .header {
     color: white;
     font-family: nanami-bold;
@@ -30,13 +53,6 @@
       margin: 0;
       line-height: 20px;
     }
-  }
-
-  .card-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(16%, 1fr));
-    grid-gap: 16px;
-    max-width: 100%;
   }
 }
 

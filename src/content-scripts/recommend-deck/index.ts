@@ -16,7 +16,7 @@ let panel: HTMLDivElement | null = null;
 
 // Function to check for the existence of the panel and add it if it doesn't already exist
 const checkPanelExists = async () => {
-  const battleContainer = document.querySelector('.deck-builder-page2__filters');
+  const battleContainer = document.querySelector('.deck-builder-page2__conflict');
 
   // Check if the battleContainer exists and the panel has not been added
   if (battleContainer && !panelAdded) {
@@ -52,7 +52,7 @@ const checkPanelExists = async () => {
       }
     }
   } else {
-    setTimeout(checkPanelExists, 500);
+    setTimeout(checkPanelExists, 1000);
   }
 };
 

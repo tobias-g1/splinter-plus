@@ -173,9 +173,14 @@ export function createHeader(text: string, format: string): HTMLDivElement {
     exploreButton.onclick = (event: any) => {
         event.stopPropagation();
         const cardContainer = document.querySelector('.deck-builder-page2__cards');
+        const filtersContainer = document.querySelector('.deck-builder-page2__filters');
 
         if (cardContainer) {
             cardContainer.classList.toggle('expanded');
+        }
+
+        if (filtersContainer) {
+            filtersContainer.classList.toggle('expanded');
         }
 
         const panelDiv: any = event.target.closest('.deck-panel, .custom-panel');
