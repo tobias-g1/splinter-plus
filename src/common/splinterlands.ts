@@ -345,7 +345,7 @@ export const buyCardsFromMarket = async (
     }, 0).toFixed(3);
 
 
-    if (tokenBalance && (tokenBalance > parseFloat(total_price))) {
+    if (!tokenBalance || (tokenBalance > parseFloat(total_price))) {
         console.log(1)
         alert(`You don't have enough ${currency} to complete this purchase.`);
         return;
@@ -377,8 +377,8 @@ export const rentCardsFromMarket = async (
         return sum + (buy_price || 0);
     }, 0).toFixed(3);
 
-    if (tokenBalance && (tokenBalance > parseFloat(total_price))) {
-        alert(`You don't have enough ${currency} to complete this purchase.`);
+    if (!tokenBalance || tokenBalance > parseFloat(total_price)) {
+        alert(`You don't have enough ${currency} to complete this rental.`);
         return;
     }
 
