@@ -1,7 +1,7 @@
 import { getAccessToken } from "src/common/auth";
 import { CardResponse, DeckResponse } from "src/interfaces/spinter-plus.interface";
 
-const BASE_URL: string = process.env.SPLINTERPLUS_BASE || "https://deckwhisperer.autoimp.me";
+const BASE_URL: string = "https://deckwhisperer.autoimp.me";
 
 type Params = { [key: string]: any };
 
