@@ -1,4 +1,5 @@
 import { addCombineButton } from "src/content-scripts/combine/add-button";
+import '../../styles/combine.scss';
 import '../../styles/modal.scss';
 import { CombineModal } from "../common/combine-modal";
 
