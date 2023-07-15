@@ -70,9 +70,9 @@ export const logout = async (
     return data;
 };
 
-export const refreshToken = async (): Promise<{ access_token: string }> => {
+export const refreshToken = async (refresh_token: string): Promise<{ access_token: string }> => {
 
-    const { data } = await sendRequest("refresh", "GET", "refresh");
+    const { data } = await sendRequest("refresh", "GET", refresh_token);
     return data;
 };
 

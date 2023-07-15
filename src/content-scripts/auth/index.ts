@@ -1,4 +1,4 @@
-import { clearAccessToken, getAccessToken, login } from "src/common/auth";
+import { clearAccessToken, getAccessToken, getRefreshToken, login, setAccessToken } from "src/common/auth";
 import { refreshToken } from "src/common/splinter-plus";
 
 async function runContentScript() {
@@ -16,12 +16,15 @@ async function runContentScript() {
             // Check if the access token is expired
             if (currentTime >= expirationTime) {
                 console.log('Access token expired, refreshing...');
-                await clearAccessToken();
                 try {
-                    await refreshToken();
+                    const refresh_token = await getRefreshToken();
+                    const response = await refreshToken(refresh_token);
+                    const { access_token } = response;
+                    await setAccessToken(access_token);
                     console.log('Token successfully refreshed');
                 } catch (error) {
                     console.error('Failed to refresh token:', error);
+                    await clearAccessToken();
                     await login();
                     console.log('Login successful');
                 }
