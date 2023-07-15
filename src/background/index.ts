@@ -68,20 +68,6 @@ chrome.alarms.onAlarm.addListener(async (alarm) => {
   handleAlarm(alarm);
 });
 
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status === 'complete' && tab.url && /^https/.test(tab.url)) {
-    if (tab.url === 'https://splinterlands.com/?p=create_team2') {
-      scriptInjected = true;
-
-      chrome.scripting.executeScript({
-        target: { tabId: tabId },
-        files: ['deckBundle.js']
-      }, () => {
-        console.log('Script injected successfully.');
-      });
-    }
-  }
-});
 
 
 console.log('Background Script Loaded');
