@@ -71,8 +71,5 @@ const config = {
     new NodePolyfillPlugin(),
   ],
 };
-<<<<<<< HEAD
-=======
 
->>>>>>> parent of 4936808 (Populate manifest with extension ID correctly)
 module.exports = config;
