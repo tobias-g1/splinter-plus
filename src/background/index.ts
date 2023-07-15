@@ -1,93 +1,73 @@
-import { PluginMessage } from '../interfaces/plugin-messages.interface';
-import {
-  CheckboxSetting,
-  DropdownSetting,
-  InputSetting,
-  PluginSettingType,
-} from '../interfaces/plugins.interface';
-import { I18nUtils } from './i18n.utils';
+import { PluginMessage } from 'hive-keychain-commons/lib/plugins';
+import { handleKeyChainResponse } from 'src/common/keychain-response';
+import { createAlarms, handleAlarm } from './alarms';
+import { sendPluginData } from './plugin';
 
-const KEYCHAIN_PLUGIN_DATA_KEY = 'KEYCHAIN_PLUGIN_DATA';
+let contentScriptPort: chrome.runtime.Port | null = null;
+let contentScriptReady = false;
+let scriptInjected = false;
 
-//@ts-ignore
-chrome.i18n.getMessage = I18nUtils.getMessage;
+chrome.runtime.onConnect.addListener((port) => {
+  if (port.name === "content-script") {
+    contentScriptPort = port;
 
-const getPlugin = async () => {
-  return {
-    definition: {
-      title: await chrome.i18n.getMessage('plugin_example'),
-      description: await chrome.i18n.getMessage('my_plugin_description'),
-      generalSettings: [
-        {
-          label: await chrome.i18n.getMessage('text_input_example_label'),
-          key: 'inputSettingKey',
-          type: PluginSettingType.INPUT,
-          hint: await chrome.i18n.getMessage('text_input_example_hint'),
-          inputType: 'text',
-          placeholder: await chrome.i18n.getMessage('placeholder'),
-        } as InputSetting,
-        {
-          label: await chrome.i18n.getMessage('dropdown_example_label'),
-          key: 'dropdownSettingKey',
-          type: PluginSettingType.DROPDOWN,
-          data: [
-            {
-              label: await chrome.i18n.getMessage('dropdown_value1_example'),
-              value: 'value1',
-            },
-            {
-              label: await chrome.i18n.getMessage('dropdown_value2_example'),
-              value: 'value2',
-            },
-            {
-              label: await chrome.i18n.getMessage('dropdown_value3_example'),
-              value: 'value3',
-            },
-            { label: 'Not translated value', value: 'value4' },
-          ],
-        } as DropdownSetting,
-      ],
-      userSettings: [
-        {
-          label: await chrome.i18n.getMessage('checkbox_example_label'),
-          key: 'checkboxSettingKey',
-          type: PluginSettingType.CHECKBOX,
-          hint: await chrome.i18n.getMessage('checkbox_example_hint'),
-        } as CheckboxSetting,
-        {
-          label: await chrome.i18n.getMessage(
-            'required_text_input_example_label',
-          ),
-          placeholder: await chrome.i18n.getMessage(
-            'required_text_input_example_label',
-          ),
-          key: 'requiredInputSettingKey',
-          type: PluginSettingType.INPUT,
-          inputType: 'text',
-          required: true,
-        } as InputSetting,
-      ],
-    },
-  };
+    port.onMessage.addListener((message) => {
+      console.log("Message from content script:", message);
+      if (message.command === 'activeTab') {
+        const activeTabId = message.tabId;
+        console.log(`Tab ID received and stored: ${activeTabId}`);
+        port.postMessage({ status: 'Tab ID received' });
+      } else if (message.command === 'contentReady') {
+        contentScriptReady = true;
+        console.log('Content script is ready.');
+      }
+      // Handle other messages...
+    });
+
+    // Notify the content script that the background script is ready
+    port.postMessage({ command: 'backgroundReady' });
+    console.log('Sent backgroundReady message to content script');
+  }
+});
+
+// Function to send messages to the content script
+export const sendMessageToContentScript = (command: any) => {
+  if (contentScriptPort && contentScriptReady) {
+    contentScriptPort.postMessage(command);
+    console.log('Message sent to content script:', command);
+  } else {
+    console.error("No connection to content script or content script is not ready.");
+  }
 };
 
-const sendPluginData = async (sendResp: (response?: any) => void) => {
-  const data = await chrome.storage.local.get(KEYCHAIN_PLUGIN_DATA_KEY);
-  sendResp({ ...(await getPlugin()), data: data.plugindata });
-};
-
-const externalMessageHandler = async (
-  message: any,
-  sender: chrome.runtime.MessageSender,
-  sendResp: (response?: any) => void,
-) => {
+const externalMessageHandler = async (message: any, sender: any, sendResp: any) => {
   if (message.command === PluginMessage.IS_INSTALLED) {
     sendResp(PluginMessage.ACK_PLUGIN_INSTALL);
   } else if (message.command === PluginMessage.GET_PLUGIN_INFO) {
     sendPluginData(sendResp);
+  } else if (message.command === PluginMessage.HIVE_KEYCHAIN_RESPONSE) {
+    handleKeyChainResponse(message);
   } else if (message.command === PluginMessage.SAVE_PLUGIN_DATA) {
-    chrome.storage.local.set({ plugindata: message.value });
-    sendResp(PluginMessage.ACK_PLUGIN_DATA_SAVED);
+    chrome.storage.local.set({ plugindata: message.value }, () => {
+      if (chrome.runtime.lastError) {
+        console.error('Error saving data:', chrome.runtime.lastError);
+      }
+      sendResp(PluginMessage.ACK_PLUGIN_DATA_SAVED);
+    });
+  } else {
+    console.log(message);
   }
 };
+
 chrome.runtime.onMessageExternal.addListener(externalMessageHandler);
+
+createAlarms();
+
+chrome.alarms.onAlarm.addListener(async (alarm) => {
+  console.log('Alarm triggered:', alarm);
+  handleAlarm(alarm);
+});
+
+
+
+console.log('Background Script Loaded');

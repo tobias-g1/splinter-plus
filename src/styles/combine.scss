@@ -1,0 +1,28 @@
+.sp_button_container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  cursor: default !important;
+}
+
+.sp_button_container_new {
+  height: 50px;
+  cursor: default !important;
+  .sp_combine {
+    fill: #573e41;
+    background-attachment: #573e41;
+    color: #573e41;
+  }
+}
+
+.sp_combine.btn_combine {
+  width: 50px;
+  height: 25px;
+  background-repeat: no-repeat;
+  cursor: pointer !important;
+  width: 25px !important;
+  background-position: center;
+  margin: auto;
+  background-size: contain;
+  margin-left: 7.5px;
+}

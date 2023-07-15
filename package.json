@@ -21,11 +21,14 @@
   "dependencies": {
     "@hiveio/dhive": "^1.2.0",
     "@types/chrome": "^0.0.177",
+    "jwt-decode": "^3.1.2",
     "node-polyfill-webpack-plugin": "^1.1.4",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "sscjs": "^0.0.9",
-    "url-loader": "^4.1.1"
+    "superagent": "^8.0.9",
+    "url-loader": "^4.1.1",
+    "url-search-params": "^1.1.0"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.8",
@@ -37,11 +40,14 @@
     "@types/react": "^17.0.43",
     "@types/react-dom": "^17.0.14",
     "@types/remote-redux-devtools": "^0.5.5",
+    "@types/superagent": "^4.1.18",
+    "@types/url-search-params": "^1.1.0",
     "babel-loader": "^8.0.2",
     "babel-plugin-module-resolver": "^4.1.0",
     "copy-webpack-plugin": "^10.2.0",
     "css-loader": "^6.5.1",
     "dotenv": "^14.2.0",
+    "hive-keychain-commons": "github:hive-keychain/hive-keychain-commons",
     "node-sass": "^7.0.1",
     "react-hot-loader": "^4.13.0",
     "remote-redux-devtools": "^0.5.16",
