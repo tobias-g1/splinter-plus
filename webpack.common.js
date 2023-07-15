@@ -3,8 +3,9 @@ const CopyPlugin = require('copy-webpack-plugin');
 const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const NodePolyfillPlugin = require('node-polyfill-webpack-plugin');
 const path = require('path');
+const fs = require('fs');
 
-const config = {
+module.exports = {
   entry: {
     background: './src/background/index.ts',
     combine: './src/content-scripts/combine/index.ts',
@@ -69,7 +70,42 @@ const config = {
       patterns: [{ from: 'public', to: '.' }],
     }),
     new NodePolyfillPlugin(),
-  ],
-};
+    new webpack.DefinePlugin({
+      'process.env.KEYCHAIN_EXTENSION_ID': JSON.stringify(
+        process.env.KEYCHAIN_EXTENSION_ID,
+      ),
+    }),
+    {
+      apply: (compiler) => {
+        compiler.hooks.afterEmit.tap('GenerateManifest', (compilation) => {
+          const manifestPath = path.join(compiler.outputPath, 'manifest.json');
+          const manifestTemplatePath = path.join(
+            __dirname,
+            'public',
+            'manifest.json',
+          );
 
-module.exports = config;
+          // Read the manifest template file
+          const manifestTemplate = JSON.parse(
+            fs.readFileSync(manifestTemplatePath, 'utf8'),
+          );
+
+          // Update the ids array with the KEYCHAIN_EXTENSION_ID
+          manifestTemplate.externally_connectable.ids = [
+            process.env.KEYCHAIN_EXTENSION_ID,
+          ];
+
+          // Write the updated manifest to the output directory
+          fs.writeFileSync(
+            manifestPath,
+            JSON.stringify(manifestTemplate, null, 2),
+          );
+        });
+      },
+    },
+  ],
+  output: {
+    path: path.join(__dirname, 'dist-dev'),
+    filename: '[name]Bundle.js',
+  },
+};
