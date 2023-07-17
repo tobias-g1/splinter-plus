@@ -14,6 +14,9 @@ let panelDiv: HTMLDivElement | null = null;
 let format: string = '';
 let league: string = '';
 
+// Declare a flag to indicate if the button has been added
+let buttonAdded = false;
+
 function checkBattleHistoryUrl() {
     if (window.location.href === battleHistoryUrl) {
         return true;
@@ -27,6 +30,7 @@ if (checkBattleHistoryUrl()) {
     const checkPanelExists = async () => {
         const historyHeaderDiv = document.querySelector('.history-header');
         const customPanelDiv = document.querySelector('.custom-panel');
+
         if (historyHeaderDiv && !customPanelDiv) {
             panelDiv = document.createElement('div');
             panelDiv.classList.add('custom-panel');
@@ -38,14 +42,24 @@ if (checkBattleHistoryUrl()) {
                 childList: true,
                 subtree: true
             });
+
+            // Set the buttonAdded flag to true
+            buttonAdded = true;
         }
     };
-
-    checkPanelExists();
 
     const observer = new MutationObserver(() => {
         checkPanelExists();
     });
+
+    checkPanelExists();
+
+    // Check if the button hasn't been added after a certain interval
+    const interval = setInterval(() => {
+        if (!buttonAdded) {
+            checkPanelExists();
+        }
+    }, 500);
 
     observer.observe(document.body, {
         childList: true,
