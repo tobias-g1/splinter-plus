@@ -7,8 +7,12 @@ const SETTINGS_REFRESH_INTERVAL_MINUTES = Number(process.env.SETTINGS_REFRESH_IN
 // The interval (in minutes) for checking the auto claim setting
 const CHECK_AUTO_CLAIM_SETTING_INTERVAL_MINUTES = Number(process.env.CHECK_AUTO_CLAIM_SETTING_INTERVAL_MINUTES) || 60;
 
+// The interval (in minutes) for checking the auto claim all setting
+const CHECK_AUTO_CLAIM_ALL_SETTING_INTERVAL_MINUTES = Number(process.env.CHECK_AUTO_CLAIM_ALL_SETTING_INTERVAL_MINUTES) || 1440;
+
 const CHECK_SETTINGS_ALARM = 'checkSettings';
 const CHECK_AUTO_CLAIM_SETTING_ALARM = 'checkAutoClaimSetting';
+const CHECK_AUTO_CLAIM_ALL_SETTING_ALARM = 'checkAutoClaimAllSetting';
 
 /**
  * Creates alarms for checking settings and auto claim setting at specified intervals.
@@ -19,6 +23,9 @@ export const createAlarms = () => {
   });
   chrome.alarms.create(CHECK_AUTO_CLAIM_SETTING_ALARM, {
     periodInMinutes: CHECK_AUTO_CLAIM_SETTING_INTERVAL_MINUTES,
+  });
+  chrome.alarms.create(CHECK_AUTO_CLAIM_ALL_SETTING_ALARM, {
+    periodInMinutes: CHECK_AUTO_CLAIM_ALL_SETTING_INTERVAL_MINUTES,
   });
 };
 

@@ -25,4 +25,23 @@
   margin: auto;
   background-size: contain;
   margin-left: 7.5px;
+  &:hover {
+    .tooltip {
+      display: block;
+    }
+  }
+  .tooltip {
+    background: black;
+    top: -50px;
+    position: relative;
+    width: 210px;
+    left: -90px;
+    text-align: center;
+    padding: 10px;
+    font-size: 13px;
+    border-radius: 10px;
+    border: 1px solid #05a1aa;
+    color: #efdd95;
+    display: none;
+  }
 }
