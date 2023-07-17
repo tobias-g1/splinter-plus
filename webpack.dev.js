@@ -21,7 +21,7 @@ module.exports = merge(common, {
     }),
     new TransformJson({
       // json configuration
-      filename: 'dist-dev/manifest.json',
+      filename: 'manifest.json',
       object: {
         externally_connectable: {
           ids: [dotenv.config().parsed.KEYCHAIN_EXTENSION_ID],
