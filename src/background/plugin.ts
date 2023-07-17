@@ -9,6 +9,12 @@ export const getPlugin = async () => {
       generalSettings: [],
       userSettings: [
         {
+          label: await getMessage('auto_claim_label'),
+          key: 'autoClaimAllSetting',
+          type: PluginSettingType.CHECKBOX,
+          hint: await getMessage('auto_claim_hint'),
+        } as CheckboxSetting,
+        {
           label: await getMessage('claim_reward_label'),
           key: 'autoClaimSetting',
           type: PluginSettingType.CHECKBOX,

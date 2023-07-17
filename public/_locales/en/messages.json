@@ -24,11 +24,19 @@
     "description": "Hint for the 'Claim reward' setting."
   },
   "stake_reward_label": {
-    "message": "Automatically stake claimed SPS rewards",
+    "message": "Auto Compound Staked Rewards",
     "description": "Label for the 'Claim reward' setting."
   },
   "stake_reward_hint": {
-    "message": "Automatically stake claimed SPS rewards.",
+    "message": "Automatically stake claimed SPS rewards that are received from your hourly automatic claim.",
     "description": "Hint for the 'Claim reward' setting."
+  },
+  "auto_claim_label": {
+    "message": "Claim All Rewards Automatically",
+    "description": "Auto Claim All"
+  },
+  "auto_claim_hint": {
+    "message": "Automatically claim all Splinterlands rewards every 24 hours.",
+    "description": "Hint for the 'Auto Claim All' setting."
   }
 }
