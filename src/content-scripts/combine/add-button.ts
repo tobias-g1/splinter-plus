@@ -44,10 +44,6 @@ const addButtonToDOM = (buttonsDivs: NodeListOf<Element>, type: string): void =>
     });
 };
 
-/**
- * Creates a combine button with necessary attributes.
- * @returns The created combine button.
- */
 const createCombineButton = (type: string): HTMLDivElement => {
     const button = document.createElement('div');
 
@@ -63,9 +59,21 @@ const createCombineButton = (type: string): HTMLDivElement => {
     button.className = 'btn_combine sp_combine';
     button.setAttribute('data-toggle', 'tooltip');
     button.setAttribute('data-placement', 'top');
-    button.setAttribute('role', 'button');
-    button.setAttribute('data-template', '<div class="tooltip" role="tooltip"><div class="tooltip-inner modern" style="min-width: 175px; max-width: 175px;"></div></div>');
     button.setAttribute('data-original-title', 'Combine to Next Level');
+
+    // Create the div for the tooltip
+    const tooltipDiv = document.createElement('div');
+    tooltipDiv.className = 'tooltip';
+    tooltipDiv.innerText = 'Combine to Next Level';
+
+    // Append the tooltip div to the button
+    button.appendChild(tooltipDiv);
+
     return button;
 };
+
+
+
+
+
 
