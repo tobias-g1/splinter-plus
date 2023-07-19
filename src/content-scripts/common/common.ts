@@ -388,6 +388,21 @@ export function convertToTitleCase(input: string): string {
     return words.join(' ');
 }
 
+export function extractLeagueType(input: string): string {
+    const leagueTypes = ['Novice', 'Bronze', 'Silver', 'Gold', 'Diamond', 'Champion'];
+
+    const words = input.toLowerCase().split(' ');
+
+    for (let i = 0; i < words.length; i++) {
+        const word = words[i];
+        if (leagueTypes.includes(word)) {
+            return word;
+        }
+    }
+
+    return '';
+}
+
 export function extractElementText(selector: string): string {
     const element = document.querySelector(selector) as HTMLElement | null;
 

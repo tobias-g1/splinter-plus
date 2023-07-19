@@ -90,7 +90,7 @@ async function buildRecommendedCards(): Promise<HTMLDivElement> {
   const recommendedCards = document.createElement('div');
   recommendedCards.classList.add('recommended-cards');
 
-  const league: string = await getValueFromLocalStorage('league');
+  let league: string = await getValueFromLocalStorage('league');
   const format: string = await getValueFromLocalStorage('format');
   const mana: string = extractElementText('.mana-cap');
 

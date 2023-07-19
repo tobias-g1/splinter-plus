@@ -5,7 +5,7 @@ import '../../styles/panel.scss';
 import { getCards } from 'src/common/splinter-plus';
 import { getCardDetails, getCollection } from 'src/common/splinterlands';
 import { getUsernameFromLocalStorage } from 'src/common/user';
-import { convertToTitleCase, createCardItem, createContentHeader, createHeader, extractElementText, setValueInLocalStorage } from 'src/content-scripts/common/common';
+import { createCardItem, createContentHeader, createHeader, extractElementText, extractLeagueType, setValueInLocalStorage } from 'src/content-scripts/common/common';
 import { CardResponse } from 'src/interfaces/spinter-plus.interface';
 import { Card, CardDetail, CardDetailOwnership, Collection } from 'src/interfaces/splinterlands.interface';
 
@@ -87,7 +87,7 @@ async function buildRecommendedCards(): Promise<HTMLDivElement> {
     setValueInLocalStorage('format', format);
 
     league = extractElementText('#current_league_text')
-    league = convertToTitleCase(league);
+    league = extractLeagueType(league);
     setValueInLocalStorage('league', league);
 
     const recommendedCards = document.createElement('div');
