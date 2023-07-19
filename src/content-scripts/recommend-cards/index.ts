@@ -87,7 +87,9 @@ async function buildRecommendedCards(): Promise<HTMLDivElement> {
     setValueInLocalStorage('format', format);
 
     league = extractElementText('#current_league_text')
+    console.log(league)
     league = extractLeagueType(league);
+    console.log(league)
     setValueInLocalStorage('league', league);
 
     const recommendedCards = document.createElement('div');

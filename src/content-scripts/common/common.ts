@@ -391,12 +391,12 @@ export function convertToTitleCase(input: string): string {
 export function extractLeagueType(input: string): string {
     const leagueTypes = ['Novice', 'Bronze', 'Silver', 'Gold', 'Diamond', 'Champion'];
 
-    const words = input.toLowerCase().split(' ');
+    const lowercasedInput = input.toLowerCase();
 
-    for (let i = 0; i < words.length; i++) {
-        const word = words[i];
-        if (leagueTypes.includes(word)) {
-            return word;
+    for (let i = 0; i < leagueTypes.length; i++) {
+        const leagueType = leagueTypes[i];
+        if (lowercasedInput.includes(leagueType.toLowerCase())) {
+            return leagueType;
         }
     }
 
