@@ -137,22 +137,25 @@ export function addResultContainer(modal: HTMLElement, header: string, descripti
     setModalBodyContent(modal, resultContainer);
 }
 
-export function createResultContent(header: string, text: string, modal: HTMLElement, buttonText: string): HTMLElement {
+export function createResultContent(header: string, text: string, modal?: HTMLElement | null, buttonText?: string | null): HTMLElement {
     const resultContent: HTMLDivElement = document.createElement('div');
     resultContent.classList.add('result-content');
 
-    const closeButton: HTMLButtonElement = document.createElement('button');
-    closeButton.setAttribute('class', 'gradient-button green');
-    closeButton.textContent = buttonText;
-
-    // Add event listener to the button
-    closeButton.addEventListener('click', () => {
-        modal.remove();
-    });
-
     resultContent.innerHTML = `<h2 class="result-header">${header}</h2><p>${text}</p>`;
 
-    resultContent.appendChild(closeButton); // Appending the button to the resultContent div
+    if (modal && buttonText) {
+        const closeButton: HTMLButtonElement = document.createElement('button');
+        closeButton.setAttribute('class', 'gradient-button green');
+        closeButton.textContent = buttonText;
+
+        // Add event listener to the button
+        closeButton.addEventListener('click', () => {
+            modal.remove();
+        });
+        resultContent.appendChild(closeButton);
+
+    }
+
 
     return resultContent;
 }
@@ -386,6 +389,21 @@ export function convertToTitleCase(input: string): string {
     }
 
     return words.join(' ');
+}
+
+export function extractLeagueType(input: string): string {
+    const leagueTypes = ['Novice', 'Bronze', 'Silver', 'Gold', 'Diamond', 'Champion'];
+
+    const lowercasedInput = input.toLowerCase();
+
+    for (let i = 0; i < leagueTypes.length; i++) {
+        const leagueType = leagueTypes[i];
+        if (lowercasedInput.includes(leagueType.toLowerCase())) {
+            return leagueType;
+        }
+    }
+
+    return '';
 }
 
 export function extractElementText(selector: string): string {
