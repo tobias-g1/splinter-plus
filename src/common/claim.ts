@@ -96,9 +96,17 @@ export const attemptAutoStake = async (user: string, trxId: string): Promise<any
         } else if (retryCount < 5) {
           retryCount++;
           // Retry after 3 seconds if transaction not found
-          setTimeout(checkBalanceHistory, 3000);
+          return new Promise((resolve, reject) => {
+            setTimeout(async () => {
+              try {
+                resolve(await checkBalanceHistory());
+              } catch (error) {
+                reject(error);
+              }
+            }, 3000);
+          });
         } else {
-          console.log('Transaction not found after 5 retries');
+          throw new Error('Transaction not found after 5 retries');
         }
       };
       checkBalanceHistory();
