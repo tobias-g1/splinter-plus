@@ -7,7 +7,7 @@ import { getCardDetails, getCollection } from 'src/common/splinterlands';
 import { getUsernameFromLocalStorage } from 'src/common/user';
 import { DeckResponse } from 'src/interfaces/spinter-plus.interface';
 import { Card, CardDetail, CardDetailOwnership, Collection } from 'src/interfaces/splinterlands.interface';
-import { createCardItem, createContentHeader, createHeader, extractElementText, getValueFromLocalStorage } from '../common/common';
+import { createCardItem, createContentHeader, createHeader, createLoadingIndicator, createResultContent, extractElementText, getValueFromLocalStorage } from '../common/common';
 
 const selectTeamUrl = 'https://splinterlands.com/?p=create_team2';
 let panelAdded = false;
@@ -39,16 +39,18 @@ const checkPanelExists = async () => {
       const panelContent = document.createElement('div');
       panelContent.classList.add('panel-content');
 
+      panel.appendChild(panelContent);
+
       const contentHeader = createContentHeader(
         'Discover the ultimate deck tailored to your ruleset, splinters, mana, league, and game format. Our expert analysis has identified the top-performing decks, ensuring you have access to the very best. Choose from the options below to purchase or rent the cards you need to dominate the game.'
       );
       panelContent.appendChild(contentHeader);
 
+      battleContainer.appendChild(panel);
+
       const recommendedCards = await buildRecommendedCards();
 
       panelContent.appendChild(recommendedCards);
-      panel.appendChild(panelContent);
-      battleContainer.appendChild(panel);
 
       if (observer) {
         observer.disconnect();
@@ -114,7 +116,23 @@ async function buildRecommendedCards(): Promise<HTMLDivElement> {
     }
   });
 
-  const decks: DeckResponse = await getDecks(parseInt(mana), [ruleset], filteredElements, league, format, 1, 0);
+  let decks: DeckResponse;
+  let loadingIndicator: HTMLElement = createLoadingIndicator(`We're loading your recommended deck for this battle.`);
+  let resultContainer: HTMLElement = createResultContent('Oops, something went wrong', 'An unexpected error occurred. Please try again later.', null, null);
+  const content = document.querySelector('.panel-content');
+
+  try {
+    content?.appendChild(loadingIndicator);
+    decks = await getDecks(parseInt(mana), [ruleset], filteredElements, league, format, 1, 0);
+  } catch (error) {
+    loadingIndicator.remove();
+    content?.appendChild(resultContainer);
+    console.error('An error occurred in getCards:', error);
+    throw error;
+  }
+
+  loadingIndicator.remove();
+
   const deck = decks.decks[0];
   const cardIds: number[] = [];
   const cardKeys: string[] = [];

@@ -69,12 +69,16 @@ export const logout = async (
     );
     return data;
 };
-
 export const refreshToken = async (refresh_token: string): Promise<{ access_token: string }> => {
-
-    const { data } = await sendRequest("refresh", "GET", refresh_token);
-    return data;
+    try {
+        const { data } = await sendRequest("refresh", "GET", refresh_token);
+        return data;
+    } catch (error) {
+        console.error("Error occurred while refreshing token:", error);
+        throw new Error("Failed to refresh token");
+    }
 };
+
 
 export const getDecks = async (
     mana: number,
