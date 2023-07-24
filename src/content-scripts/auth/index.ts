@@ -6,11 +6,9 @@ async function runContentScript() {
 
     if (accessToken) {
         try {
-            // Decode the access token to get the username and expiration time
             const tokenParts = accessToken.split('.');
             const tokenPayload = JSON.parse(atob(tokenParts[1]));
-            const username = tokenPayload.aud;
-            const expirationTime = tokenPayload.exp * 1000; // Convert expiration time to milliseconds
+            const expirationTime = tokenPayload.exp * 1000;
             const currentTime = Date.now();
 
             // Check if the access token is expired
@@ -18,13 +16,20 @@ async function runContentScript() {
                 console.log('Access token expired, refreshing...');
                 try {
                     const refresh_token = await getRefreshToken();
-                    const response = await refreshToken(refresh_token);
-                    const { access_token } = response;
-                    await setAccessToken(access_token);
-                    console.log('Token successfully refreshed');
+                    try {
+                        const response = await refreshToken(refresh_token);
+                        const { access_token } = response;
+                        await setAccessToken(access_token);
+                        console.log('Token successfully refreshed');
+                    } catch (error) {
+                        console.error('Failed to refresh token:', error);
+                        console.log('Refreshing token failed. Please log in again.');
+                        await clearAccessToken();
+                        await login();
+                        return;
+                    }
                 } catch (error) {
-                    console.error('Failed to refresh token:', error);
-                    await clearAccessToken();
+                    console.error('Failed to get refresh token:', error);
                     await login();
                 }
             } else {
