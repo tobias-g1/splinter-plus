@@ -79,7 +79,7 @@ async function createCardList(details: CardDetailOwnership[], format: string): P
 
 async function buildRecommendedCards(): Promise<HTMLDivElement> {
     try {
-        document.addEventListener('purchaseCompleted', refreshCardsPanel);
+        document.addEventListener('refreshCards', refreshCardsPanel);
 
         const format = extractElementText('.bh-selectable-obj a.selected');
         setValueInLocalStorage('format', format);
@@ -172,7 +172,7 @@ export async function buildAndInsertPanel() {
     contentDiv.appendChild(recommendedCards);
 }
 
-async function refreshCardsPanel() {
+export async function refreshCardsPanel() {
 
     if (panelDiv) {
         const cardDiv = panelDiv.querySelector('.recommended-cards');

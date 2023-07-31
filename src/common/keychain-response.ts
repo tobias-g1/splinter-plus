@@ -43,6 +43,7 @@ export const handleKeyChainResponse = async (message: any) => {
             const { access_token, refresh_token } = token;
             setAccessToken(access_token);
             setRefreshToken(refresh_token);
+            return sendMessageToContentScript({ command: "refresh-cards", data: null });
         }
     };
 

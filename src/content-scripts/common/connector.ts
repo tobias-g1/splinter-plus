@@ -1,3 +1,4 @@
+import { refreshCardsPanel } from 'src/content-scripts/recommend-cards';
 // backgroundScriptConnector.ts
 
 let backgroundScriptPort: chrome.runtime.Port;
@@ -23,6 +24,9 @@ export const initializeBackgroundScriptConnection = (modal: any): void => {
                 break;
             case 'combine':
                 modalInstance.handleCombine(message.data);
+                break;
+            case 'refresh-cards':
+                refreshCardsPanel()
                 break;
         }
     });
