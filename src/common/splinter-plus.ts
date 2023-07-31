@@ -1,4 +1,4 @@
-import { getAccessToken } from "src/common/auth";
+import { getAccessToken, refreshToken as performRefresh } from "src/common/auth";
 import { CardResponse, DeckResponse } from "src/interfaces/spinter-plus.interface";
 
 const BASE_URL: string = "https://deckwhisperer.autoimp.me";
@@ -10,39 +10,53 @@ export const sendRequest = async (
     method: string,
     token?: string,
     params?: Params,
-    body?: any
+    body?: any,
+    retryAttempts: number = 3
 ): Promise<any> => {
-    const config: RequestInit = { method };
+    try {
 
-    if (token) {
-        config.headers = {
-            ...config.headers,
-            Authorization: `Bearer ${token}`,
-        };
+        const config: RequestInit = { method };
+
+        if (token) {
+            config.headers = {
+                ...config.headers,
+                Authorization: `Bearer ${token}`,
+            };
+        }
+
+        if (body) {
+            config.headers = {
+                ...config.headers,
+                "Content-Type": "application/json",
+            };
+            config.body = JSON.stringify(body);
+        }
+
+        if (params) {
+            const urlParams = new URLSearchParams(params);
+            endpoint += `?${urlParams.toString()}`;
+        }
+
+        const response = await fetch(`${BASE_URL}/${endpoint}`, config);
+        const responseData = await response.json();
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                console.log('Received a 401 error. Attempting to refresh the token and retry the request...');
+                await performRefresh()
+                return await sendRequest(endpoint, method, await getAccessToken(), params, body, retryAttempts - 1);
+            } else {
+                throw new Error(responseData.error || responseData.message);
+            }
+        }
+
+        return { data: responseData, status: response.status };
+    } catch (error) {
+        console.error('Request failed:', error);
+        throw error;
     }
-
-    if (body) {
-        config.headers = {
-            ...config.headers,
-            "Content-Type": "application/json",
-        };
-        config.body = JSON.stringify(body);
-    }
-
-    if (params) {
-        const urlParams = new URLSearchParams(params);
-        endpoint += `?${urlParams.toString()}`;
-    }
-
-    const response = await fetch(`${BASE_URL}/${endpoint}`, config);
-    const responseData = await response.json();
-
-    if (!response.ok) {
-        throw new Error(responseData.error || responseData.message);
-    }
-
-    return { data: responseData, status: response.status };
 };
+
 
 export const login = async (
     message: string,
