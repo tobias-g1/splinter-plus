@@ -13,9 +13,11 @@ const battleHistoryUrl = 'https://splinterlands.com/?p=battle_history';
 let panelDiv: HTMLDivElement | null = null;
 let format: string = '';
 let league: string = '';
+let intervalId: NodeJS.Timeout | null = null;
 
 // Declare a flag to indicate if the button has been added
 let buttonAdded = false;
+
 
 function checkBattleHistoryUrl() {
     if (window.location.href === battleHistoryUrl) {
@@ -25,9 +27,12 @@ function checkBattleHistoryUrl() {
     }
 }
 
-if (checkBattleHistoryUrl()) {
 
-    const checkPanelExists = async () => {
+
+async function checkPanelExists() {
+
+    if (checkBattleHistoryUrl()) {
+
         const historyHeaderDiv = document.querySelector('.history-header');
         const customPanelDiv = document.querySelector('.custom-panel');
 
@@ -46,26 +51,19 @@ if (checkBattleHistoryUrl()) {
             // Set the buttonAdded flag to true
             buttonAdded = true;
         }
-    };
+    }
+};
 
-    const observer = new MutationObserver(() => {
-        checkPanelExists();
-    });
-
+const observer = new MutationObserver(() => {
     checkPanelExists();
+});
 
-    // Check if the button hasn't been added after a certain interval
-    const interval = setInterval(() => {
-        if (!buttonAdded) {
-            checkPanelExists();
-        }
-    }, 500);
+checkPanelExists();
 
-    observer.observe(document.body, {
-        childList: true,
-        subtree: true
-    });
-}
+observer.observe(document.body, {
+    childList: true,
+    subtree: true
+});
 
 async function createCardList(details: CardDetailOwnership[], format: string): Promise<HTMLDivElement> {
     const cardList = document.createElement('div');
@@ -81,7 +79,7 @@ async function createCardList(details: CardDetailOwnership[], format: string): P
 
 async function buildRecommendedCards(): Promise<HTMLDivElement> {
     try {
-        document.addEventListener('purchaseCompleted', refreshCardsPanel);
+        document.addEventListener('refreshCards', refreshCardsPanel);
 
         const format = extractElementText('.bh-selectable-obj a.selected');
         setValueInLocalStorage('format', format);
@@ -174,7 +172,7 @@ export async function buildAndInsertPanel() {
     contentDiv.appendChild(recommendedCards);
 }
 
-async function refreshCardsPanel() {
+export async function refreshCardsPanel() {
 
     if (panelDiv) {
         const cardDiv = panelDiv.querySelector('.recommended-cards');
@@ -190,3 +188,16 @@ async function refreshCardsPanel() {
         }
     }
 }
+
+
+function startPanelCheckInterval() {
+    intervalId = setInterval(() => {
+        if (!buttonAdded) {
+            checkPanelExists();
+        }
+    }, 500);
+}
+
+startPanelCheckInterval();
+
+console.log("Recommended Cards Loaded");

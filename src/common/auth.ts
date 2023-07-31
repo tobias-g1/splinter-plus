@@ -76,14 +76,13 @@ export const login = async () => {
 
 export const refreshToken = async (): Promise<void> => {
     try {
-        const access_token = await getAccessToken();
-        const refresh_token = await getRefreshToken();
-        if (access_token && refresh_token) {
-            const { access_token: new_access_token, refresh_token: new_refresh_token } = await sendRequest('refresh', 'GET', refresh_token);
-            await setAccessToken(new_access_token);
-            await setRefreshToken(new_refresh_token);
-            console.log('Refreshed access token:', new_access_token);
-            console.log('Refreshed refresh token:', new_refresh_token);
+        const accessToken = await getAccessToken();
+        const refreshToken = await getRefreshToken();
+        if (accessToken && refreshToken) {
+            const response = await sendRequest('refresh', 'GET', refreshToken);
+            const { access_token } = response.data;
+            await setAccessToken(access_token);
+            console.log('Refreshed access token:', access_token);
         } else {
             await login();
         }
