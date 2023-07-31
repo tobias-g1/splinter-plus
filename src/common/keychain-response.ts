@@ -12,13 +12,17 @@ import { KeyChainResponse } from "src/interfaces/keychain-response.interface";
 export const handleKeyChainResponse = async (message: any) => {
     const { response } = message;
     const { data, result } = response;
-    const { id, type, username } = data;
+    const { id, type, username, json } = data;
     const { tx_id } = result;
+    const parsedJson = JSON.parse(json);
 
     const handleCustomRequest = (id: string) => {
         switch (id) {
             case "sm_stake_tokens":
-                return attemptAutoStake(username, tx_id);
+                if (json.qty === 0) {
+                    return attemptAutoStake(username, tx_id, data);
+                }
+                break;
             case "sm_market_purchase":
                 return sendMessageToContentScript({ command: "purchase", data: { tx_id } });
             case "sm_combine_cards":
@@ -39,6 +43,7 @@ export const handleKeyChainResponse = async (message: any) => {
             const { access_token, refresh_token } = token;
             setAccessToken(access_token);
             setRefreshToken(refresh_token);
+            return sendMessageToContentScript({ command: "refresh-cards", data: null });
         }
     };
 
