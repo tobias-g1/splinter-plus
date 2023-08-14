@@ -18,7 +18,6 @@ let intervalId: NodeJS.Timeout | null = null;
 // Declare a flag to indicate if the button has been added
 let buttonAdded = false;
 
-
 function checkBattleHistoryUrl() {
     if (window.location.href === battleHistoryUrl) {
         return true;

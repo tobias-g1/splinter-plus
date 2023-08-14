@@ -7,12 +7,14 @@ import { getCardDetails, getCollection } from 'src/common/splinterlands';
 import { getUsernameFromLocalStorage } from 'src/common/user';
 import { DeckResponse } from 'src/interfaces/spinter-plus.interface';
 import { Card, CardDetail, CardDetailOwnership, Collection } from 'src/interfaces/splinterlands.interface';
+import { getFormatFromLocalStorage } from '../../../.history/src/content-scripts/common/common_20230714123547';
 import { createCardItem, createContentHeader, createHeader, createLoadingIndicator, createResultContent, extractElementText, getValueFromLocalStorage } from '../common/common';
 
 const selectTeamUrl = 'https://splinterlands.com/?p=create_team2';
 let panelAdded = false;
 let observer: MutationObserver | null = null;
 let panel: HTMLDivElement | null = null;
+let format: string = '';
 
 // Function to check for the existence of the panel and add it if it doesn't already exist
 const checkPanelExists = async () => {
@@ -63,8 +65,11 @@ const checkPanelExists = async () => {
 
 // Function to observe changes in the DOM and trigger the logic when required elements are added
 const observeDOMChanges = () => {
-  observer = new MutationObserver(() => {
-    checkPanelExists();
+  observer = new MutationObserver(async () => {
+    format = await getFormatFromLocalStorage()
+    if (process.env.GAME_MODES && process.env.format && process.env.GAME_MODES.includes(process.env.format.toLowerCase())) {
+      checkPanelExists();
+    }
   });
 
   observer.observe(document.body, {
@@ -93,7 +98,6 @@ async function buildRecommendedCards(): Promise<HTMLDivElement> {
   recommendedCards.classList.add('recommended-cards');
 
   let league: string = await getValueFromLocalStorage('league');
-  const format: string = await getValueFromLocalStorage('format');
   const mana: string = extractElementText('.mana-cap');
 
   // Extract Ruleset
@@ -209,7 +213,11 @@ async function requestRefresh() {
     location.reload();
   }
 }
-
-checkPanelExists();
+(async () => {
+  if (process.env.GAME_MODES && process.env.format && process.env.GAME_MODES.includes(process.env.format.toLowerCase())) {
+    format = await getFormatFromLocalStorage()
+    checkPanelExists();
+  }
+})
 
 console.log('Recommneded Deck Loaded.')
