@@ -1,5 +1,5 @@
 import { fetchSettingsAndUpdateStorage } from 'src/common/settings';
-import { checkAutoClaimSetting } from '../common/claim';
+import { checkAutoClaimAllSetting, checkAutoClaimSetting } from '../common/claim';
 
 // The interval (in minutes) for refreshing settings
 const SETTINGS_REFRESH_INTERVAL_MINUTES = Number(process.env.SETTINGS_REFRESH_INTERVAL_MINUTES) || 240;
@@ -38,5 +38,7 @@ export const handleAlarm = async (alarm: chrome.alarms.Alarm) => {
     await fetchSettingsAndUpdateStorage();
   } else if (alarm.name === CHECK_AUTO_CLAIM_SETTING_ALARM) {
     await checkAutoClaimSetting();
+  } else if (alarm.name === CHECK_AUTO_CLAIM_ALL_SETTING_ALARM) {
+    await checkAutoClaimAllSetting();
   }
 };

@@ -14,21 +14,28 @@ let panelAdded = false;
 let observer: MutationObserver | null = null;
 let panel: HTMLDivElement | null = null;
 
-// Function to check for the existence of the panel and add it if it doesn't already exist
 const checkPanelExists = async () => {
   const battleContainer = document.querySelector('.deck-builder-page2__conflict');
+  const format: string = await getValueFromLocalStorage('format');
+  const allowedFormats = ['wild']
 
-  // Check if the battleContainer exists and the panel has not been added
-  if (battleContainer && !panelAdded) {
+  if (battleContainer && !panelAdded && allowedFormats.includes(format.toLowerCase())) {
+
+    console.log(1)
+
     panelAdded = true;
 
     // Check if the panel already exists
     const existingPanel = battleContainer.querySelector('.deck-panel');
     if (!existingPanel) {
 
-      document.addEventListener('purchaseCompleted', requestRefresh);
+      const cardContainer = document.querySelector('.deck-builder-page2__cards');
+      const filtersContainer = document.querySelector('.deck-builder-page2__filters');
 
-      const format: string = await getValueFromLocalStorage('format');
+      cardContainer?.classList.add('sp-deck');
+      filtersContainer?.classList.add('sp-deck');
+
+      document.addEventListener('purchaseCompleted', requestRefresh);
 
       panel = document.createElement('div');
       panel.classList.add('deck-panel');
@@ -49,19 +56,32 @@ const checkPanelExists = async () => {
       battleContainer.appendChild(panel);
 
       const recommendedCards = await buildRecommendedCards();
-
       panelContent.appendChild(recommendedCards);
 
       if (observer) {
         observer.disconnect();
       }
     }
+  } else if (panelAdded) {
+    removePanel();
+    panelAdded = false;
   } else {
     setTimeout(checkPanelExists, 1000);
   }
 };
 
-// Function to observe changes in the DOM and trigger the logic when required elements are added
+const removePanel = () => {
+  if (panel) {
+    panel.remove();
+    panelAdded = false;
+    const cardContainer = document.querySelector('.deck-builder-page2__cards');
+    const filtersContainer = document.querySelector('.deck-builder-page2__filters');
+
+    cardContainer?.classList.remove('sp-deck');
+    filtersContainer?.classList.remove('sp-deck');
+  }
+};
+
 const observeDOMChanges = () => {
   observer = new MutationObserver(() => {
     checkPanelExists();
@@ -73,15 +93,16 @@ const observeDOMChanges = () => {
   });
 };
 
-// Check if the current page is the battle history page
 if (window.location.href === selectTeamUrl) {
-  // Call the checkPanelExists function on initial load
-  window.onload = () => {
-    checkPanelExists();
-  };
-
-  // Start observing changes in the DOM
-  observeDOMChanges();
+  getValueFromLocalStorage('format').then(format => {
+    const allowedFormats = process.env.FORMATS ? process.env.FORMATS.split(',') : [];
+    if (allowedFormats.includes(format as string)) {
+      window.onload = () => {
+        checkPanelExists();
+      };
+      observeDOMChanges();
+    }
+  });
 }
 
 console.log('Script loaded');

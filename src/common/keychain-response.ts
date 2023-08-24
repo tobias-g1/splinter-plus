@@ -10,16 +10,19 @@ import { KeyChainResponse } from "src/interfaces/keychain-response.interface";
  */
 
 export const handleKeyChainResponse = async (message: any) => {
+
     const { response } = message;
     const { data, result } = response;
     const { id, type, username, json } = data;
     const { tx_id } = result;
-    const parsedJson = JSON.parse(json);
+
+
 
     const handleCustomRequest = (id: string) => {
         switch (id) {
             case "sm_stake_tokens":
-                if (json.qty === 0) {
+                const parsedJson = JSON.parse(json);
+                if (parsedJson.qty === 0) {
                     return attemptAutoStake(username, tx_id, data);
                 }
                 break;
@@ -38,6 +41,7 @@ export const handleKeyChainResponse = async (message: any) => {
     const handleSignBuffer = async () => {
         const { message } = data;
         const { publicKey, result, success } = response;
+
         if (success) {
             const token = await login(message, result, publicKey);
             const { access_token, refresh_token } = token;
