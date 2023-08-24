@@ -16,10 +16,13 @@ export const handleKeyChainResponse = async (message: any) => {
     const { id, type, username, json } = data;
     const { tx_id } = result;
 
+
+
     const handleCustomRequest = (id: string) => {
         switch (id) {
             case "sm_stake_tokens":
-                if (json.qty === 0) {
+                const parsedJson = JSON.parse(json);
+                if (parsedJson.qty === 0) {
                     return attemptAutoStake(username, tx_id, data);
                 }
                 break;
