@@ -41,31 +41,34 @@ export const checkAutoClaimAllSetting = async () => {
   try {
     const data = await getUserSettings();
 
-    for (const user in data) {
+    // Filter out only the users which have the autoClaimAllSetting enabled and no existing lock
+    const eligibleUsers = Object.keys(data).filter(user =>
+      data.hasOwnProperty(user) && data[user].autoClaimAllSetting && !autoClaimAllLocks[user]
+    );
 
-      if (autoClaimAllLocks[user]) {
-        console.log(`Skipping ${user} because they are currently being processed.`);
-        continue;
-      }
-      const autoClaimAllSettingEnabled = data[user].autoClaimAllSetting;
+    // Create a promise for each eligible user and execute them concurrently
+    await Promise.all(
+      eligibleUsers.map(async user => {
+        autoClaimAllLocks[user] = true;
 
-      if (autoClaimAllSettingEnabled) {
-        console.log(`Auto claim all setting is enabled for ${user}`);
-        autoClaimAllLocks[user] = true;  // Set lock before the asynchronous call
         try {
-          claimAll(user);
+          console.log(`Auto claim all setting is enabled for ${user}`);
+          await claimAll(user);
         } catch (error) {
-          console.error(`Error while staking tokens for ${user}: `, error);
+          console.error(`Error while claiming all for ${user}: `, error);
         } finally {
-          autoClaimAllLocks[user] = false;  // Release lock after the asynchronous call completes
+          autoClaimAllLocks[user] = false;
         }
-      }
-    }
+      })
+    );
+
     return;
   } catch (error) {
-    console.error('Error while retrieving plugin data from local storage: ', error);
+    console.error('Error while retrieving user settings: ', error);
+    return [];
   }
 };
+
 
 export const attemptAutoStake = async (user: string, trxId: string, data: any): Promise<void> => {
   try {
