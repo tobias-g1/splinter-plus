@@ -25,7 +25,7 @@ export const checkAutoClaimSetting = async () => {
         } catch (error) {
           console.error(`Error while staking tokens for ${user}: `, error);
         } finally {
-          autoClaimLocks[user] = false;
+          delete autoClaimLocks[user];
         }
       })
     );
@@ -40,6 +40,7 @@ export const checkAutoClaimSetting = async () => {
 export const checkAutoClaimAllSetting = async () => {
   try {
     const data = await getUserSettings();
+
 
     // Filter out only the users which have the autoClaimAllSetting enabled and no existing lock
     const eligibleUsers = Object.keys(data).filter(user =>
@@ -57,7 +58,7 @@ export const checkAutoClaimAllSetting = async () => {
         } catch (error) {
           console.error(`Error while claiming all for ${user}: `, error);
         } finally {
-          autoClaimAllLocks[user] = false;
+          delete autoClaimAllLocks[user]
         }
       })
     );
@@ -74,7 +75,7 @@ export const attemptAutoStake = async (user: string, trxId: string, data: any): 
   try {
     const userSettings = await getUserSettings();
     if (userSettings[user]?.autoStakeSetting) {
-      const maxRetries = 5;
+      const maxRetries = 10;
       const maxBackoffTime = 5000; // Maximum backoff time in milliseconds
       let retryCount = 0;
 
@@ -88,19 +89,29 @@ export const attemptAutoStake = async (user: string, trxId: string, data: any): 
             const quantity = parseFloat(foundTransaction.amount);
 
             if (quantity > 0) {
+              console.log(`Greater than 0 claim - Found transaction for stake ${user} - ${trxId} (Attempt ${retryCount})`)
               await stakeTokens(user, quantity, 'SPS');
+            } else {
+              console.log(`0 claim - Found transaction for stake ${user} - ${trxId} (Attempt ${retryCount})`)
             }
+
           } else if (retryCount < maxRetries) {
 
             retryCount++;
+
+            console.log(`Attempting to find transaction for stake ${user} - ${trxId} (Attempt ${retryCount})`)
             const backoffTime = Math.min(Math.pow(2, retryCount) * 1000, maxBackoffTime);
             await new Promise((resolve) => setTimeout(resolve, backoffTime));
             await checkBalanceHistory();
           } else {
-            console.log('transaction not found')
+            console.log('Reached max retries (10)');
           }
         } catch (error) {
-          throw new Error(`Error during balance history check: ${error}`);
+          console.error(`Error during balance history check: ${error}`);
+          retryCount++;
+          const backoffTime = Math.min(Math.pow(2, retryCount) * 1000, maxBackoffTime);
+          await new Promise((resolve) => setTimeout(resolve, backoffTime));
+          await checkBalanceHistory();
         }
       };
 
@@ -139,9 +150,10 @@ export const claimAll = async (username: string): Promise<any> => {
       app: process.env.APP,
       n: generateSafeRandomNumber()
     });
-    const claim = await sendCustomJSONRequest('sm_claim_rewards', json, username, KeychainKeyTypes.posting);
-    console.log('Claim All Created');
-    return claim;
+    sendCustomJSONRequest('sm_claim_rewards', json, username, KeychainKeyTypes.posting).then(res => {
+      console.log('Claim All Created');
+      return res;
+    })
   } catch (error) {
     console.error('Error while sending custom JSON request: ', error);
     throw error;

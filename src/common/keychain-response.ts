@@ -32,6 +32,8 @@ export const handleKeyChainResponse = async (message: any) => {
                 return sendMessageToContentScript({ command: "combine", data: { tx_id } });
             case "sm_market_rent":
                 return sendMessageToContentScript({ command: "rent", data: { tx_id } });
+            case "sm_claim_rewards":
+                console.log('sm_claim_rewards - No action required.')
             default:
                 console.log("unhandled response", response);
                 break;
