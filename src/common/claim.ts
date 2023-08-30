@@ -40,8 +40,7 @@ export const checkAutoClaimSetting = async () => {
 export const checkAutoClaimAllSetting = async () => {
   try {
     const data = await getUserSettings();
-
-
+    
     // Filter out only the users which have the autoClaimAllSetting enabled and no existing lock
     const eligibleUsers = Object.keys(data).filter(user =>
       data.hasOwnProperty(user) && data[user].autoClaimAllSetting && !autoClaimAllLocks[user]
