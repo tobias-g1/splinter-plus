@@ -42,7 +42,7 @@ export const getUserSettings = async (): Promise<any> => {
     return new Promise<any>((resolve, reject) => {
       chrome.storage.local.get('plugindata', (result) => {
         if (chrome.runtime.lastError) {
-          reject(new Error(chrome.runtime.lastError.message));
+          reject(chrome.runtime.lastError.message);
         } else {
           resolve(result?.plugindata?.userSettings || {});
         }
