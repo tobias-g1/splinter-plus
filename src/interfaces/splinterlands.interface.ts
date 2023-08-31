@@ -1028,3 +1028,16 @@ export interface Distribution {
     total_burned_xp: string
 }
 
+export interface UnclaimedBalances {
+    unclaimed_balances: UnclaimedBalance[]
+    last_claim_date: string
+}
+
+export interface UnclaimedBalance {
+    player: string
+    token: string
+    type: string
+    balance: string
+    last_updated_date: string
+}
+
