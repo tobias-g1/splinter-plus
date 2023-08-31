@@ -1,6 +1,8 @@
 import { getUserSettings } from "@background/plugin";
 import { generateSafeRandomNumber, sendCustomJSONRequest } from "src/common/keychain";
 import { KeychainKeyTypes } from "src/interfaces/keychain.interface";
+import { UnclaimedBalances } from "src/interfaces/splinterlands.interface";
+import { getUnclaimedBalances } from '../../.history/src/common/splinterlands_20230831093104';
 import { lookupBalanceHistory } from './splinterlands';
 const autoClaimLocks: Record<string, boolean> = {};
 const autoClaimAllLocks: Record<string, boolean> = {};
@@ -40,7 +42,7 @@ export const checkAutoClaimSetting = async () => {
 export const checkAutoClaimAllSetting = async () => {
   try {
     const data = await getUserSettings();
-    
+
     // Filter out only the users which have the autoClaimAllSetting enabled and no existing lock
     const eligibleUsers = Object.keys(data).filter(user =>
       data.hasOwnProperty(user) && data[user].autoClaimAllSetting && !autoClaimAllLocks[user]
@@ -49,11 +51,26 @@ export const checkAutoClaimAllSetting = async () => {
     // Create a promise for each eligible user and execute them concurrently
     await Promise.all(
       eligibleUsers.map(async user => {
+
         autoClaimAllLocks[user] = true;
 
         try {
+
           console.log(`Auto claim all setting is enabled for ${user}`);
-          await claimAll(user);
+          const unclaimed: UnclaimedBalances = await getUnclaimedBalances(user, 'SPS');
+
+          const lastClaimDate = new Date(unclaimed.last_claim_date);
+          const currentTime = new Date();
+
+          const timeDifference = currentTime.getTime() - lastClaimDate.getTime();
+          const hoursDifference = timeDifference / (1000 * 60 * 60);
+
+          if (hoursDifference > 24 && unclaimed.unclaimed_balances.length !== 0) {
+            await claimAll(user);
+          } else {
+            console.log(`Less than 24 hours since last claim all for ${user} or user has no balances`);
+          }
+
         } catch (error) {
           console.error(`Error while claiming all for ${user}: `, error);
         } finally {
@@ -122,8 +139,6 @@ export const attemptAutoStake = async (user: string, trxId: string, data: any): 
     console.error(`Error while attempting auto-stake for ${user}: `, error);
   }
 };
-
-
 
 export const stakeTokens = async (username: string, quantity: number, symbol: string): Promise<any> => {
   try {
