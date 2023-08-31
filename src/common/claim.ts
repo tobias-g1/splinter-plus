@@ -65,7 +65,7 @@ export const checkAutoClaimAllSetting = async () => {
           const timeDifference = currentTime.getTime() - lastClaimDate.getTime();
           const hoursDifference = timeDifference / (1000 * 60 * 60);
 
-          if (hoursDifference > 24 && unclaimed.unclaimed_balances.length !== 0) {
+          if (hoursDifference > 23 && unclaimed.unclaimed_balances.length !== 0) {
             await claimAll(user);
           } else {
             console.log(`Less than 24 hours since last claim all for ${user} or user has no balances`);
